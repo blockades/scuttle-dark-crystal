@@ -1,0 +1,37 @@
+{
+  "name": "dark-crystal",
+  "version": "0.0.1",
+  "description": "socially sharing secrets / backups on secure scuttlebutt",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/**/*.test.js | tap-diff"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blockades/dark-crystal.git"
+  },
+  "keywords": [
+    "shamir",
+    "secrets",
+    "dark",
+    "crystal",
+    "blockades",
+    "ssb",
+    "scuttlebutt"
+  ],
+  "author": "MMT",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blockades/dark-crystal/issues"
+  },
+  "homepage": "https://github.com/blockades/dark-crystal#readme",
+  "dependencies": {
+    "ssb-private": "^0.2.1"
+  },
+  "devDependencies": {
+    "scuttle-testbot": "^1.1.6",
+    "tap-diff": "^0.1.1",
+    "tape": "^4.9.1",
+    "tape-plus": "^1.0.0"
+  }
+}
