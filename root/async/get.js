@@ -1,4 +1,4 @@
-const { isRoot } = require('ssb-schema-definitions')
+const { isRoot } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
   return function get (key, callback) {

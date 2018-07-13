@@ -1,21 +1,28 @@
-const { isRitual, isRoot } = require('ssb-schema-definitions')
+const { isRitual, isRoot, isShard } = require('ssb-dark-crystal-schemas')
 
 module.exports = {
-  async: {
-    get: {
-      root: require('./darkcrystal/async/get/root'),
-      ritual: require('./darkcrystal/async/get/ritual'),
-      shard: require('./darkcrystal/async/get/shard')
-    },
-    publish: {
-      root: require('./darkcrystal/async/publish/root'),
-      ritual: require('./darkcrystal/async/publish/ritual'),
-      shard: require('./darkcrystal/async/publish/shard')
+  root: {
+    async: {
+      get: require('./root/async/get'),
+      publish: require('./root/async/publish'),
     }
-    share: require('./darkcrystal/async/share')
   },
-  pull: {
-    shards: require('./darkcrystal/pull/shards')
+  ritual: {
+    async: {
+      get: require('./ritual/async/get'),
+      publish: require('./ritual/async/publish'),
+    }
+  },
+  shard: {
+    async: {
+      get: require('./shard/async/get'),
+      publish: require('./shard/async/publish'),
+    }
+  },
+  share: {
+    async: {
+      share: require('./darkcrystal/async/share')
+    }
   },
   sync: {
     isRitual: () => isRitual,
