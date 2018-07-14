@@ -1,0 +1,9 @@
+{
+  "type": "dark-crystal/ritual",
+  "version": "1",
+  "root": "%viiJnnnXjNkfCALivEZbrDe8UndkCCCNQ/CgBOWgJLw=.sha256",
+  "quorum":2,
+  "shards":5,
+  "tool": "secrets.js@1.4.5",
+  "recps": ["@95WQAJ1XZju4YFpLib3JYdbx//BCtr5dq3bR9jPxYWs=.ed25519"]
+}
