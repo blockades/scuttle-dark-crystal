@@ -9,11 +9,11 @@ module.exports = function (server) {
   const getRoot = GetRoot(server)
   const publishRitual = PublishRitual(server)
 
-  return function ({ name, rootID, secret, quorum, recps }, callback) {
+  return function ({ name, rootId, secret, quorum, recps }, callback) {
     const numOfShards = recps.length
     const shards = secrets.share(secret, numOfShards, quorum)
 
-    getRoot(rootID, (err, root) => {
+    getRoot(rootId, (err, root) => {
       if (!root) return publishRoot({ name }, performSecretRitual)
       else return performSecretRitual(err, root)
     })
@@ -22,6 +22,8 @@ module.exports = function (server) {
       if (err) return callback(err)
 
       publishRitual({ root, shards: numOfShards, quorum }, (err, ritual) => {
+        if (err) return callback(err)
+
         var params = Array.from(Array(numOfShards).keys()).reduce((acc, index) => {
           acc.push({
             root: root.key,
