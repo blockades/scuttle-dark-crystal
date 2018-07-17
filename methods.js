@@ -1,4 +1,4 @@
-const { isRitual, isRoot, isShard } = require('ssb-dark-crystal-schemas')
+const { isRitual, isRoot, isShard } = require('ssb-dark-crystal-schema')
 
 module.exports = {
   root: {

@@ -26,6 +26,8 @@
   },
   "homepage": "https://github.com/blockades/dark-crystal#readme",
   "dependencies": {
+    "secrets.js-grempe": "^1.1.0",
+    "ssb-dark-crystal-schema": "^1.0.0",
     "ssb-private": "^0.2.1"
   },
   "devDependencies": {

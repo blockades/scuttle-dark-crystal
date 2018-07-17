@@ -1,4 +1,4 @@
-const { isRoot, SCHEMA_VERSION } = require('dark-crystal-schemas')
+const { isRoot, SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
   return function publish (params, callback) {
