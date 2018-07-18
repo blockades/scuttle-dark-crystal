@@ -1,5 +1,6 @@
-const { isShard, SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
 const pull = require('pull-stream')
+
+const { isShard, SCHEMA_VERSION, errorParser } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
   return function publishAll ({ shards, recps, rootId }, callback) {
@@ -20,9 +21,11 @@ module.exports = function (server) {
       pull.filter(isShard),
       pull.collect((err, params) => {
         if (params.length !== shards.length) {
-          let errors = msgs.filter(msg => msg.errors)
-          let error = new Error(`${errors}`)
-          return callback(error)
+          let errors = msgs
+            .map(msg => msg.errors)
+            .filter(errorParser)
+
+          return callback(new Error(`${errors}`))
         }
         pull(
           pull.values(params),
