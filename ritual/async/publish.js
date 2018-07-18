@@ -1,4 +1,3 @@
-
 const { isRitual, SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
