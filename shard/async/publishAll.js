@@ -26,7 +26,7 @@ module.exports = function (server) {
         }
         pull(
           pull.values(params),
-          pull.asyncMap(server.publish(params)),
+          pull.asyncMap(server.publish),
           pull.collect((err, msgs) => {
             if (err) callback(err)
             else callback(null, msgs)
