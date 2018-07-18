@@ -55,7 +55,11 @@ module.exports = function (server) {
         // RESOLUTION: Extracted reducer into a publishAll function
         publishAllShards({ shards, recps, rootId }, (err, shards) => {
           if (err) callback(err)
-          else callback(null, shards)
+          else callback(null, {
+            root: root,
+            ritual: ritual,
+            shards: shards
+          })
         })
       })
     })
