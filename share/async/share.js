@@ -16,9 +16,7 @@ module.exports = function (server) {
       throw new Error('provide a callback')
     }
 
-    recps = sanitize(recps)
-
-    var validator = prePublishValidation({ name, quorum, recps })
+    var validator = prePublishValidation()
     if (!validator.valid) return callback(valid.errors.join(', '))
 
     const numOfShards = recps.length
@@ -45,12 +43,14 @@ module.exports = function (server) {
       })
     })
 
-    function prePublishValidation ({ recps,  }) {
+    function prePublishValidation () {
+      let recipients = sanitize(recps)
+
       var errors = []
-      if (recps.length < 1)
+      if (recipients.length < 1)
         errors.push(new Error(`data.recps: must be a feedId`))
 
-      if (recps.includes(servereid))
+      if (recipients.includes(server.id))
         errors.push(new Error(`data.recps: doesn't need to include self`))
 
       if (!isNumber(quorum))
@@ -59,7 +59,7 @@ module.exports = function (server) {
       if (quorum === 0)
         errors.push(new Error(`data.quorum: must be greater than 0`))
 
-      if (recps.length < quorum)
+      if (recipients.length < quorum)
         errors.push(new Error(`data.quorum: greater than number of recps`))
 
       return {
