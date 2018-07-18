@@ -36,7 +36,7 @@ module.exports = function (server) {
         // QUESTION: Can we somehow wrap the shard publication in a single database 'transaction'?
         // SOLUTION: Have a publishShards (plural) function which validates each with isShard before publishing all
         // RESOLUTION: Extracted reducer into a publishAll function
-        publishShards({ shards, recps, rootId }, (err, shards) => {
+        publishAllShards({ shards, recps, rootId }, (err, shards) => {
           if (err) callback(err)
           else callback(null, shards)
         })
