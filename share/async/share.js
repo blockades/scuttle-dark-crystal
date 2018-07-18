@@ -26,9 +26,12 @@ module.exports = function (server) {
       .map(recp => typeof recp === 'string' ? recp : recp.link)
       .filter(Boolean)
       .filter(isFeed)
+
+    if (feedIds.length < recps.length) return callback(new Error(`data.recps: must be a feedId`))
+
     let recipients = [...new Set(feedIds)]
 
-    if (recipients.length < 1) return callback(new Error(`data.recps: must be a feedId`))
+    if (recipients.length < feedIds.length) return callback(new Error(`data.recps: please provide unique feedIds`))
     if (recipients.includes(server.id)) return callback(new Error(`data.recps: can't include ${server.id}`))
     if (quorum === 0) return callback(new Error(`data.quorum: must be greater than 0`))
     if (recipients.length < quorum) return callback(new Error(`data.quorum: greater than number of recps`))

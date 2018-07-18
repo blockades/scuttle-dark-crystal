@@ -29,7 +29,7 @@ describe('share.async.share', context => {
     assert.equal(2, share.length, 'takes two arguments')
   })
 
-  context('validates the params', assert => {
+  context('validates params', assert => {
     assert.throws(() => share({ secret, quorum, recps }, () => {}), 'throws an error when name is missing')
     assert.throws(() => share({ name, quorum, recps }, () => {}), 'throws an error when secret is missing')
     assert.throws(() => share({ name, secret, recps }, () => {}), 'throws an error when quorum is missing')
@@ -45,12 +45,21 @@ describe('share.async.share', context => {
       assert.notOk(data, 'data is undefined')
       assert.equal(err.message, 'data.recps: must be a feedId', 'invalid feedId')
 
-      recps = [server.id]
+      repeatFeed = server.createFeed().id
+      recps = [repeatFeed, repeatFeed]
       share({ name, secret, quorum, recps }, (err, data) => {
         assert.ok(err, 'raises error')
         assert.notOk(data, 'data is undefined')
-        assert.equal(err.message, `data.recps: can't include ${server.id}`, 'raises error when includes self')
-        next()
+        assert.equal(err.message, 'data.recps: please provide unique feedIds', 'invalid feedId')
+
+        recps = [server.id]
+        share({ name, secret, quorum, recps }, (err, data) => {
+          assert.ok(err, 'raises error')
+          assert.notOk(data, 'data is undefined')
+          assert.equal(err.message, `data.recps: can't include ${server.id}`, 'raises error when includes self')
+
+          next()
+        })
       })
     })
   })
