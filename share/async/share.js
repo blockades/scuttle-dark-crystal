@@ -20,7 +20,8 @@ module.exports = function (server) {
     if (!secret && !isString(secret)) throw new Error('secret must be a string')
     if (!quorum && !isNumber(quorum)) throw new Error('quorum must be a number')
     if (!recps && !Array.isArray(recps)) throw new Error('recps must be an array')
-    if (!callback && !isFunction(callback)) throw new Error('callback is not a function')
+    if (!callback) throw new Error('a callback must be given')
+    if (!isFunction(callback)) throw new Error('callback is not a function')
 
     let feedIds = recps
       .map(recp => typeof recp === 'string' ? recp : recp.link)
