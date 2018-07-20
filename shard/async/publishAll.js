@@ -14,6 +14,7 @@ module.exports = function (server) {
           type: 'dark-crystal/shard',
           version: SCHEMA_VERSION,
           root: rootId,
+          shard: shard,
           shard: server.private.box(shard, [recp]),
           recps: [recp, server.id]
         }
@@ -21,11 +22,10 @@ module.exports = function (server) {
       pull.filter(isShard),
       pull.collect((err, params) => {
         if (params.length !== shards.length) {
-          let errors = msgs
+          let errors = params
             .map(msg => msg.errors)
             .filter(errorParser)
-
-          return callback(new Error(`${errors}`))
+          if (errors.length) return callback(new Error(`${errors}`))
         }
         pull(
           pull.values(params),
