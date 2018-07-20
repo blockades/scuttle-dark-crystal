@@ -1,6 +1,6 @@
 {
   "type": "dark-crystal/ritual",
-  "version": "1",
+  "version": "1.0.0",
   "root": "%viiJnnnXjNkfCALivEZbrDe8UndkCCCNQ/CgBOWgJLw=.sha256",
   "quorum":2,
   "shards":5,
