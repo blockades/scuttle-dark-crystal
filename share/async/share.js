@@ -50,7 +50,7 @@ module.exports = function (server) {
       // Should specify this shards field ACTUALLY as a number - more descriptive
       publishRitual({ root: root.key, shards: numOfShards, quorum }, (err, ritual) => {
         if (err) return callback(err)
-
+        var rootId = root.key
         // QUESTION: Can we somehow wrap the shard publication in a single database 'transaction'?
         // TEMP SOLUTION: Have a publishAllShards (plural) function which validates each with isShard before publishing all
         // RESOLUTION: Extracted reducer into a publishAll function
