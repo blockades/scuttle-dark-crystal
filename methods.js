@@ -16,7 +16,7 @@ module.exports = {
   shard: {
     async: {
       get: require('./shard/async/get'),
-      publish: require('./shard/async/publish'),
+      publishAll: require('./shard/async/publishAll'),
     }
   },
   share: {
