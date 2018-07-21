@@ -126,11 +126,9 @@ describe('share.async.share', context => {
               assert.deepEqual(data.ritual, removeEncryptionData(rituals[0]), 'publishes a single ritual')
 
               pull(
-                server.query.read(optsForType('dark-crystal/shards')),
+                server.query.read(optsForType('dark-crystal/shard')),
                 pull.collect((err, shards) => {
-                  assert.deepEqual(data.shards, shards, 'publishes a set of shards')
-
-
+                  assert.deepEqual(data.shards, shards.map(removeEncryptionData), 'publishes a set of shards')
                   next()
                 })
               )
