@@ -1,111 +1,137 @@
-const { describe } = require('tape-plus')
+const { group } = require('tape-plus')
+const test = require('tape')
 const pull = require('pull-stream')
-const Server = require('scuttle-testbot')
 
 const Share = require('../../../share/async/share')
 
-describe('share.async.share', context => {
+group('share.async.share', test => {
   let server
   let share
   let recps, name, secret, quorum
 
-  context.beforeEach(c => {
-    server = Server()
+  test.beforeEach(c => {
+    server = require('scuttle-testbot')
+      .use(require('ssb-private'))
+      .use(require('ssb-query'))
+      .call()
     share = Share(server)
     recps = [
       server.createFeed().id,
       server.createFeed().id,
       server.createFeed().id
     ]
-    name = "Dark Crystal"
+    name = "My SBB Dark Crystal"
     secret = Math.random().toString(36)
     quorum = 3
   })
 
-  context.afterEach(c => {
+  test.afterEach(c => {
     server.close()
   })
 
-  context('takes a specific set of arguments', assert => {
-    assert.equal(2, share.length, 'takes two arguments')
+  test('takes a specific set of arguments', t => {
+    t.equal(2, share.length, 'takes two arguments')
   })
 
-  context('invalid params', assert => {
-    assert.throws(() => share({ secret, quorum, recps }, () => {}), 'throws an error when name is missing')
-    assert.throws(() => share({ name, quorum, recps }, () => {}), 'throws an error when secret is missing')
-    assert.throws(() => share({ name, secret, recps }, () => {}), 'throws an error when quorum is missing')
-    assert.throws(() => share({ name, secret, quorum }, () => {}), 'throws an error when recps is missing')
-    assert.throws(() => share({ name, secret, quorum, recps }), 'throws an error when callback is missing')
-    assert.throws(() => share({ name, secret, quorum, recps }, 'not a callback'), 'throws an error when callback is not a function')
+  test('invalid params', t => {
+    t.throws(() => share({ secret, quorum, recps }, () => {}), 'throws an error when name is missing')
+    t.throws(() => share({ name, quorum, recps }, () => {}), 'throws an error when secret is missing')
+    t.throws(() => share({ name, secret, recps }, () => {}), 'throws an error when quorum is missing')
+    t.throws(() => share({ name, secret, quorum }, () => {}), 'throws an error when recps is missing')
+    t.throws(() => share({ name, secret, quorum, recps }), 'throws an error when callback is missing')
+    t.throws(() => share({ name, secret, quorum, recps }, 'not a callback'), 'throws an error when callback is not a function')
   })
 
-  context('invalid recps', (assert, next) => {
+  test('invalid recps (non-feed recps)', (t, next) => {
     recps = ['thisisnotafeed']
+
     share({ name, secret, quorum, recps }, (err, data) => {
-      assert.ok(err, 'raises error')
-      assert.notOk(data, 'data is undefined')
-      assert.equal(err.message, 'data.recps: must be a feedId', 'invalid feedId')
+      t.ok(err, 'raises error')
+      t.notOk(data, 'data is undefined')
+      t.equal(err.message, 'data.recps: must be a feedId', 'invalid feedId')
 
-      repeatFeed = server.createFeed().id
-      recps = [repeatFeed, repeatFeed]
-      share({ name, secret, quorum, recps }, (err, data) => {
-        assert.ok(err, 'raises error')
-        assert.notOk(data, 'data is undefined')
-        assert.equal(err.message, 'data.recps: please provide unique feedIds', 'invalid feedId')
-
-        recps = [server.id]
-        share({ name, secret, quorum, recps }, (err, data) => {
-          assert.ok(err, 'raises error')
-          assert.notOk(data, 'data is undefined')
-          assert.equal(err.message, `data.recps: can't include ${server.id}`, 'raises error when includes self')
-
-          next()
-        })
-      })
+      server.close()
+      next()
     })
   })
 
-  context('invalid quorum', (assert, next) => {
-    quorum = 0
+  test('invalid recps (repeated feedIds)', (t, next) => {
+    repeatFeed = server.createFeed().id
+    recps = [repeatFeed, repeatFeed]
+
     share({ name, secret, quorum, recps }, (err, data) => {
-      assert.ok(err, 'raises error')
-      assert.notOk(data, 'data is undefined')
-      assert.equal(err.message, 'data.quorum: must be greater than 0', 'invalid quorum')
+      t.ok(err, 'raises error')
+      t.notOk(data, 'data is undefined')
+      t.equal(err.message, 'data.recps: please provide unique feedIds', 'invalid feedId')
+
+      server.close()
+      next()
+    })
+  })
+
+  test('invalid recps (self as recp)', (t, next) => {
+    recps = [server.id]
+
+    share({ name, secret, quorum, recps }, (err, data) => {
+      t.ok(err, 'raises error')
+      t.notOk(data, 'data is undefined')
+      t.equal(err.message, `data.recps: can't include ${server.id}`, 'raises error when includes self')
+
+      server.close()
+      next()
+    })
+  })
+
+  test('invalid quorum', (t, next) => {
+    quorum = 0
+
+    share({ name, secret, quorum, recps }, (err, data) => {
+      t.ok(err, 'raises error')
+      t.notOk(data, 'data is undefined')
+      t.equal(err.message, 'data.quorum: must be greater than 0', 'invalid quorum')
 
       quorum = recps.length + 1
 
       share({ name, secret, quorum, recps }, (err, data) => {
-        assert.ok(err, 'raises error')
-        assert.notOk(data, 'data is undefined')
-        assert.equal(err.message, 'data.quorum: greater than number of recps', 'invalid quorum')
+        t.ok(err, 'raises error')
+        t.notOk(data, 'data is undefined')
+        t.equal(err.message, 'data.quorum: greater than number of recps', 'invalid quorum')
 
+        server.close()
         next()
       })
     })
   })
 
-  context('publishes a root, a ritual and the shards', (assert, next) => {
+  test('publishes a root, a ritual and the shards', (t, next) => {
     share({ name, secret, quorum, recps }, (err, data) => {
-      assert.notOk(err, 'error is undefined')
-      assert.ok(data, 'returns the data')
+      t.notOk(err, 'error is null')
+      t.ok(data, 'returns the data')
 
-      let opts = [{ query: { $filter: { value: { content: { type: 'dark-crystal/root' } } } } }]
+      const optsForType = (type) => {
+        return { 
+          query: [{
+            $filter: { value: { content: { type } } }
+          }]
+        }
+      }
+
       pull(
-        server.query.read(opts),
+        server.query.read(optsForType('dark-crystal/root')),
         pull.collect((err, roots) => {
-          assert.deepEqual(data.root, roots[0], 'publishes a root')
+          t.deepEqual(data.root, roots[0], 'publishes a root')
 
-          let opts = [{ query: { $filter: { value: { content: { type: 'dark-crystal/ritual' } } } } }]
           pull(
-            server.query.read(opts),
+            server.query.read(optsForType('dark-crystal/ritual')),
             pull.collect((err, rituals) => {
-              assert.deepEqual(data.ritual, rituals[0], 'publishes a single ritual')
+              t.deepEqual(data.ritual, rituals[0], 'publishes a single ritual')
 
-              let opts = [{ query: { $filter: { value: { content: { type: 'dark-crystal/shards' } } } } }]
               pull(
-                server.query.read(opts),
+                server.query.read(optsForType('dark-crystal/shards')),
                 pull.collect((err, shards) => {
-                  assert.deepEqual(data.shards, shards, 'publishes a set of shards')
+                  t.deepEqual(data.shards, shards, 'publishes a set of shards')
+
+                  server.close()
 
                   next()
                 })
