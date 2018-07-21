@@ -1,5 +1,6 @@
 const fs = require('fs')
 const { describe } = require('tape-plus')
+const Server = require('../../testbot')
 
 const Publish = require('../../../ritual/async/publish')
 
@@ -9,9 +10,7 @@ describe('ritual.async.publish', context => {
   let publish
 
   context.beforeEach(c => {
-    server = require('scuttle-testbot')
-      .use(require('ssb-private'))
-      .call()
+    server = Server()
     publish = Publish(server)
     params = JSON.parse(fs.readFileSync('./test/fixtures/ritual.json', 'utf8'))
   })

@@ -1,6 +1,7 @@
 const { group } = require('tape-plus')
 const test = require('tape')
 const pull = require('pull-stream')
+const Server = require('../../testbot')
 
 const Share = require('../../../share/async/share')
 
@@ -10,10 +11,7 @@ group('share.async.share', test => {
   let recps, name, secret, quorum
 
   test.beforeEach(c => {
-    server = require('scuttle-testbot')
-      .use(require('ssb-private'))
-      .use(require('ssb-query'))
-      .call()
+    server = Server()
     share = Share(server)
     recps = [
       server.createFeed().id,
