@@ -109,15 +109,21 @@ describe('share.async.share', context => {
         }
       }
 
+      const removeEncryptionData = (message) => {
+        delete message.value.signature
+        delete message.value.cyphertext
+        return message 
+      }
+
       pull(
         server.query.read(optsForType('dark-crystal/root')),
         pull.collect((err, roots) => {
-          assert.deepEqual(data.root, roots[0], 'publishes a root')
-
+          assert.deepEqual(data.root, removeEncryptionData(roots[0]), 'publishes a root')
+         
           pull(
             server.query.read(optsForType('dark-crystal/ritual')),
             pull.collect((err, rituals) => {
-              assert.deepEqual(data.ritual, rituals[0], 'publishes a single ritual')
+              assert.deepEqual(data.ritual, removeEncryptionData(rituals[0]), 'publishes a single ritual')
 
               pull(
                 server.query.read(optsForType('dark-crystal/shards')),
