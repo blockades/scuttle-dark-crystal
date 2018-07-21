@@ -8,7 +8,9 @@ module.exports = function (server) {
       recps: [server.id]
     }, params)
 
-    if (isRoot(content)) server.publish(content, callback)
+    if (isRoot(content)) server.private.publish(content,[server.id], (err,root) => {
+      callback(err,server.private.unbox(root))
+    })
     else callback(content.errors)
   }
 }
