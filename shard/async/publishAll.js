@@ -1,4 +1,5 @@
 const pull = require('pull-stream')
+const ssbKeys = require('ssb-keys')
 
 const { isShard, SCHEMA_VERSION, errorParser } = require('ssb-dark-crystal-schema')
 
@@ -14,13 +15,12 @@ module.exports = function (server) {
           type: 'dark-crystal/shard',
           version: SCHEMA_VERSION,
           root: rootId,
-          shard: shard,
-          shard: server.private.box(shard, [recp]),
+          shard: ssbKeys.box(shard, [recp]),
           recps: [recp, server.id]
         }
       }),
       pull.filter(isShard),
-      pull.collect((err, params) => {
+      pull.collect((err,params) => {
         if (params.length !== shards.length) {
           let errors = params
             .map(msg => msg.errors)
@@ -29,7 +29,11 @@ module.exports = function (server) {
         }
         pull(
           pull.values(params),
-          pull.asyncMap(server.private.publish),
+          pull.asyncMap((shardMsg,callback) => { 
+            server.private.publish(shardMsg, shardMsg.recps, (err,msg) => {
+              callback(err,server.private.unbox(msg))
+            }) 
+          }),
           pull.collect((err, msgs) => {
             if (err) callback(err)
             else callback(null, msgs)
