@@ -15,10 +15,9 @@ module.exports = function (server) {
       recps: [server.id]
     }
 
-    // TODO - this is likely publishing publicly!!!!
-    // need to install ssb-private as a plugin and use its publish method I think
-
-    if (isRitual(content)) server.publish(content, callback)
+    if (isRitual(content)) server.private.publish(content,[server.id], (err,ritual) => {
+      callback(err,server.private.unbox(ritual))
+    })
     else callback(content.errors)
   }
 }
