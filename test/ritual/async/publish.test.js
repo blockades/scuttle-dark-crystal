@@ -1,6 +1,6 @@
 const fs = require('fs')
 const { describe } = require('tape-plus')
-const Server = require('scuttle-testbot')
+const Server = require('../../testbot')
 
 const Publish = require('../../../ritual/async/publish')
 
@@ -23,13 +23,15 @@ describe('ritual.async.publish', context => {
     publish(params, (err, ritual) => {
       assert.notOk(err, 'null errors')
       assert.ok(ritual, 'valid ritual object')
-      assert.deepEqual(params, ritual.value.content, 'ritual matches params')
+      for (var k in params) {
+        assert.equal(params[k], ritual.value.content[k], `params key ${k} in ritual`)
+      }
       next()
     })
   })
 
   context('fails to publish when invalid', (assert, next) => {
-    params.type = "dark-schmystal/ritual"
+    params.quorum = 'dog'
     publish(params, (errs, ritual) => {
       assert.ok(errs, 'has errors')
       assert.notOk(ritual, 'ritual is null')

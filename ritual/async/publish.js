@@ -4,14 +4,20 @@ const toolVersion = require('../../package.json').dependencies[tool]
 
 module.exports = function (server) {
   return function publish (params, callback) {
-    var content = Object.assign({}, {
+    const { root, shards, quorum } = params
+    var content = {
       type: 'dark-crystal/ritual',
       version: SCHEMA_VERSION,
-      tool: tool + toolVersion,
+      root,
+      shards,
+      quorum,
+      tool: `${tool}@${toolVersion}`,
       recps: [server.id]
-    }, params)
+    }
 
-    if (isRitual(content)) server.publish(content, callback)
+    if (isRitual(content)) server.private.publish(content,[server.id], (err,ritual) => {
+      callback(err,server.private.unbox(ritual))
+    })
     else callback(content.errors)
   }
 }

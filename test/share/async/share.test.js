@@ -1,6 +1,6 @@
 const { describe } = require('tape-plus')
 const pull = require('pull-stream')
-const Server = require('scuttle-testbot')
+const Server = require('../../testbot')
 
 const Share = require('../../../share/async/share')
 
@@ -17,7 +17,7 @@ describe('share.async.share', context => {
       server.createFeed().id,
       server.createFeed().id
     ]
-    name = "Dark Crystal"
+    name = "My SBB Dark Crystal"
     secret = Math.random().toString(36)
     quorum = 3
   })
@@ -39,34 +39,46 @@ describe('share.async.share', context => {
     assert.throws(() => share({ name, secret, quorum, recps }, 'not a callback'), 'throws an error when callback is not a function')
   })
 
-  context('invalid recps', (assert, next) => {
+  context('invalid recps (non-feed recps)', (assert, next) => {
     recps = ['thisisnotafeed']
+
     share({ name, secret, quorum, recps }, (err, data) => {
       assert.ok(err, 'raises error')
       assert.notOk(data, 'data is undefined')
       assert.equal(err.message, 'data.recps: must be a feedId', 'invalid feedId')
 
-      repeatFeed = server.createFeed().id
-      recps = [repeatFeed, repeatFeed]
-      share({ name, secret, quorum, recps }, (err, data) => {
-        assert.ok(err, 'raises error')
-        assert.notOk(data, 'data is undefined')
-        assert.equal(err.message, 'data.recps: please provide unique feedIds', 'invalid feedId')
+      next()
+    })
+  })
 
-        recps = [server.id]
-        share({ name, secret, quorum, recps }, (err, data) => {
-          assert.ok(err, 'raises error')
-          assert.notOk(data, 'data is undefined')
-          assert.equal(err.message, `data.recps: can't include ${server.id}`, 'raises error when includes self')
+  context('invalid recps (repeated feedIds)', (assert, next) => {
+    repeatFeed = server.createFeed().id
+    recps = [repeatFeed, repeatFeed]
 
-          next()
-        })
-      })
+    share({ name, secret, quorum, recps }, (err, data) => {
+      assert.ok(err, 'raises error')
+      assert.notOk(data, 'data is undefined')
+      assert.equal(err.message, 'data.recps: please provide unique feedIds', 'invalid feedId')
+
+      next()
+    })
+  })
+
+  context('invalid recps (self as recp)', (assert, next) => {
+    recps = [server.id]
+
+    share({ name, secret, quorum, recps }, (err, data) => {
+      assert.ok(err, 'raises error')
+      assert.notOk(data, 'data is undefined')
+      assert.equal(err.message, `data.recps: can't include ${server.id}`, 'raises error when includes self')
+
+      next()
     })
   })
 
   context('invalid quorum', (assert, next) => {
     quorum = 0
+
     share({ name, secret, quorum, recps }, (err, data) => {
       assert.ok(err, 'raises error')
       assert.notOk(data, 'data is undefined')
@@ -86,27 +98,37 @@ describe('share.async.share', context => {
 
   context('publishes a root, a ritual and the shards', (assert, next) => {
     share({ name, secret, quorum, recps }, (err, data) => {
-      assert.notOk(err, 'error is undefined')
+      assert.notOk(err, 'error is null')
       assert.ok(data, 'returns the data')
 
-      let opts = [{ query: { $filter: { value: { content: { type: 'dark-crystal/root' } } } } }]
+      const optsForType = (type) => {
+        return { 
+          query: [{
+            $filter: { value: { content: { type } } }
+          }]
+        }
+      }
+
+      const removeEncryptionData = (message) => {
+        delete message.value.signature
+        delete message.value.cyphertext
+        return message 
+      }
+
       pull(
-        server.query.read(opts),
+        server.query.read(optsForType('dark-crystal/root')),
         pull.collect((err, roots) => {
-          assert.deepEqual(data.root, roots[0], 'publishes a root')
-
-          let opts = [{ query: { $filter: { value: { content: { type: 'dark-crystal/ritual' } } } } }]
+          assert.deepEqual(data.root, removeEncryptionData(roots[0]), 'publishes a root')
+         
           pull(
-            server.query.read(opts),
+            server.query.read(optsForType('dark-crystal/ritual')),
             pull.collect((err, rituals) => {
-              assert.deepEqual(data.ritual, rituals[0], 'publishes a single ritual')
+              assert.deepEqual(data.ritual, removeEncryptionData(rituals[0]), 'publishes a single ritual')
 
-              let opts = [{ query: { $filter: { value: { content: { type: 'dark-crystal/shards' } } } } }]
               pull(
-                server.query.read(opts),
+                server.query.read(optsForType('dark-crystal/shard')),
                 pull.collect((err, shards) => {
-                  assert.deepEqual(data.shards, shards, 'publishes a set of shards')
-
+                  assert.deepEqual(data.shards, shards.map(removeEncryptionData), 'publishes a set of shards')
                   next()
                 })
               )

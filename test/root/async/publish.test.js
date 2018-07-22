@@ -1,6 +1,6 @@
 const fs = require('fs')
 const { describe } = require('tape-plus')
-const Server = require('scuttle-testbot')
+const Server = require('../../testbot')
 
 const Publish = require('../../../root/async/publish')
 
@@ -11,6 +11,7 @@ describe('root.async.publish', context => {
 
   context.beforeEach(c => {
     server = Server()
+
     publish = Publish(server)
     params = JSON.parse(fs.readFileSync('./test/fixtures/root.json', 'utf8'))
   })
@@ -23,7 +24,9 @@ describe('root.async.publish', context => {
     publish(params, (err, root) => {
       assert.notOk(err, 'null errors')
       assert.ok(root, 'valid root object')
-      assert.deepEqual(params, root.value.content, 'root matches params')
+      for (var k in params) {
+        assert.equal(params[k], root.value.content[k], `params key ${k} in root`)
+      }
       next()
     })
   })
