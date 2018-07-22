@@ -19,14 +19,15 @@ module.exports = function (server) {
           recps: [recp, server.id]
         }
       }),
-      pull.filter(isShard),
+      pull.map((shardCheck) => {
+        if (isShard(shardCheck)) return shardCheck
+        else return shardCheck 
+      }),
       pull.collect((err,params) => {
-        if (params.length !== shards.length) {
-          let errors = params
-            .map(msg => msg.errors)
+        let errors = params
+            .filter((msg) => { if (msg.errors) return msg.errors })
             .filter(errorParser)
-          if (errors.length) return callback(new Error(`${errors}`))
-        }
+        if (errors.length) return callback(new Error(`${errors}`))
         pull(
           pull.values(params),
           pull.asyncMap((shardMsg,callback) => { 
