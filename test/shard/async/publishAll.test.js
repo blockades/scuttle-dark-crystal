@@ -2,6 +2,7 @@ const { describe } = require('tape-plus')
 const pull = require('pull-stream')
 const Server = require('../../testbot')
 const secrets = require('secrets.js-grempe')
+const {isShard} = require('ssb-dark-crystal-schema')
 
 const PublishAll = require('../../../shard/async/publishAll')
 
@@ -39,9 +40,21 @@ describe('shard.async.publishAll', context => {
     publishAll({ shards, recps, rootId }, (err, data) => {
       assert.notOk(err, 'error is null')
       assert.ok(data, 'returns some data')
-      // console.log(JSON.stringify(data,null,4)) 
       assert.equal(data.length, shards.length, 'publishes one message for each recipient')
+      data.forEach((shardMessage) => {
+        assert.ok(isShard(shardMessage.value.content), 'valid shard')
+      }) 
       next()
-    })
+    })  
   })
+
+  context('publishes no shards when a single shard is invalid', (assert, next) => {
+    recps[1] = 'this is not a valid feedId'   
+    publishAll({ shards, recps, rootId }, (err, data) => {
+      assert.ok(err, 'raises error')
+      assert.notOk(data, 'data is undefined')
+      next()
+    })  
+  })
+
 })
