@@ -1,11 +1,14 @@
 const pull = require('pull-stream')
-const ssbKeys = require('ssb-keys')
+const { box } = require('ssb-keys')
+const { isFeed } = require('ssb-ref')
 
 const { isShard, SCHEMA_VERSION, errorParser } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
   return function publishAll ({ shards, recps, rootId }, callback) {
     const indexes = [...Array(shards.length).keys()]
+
+    if (!validRecps(recps)) return callback(new Error('All recps must be valid feedIds', recps))
 
     const shardMsgs = indexes
       .map(index => {
@@ -15,7 +18,7 @@ module.exports = function (server) {
           type: 'dark-crystal/shard',
           version: SCHEMA_VERSION,
           root: rootId,
-          shard: ssbKeys.box(shard, [recp]),
+          shard: box(shard, [recp]),
           recps: [recp, server.id]
         }
       })
@@ -24,11 +27,8 @@ module.exports = function (server) {
         return shard
       })
 
-    const errors = shardMsgs
-      .filter(s => s.errors)
-      .map(errorParser)
-
-    if (errors.length) return callback(new Error(errors.join(' ')))
+    const errors = getErrors(shardMsgs)
+    if (errors) return callback(new Error(errors.join(' ')))
 
     pull(
       pull.values(shardMsgs),
@@ -43,3 +43,14 @@ module.exports = function (server) {
   }
 }
 
+function validRecps (recps) {
+  return recps.every(isFeed)
+}
+
+function getErrors (msgs) {
+  const errors = msgs
+    .filter(s => s.errors)
+    .map(errorParser)
+
+  return errors.length ? errors : null
+}
