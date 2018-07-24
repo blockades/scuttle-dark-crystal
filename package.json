@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/blockades/scuttle-dark-crystal#readme",
   "dependencies": {
-    "secrets.js-grempe": "^1.1.0",
+    "secrets.js-grempe": "1.1.0",
     "ssb-dark-crystal-schema": "^1.0.1",
     "ssb-schema-definitions": "github:ssbc/ssb-schema-definitions"
   },
