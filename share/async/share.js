@@ -44,7 +44,7 @@ module.exports = function (server) {
     const hexSecret = secrets.str2hex(secret)
     const shards = secrets.share(hexSecret, numOfShards, quorum)
 
-    publishRoot({ name }, (err, root) => {
+    publishRoot(name, (err, root) => {
       if (err) return callback(err)
 
       // Should specify this shards field ACTUALLY as a number - more descriptive
