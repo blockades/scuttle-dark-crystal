@@ -5,10 +5,10 @@ const { isShard, SCHEMA_VERSION, errorParser } = require('ssb-dark-crystal-schem
 
 module.exports = function (server) {
   return function publishAll ({ shards, recps, rootId }, callback) {
-    let indexes = [...Array(shards.length).keys()]
-    pull(
-      pull.values(indexes),
-      pull.map(index => {
+    const indexes = [...Array(shards.length).keys()]
+
+    const shardMsgs = indexes
+      .map(index => {
         let recp = recps[index]
         let shard = shards[index]
         return {
@@ -18,29 +18,27 @@ module.exports = function (server) {
           shard: ssbKeys.box(shard, [recp]),
           recps: [recp, server.id]
         }
-      }),
-      pull.map((shardCheck) => {
-        if (isShard(shardCheck)) return shardCheck
-        else return shardCheck 
-      }),
-      pull.collect((err,params) => {
-        let errors = params
-            .filter((msg) => { if (msg.errors) return msg.errors })
-            .filter(errorParser)
-        if (errors.length) return callback(new Error(`${errors}`))
-        pull(
-          pull.values(params),
-          pull.asyncMap((shardMsg,callback) => { 
-            server.private.publish(shardMsg, shardMsg.recps, (err,msg) => {
-              callback(err,server.private.unbox(msg))
-            }) 
-          }),
-          pull.collect((err, msgs) => {
-            if (err) callback(err)
-            else callback(null, msgs)
-          })
-        )
       })
+      .map(shard => {
+        isShard(shard) // isShard adds errors to shard if there are any
+        return shard
+      })
+
+    const errors = shardMsgs
+      .filter(s => s.errors)
+      .map(errorParser)
+
+    if (errors.length) return callback(new Error(errors.join(' ')))
+
+    pull(
+      pull.values(shardMsgs),
+      pull.asyncMap((shardMsg, cb) => { 
+        server.private.publish(shardMsg, shardMsg.recps, (err, msg) => {
+          if (err) cb(err)
+          else cb(null, server.private.unbox(msg))
+        }) 
+      }),
+      pull.collect(callback)
     )
   }
 }
