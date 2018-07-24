@@ -1,47 +1,56 @@
 const pull = require('pull-stream')
-const ssbKeys = require('ssb-keys')
+const { box } = require('ssb-keys')
+const { isFeed } = require('ssb-ref')
 
 const { isShard, SCHEMA_VERSION, errorParser } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
   return function publishAll ({ shards, recps, rootId }, callback) {
-    let indexes = [...Array(shards.length).keys()]
-    pull(
-      pull.values(indexes),
-      pull.map(index => {
+    const indexes = [...Array(shards.length).keys()]
+
+    if (!validRecps(recps)) return callback(new Error('All recps must be valid feedIds', recps))
+
+    const shardMsgs = indexes
+      .map(index => {
         let recp = recps[index]
         let shard = shards[index]
         return {
           type: 'dark-crystal/shard',
           version: SCHEMA_VERSION,
           root: rootId,
-          shard: ssbKeys.box(shard, [recp]),
+          shard: box(shard, [recp]),
           recps: [recp, server.id]
         }
-      }),
-      pull.map((shardCheck) => {
-        if (isShard(shardCheck)) return shardCheck
-        else return shardCheck 
-      }),
-      pull.collect((err,params) => {
-        let errors = params
-            .filter((msg) => { if (msg.errors) return msg.errors })
-            .filter(errorParser)
-        if (errors.length) return callback(new Error(`${errors}`))
-        pull(
-          pull.values(params),
-          pull.asyncMap((shardMsg,callback) => { 
-            server.private.publish(shardMsg, shardMsg.recps, (err,msg) => {
-              callback(err,server.private.unbox(msg))
-            }) 
-          }),
-          pull.collect((err, msgs) => {
-            if (err) callback(err)
-            else callback(null, msgs)
-          })
-        )
       })
+      .map(shard => {
+        isShard(shard) // isShard adds errors to shard if there are any
+        return shard
+      })
+
+    const errors = getErrors(shardMsgs)
+    if (errors) return callback(new Error(errors.join(' ')))
+
+    pull(
+      pull.values(shardMsgs),
+      pull.asyncMap((shardMsg, cb) => { 
+        server.private.publish(shardMsg, shardMsg.recps, (err, msg) => {
+          if (err) cb(err)
+          else cb(null, server.private.unbox(msg))
+        }) 
+      }),
+      pull.collect(callback)
     )
   }
 }
 
+function validRecps (recps) {
+  return recps.every(isFeed)
+}
+
+function getErrors (msgs) {
+  const errors = msgs
+    .filter(s => s.errors)
+    .map(errorParser)
+
+  return errors.length ? errors : null
+}
