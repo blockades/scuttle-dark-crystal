@@ -1,5 +1,5 @@
 {
-  "name": "dark-crystal",
+  "name": "scuttle-dark-crystal",
   "version": "0.0.1",
   "description": "socially sharing secrets / backups on secure scuttlebutt",
   "main": "index.js",
@@ -20,11 +20,11 @@
     "scuttlebutt"
   ],
   "author": "MMT",
-  "license": "ISC",
+  "license": "AGPL-3.0",
   "bugs": {
-    "url": "https://github.com/blockades/dark-crystal/issues"
+    "url": "https://github.com/blockades/scuttle-dark-crystal/issues"
   },
-  "homepage": "https://github.com/blockades/dark-crystal#readme",
+  "homepage": "https://github.com/blockades/scuttle-dark-crystal#readme",
   "dependencies": {
     "ssb-private": "^0.2.1"
   },
