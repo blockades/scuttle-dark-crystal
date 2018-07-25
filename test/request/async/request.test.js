@@ -30,12 +30,13 @@ describe('request.async.request', context => {
 
   context('Publishes requests when given a rootId which has some related shards published', (assert, next) => {
     share({ name, secret, quorum, recps }, (err, data) => { 
-      var rootId = data.ritual.root
-      
+      var rootId = data.root.key
       request(rootId, (err,msgs) => {
         assert.notOk(err, 'null errors')
         assert.ok(msgs, 'invites messages')
-        console.log(msgs)
+        console.log('err',err)
+        console.log('msgs',msgs)
+        next()
       })
     })
     
