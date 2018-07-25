@@ -21,7 +21,7 @@ module.exports = {
   },
   share: {
     async: {
-      share: require('./darkcrystal/async/share')
+      share: require('./share/async/share')
     }
   },
   sync: {
