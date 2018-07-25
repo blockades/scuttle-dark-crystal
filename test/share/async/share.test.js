@@ -45,7 +45,7 @@ describe('share.async.share', context => {
     share({ name, secret, quorum, recps }, (err, data) => {
       assert.ok(err, 'raises error')
       assert.notOk(data, 'data is undefined')
-      assert.equal(err.message, 'data.recps: must be a feedId', 'invalid feedId')
+      assert.equal(err.message, 'data.recps: all recps must be a feedId', 'invalid feedId')
 
       next()
     })

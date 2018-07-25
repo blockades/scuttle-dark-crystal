@@ -18,24 +18,22 @@ module.exports = function (server) {
   return function ({ name, secret, quorum, recps }, callback) {
     if (!name && !isString(name)) throw new Error('name must be a string')
     if (!secret && !isString(secret)) throw new Error('secret must be a string')
-    if (!quorum && !isNumber(quorum)) throw new Error('quorum must be a number')
-    if (!recps && !Array.isArray(recps)) throw new Error('recps must be an array')
-    if (!callback) throw new Error('a callback must be given')
+    if (!isNumber(quorum)) throw new Error('quorum must be a number')
+    if (!Array.isArray(recps)) throw new Error('recps must be an array')
     if (!isFunction(callback)) throw new Error('callback is not a function')
 
     let feedIds = recps
       .map(recp => typeof recp === 'string' ? recp : recp.link)
       .filter(Boolean)
       .filter(isFeed)
-
-    if (feedIds.length < recps.length) return callback(new Error(`data.recps: must be a feedId`))
+    if (feedIds.length < recps.length) return callback(new Error(`data.recps: all recps must be a feedId`))
 
     let recipients = [...new Set(feedIds)]
-
     if (recipients.length < feedIds.length) return callback(new Error(`data.recps: please provide unique feedIds`))
+
     if (recipients.includes(server.id)) return callback(new Error(`data.recps: can't include ${server.id}`))
-    if (quorum === 0) return callback(new Error(`data.quorum: must be greater than 0`))
-    if (recipients.length < quorum) return callback(new Error(`data.quorum: greater than number of recps`))
+    if (quorum < 1) return callback(new Error(`data.quorum: must be greater than 0`))
+    if (quorum > recipients.length) return callback(new Error(`data.quorum: greater than number of recps`))
 
     const numOfShards = recps.length
 
@@ -55,8 +53,9 @@ module.exports = function (server) {
         // TEMP SOLUTION: Have a publishAllShards (plural) function which validates each with isShard before publishing all
         // RESOLUTION: Extracted reducer into a publishAll function
         publishAllShards({ shards, recps, rootId }, (err, shards) => {
-          if (err) callback(err)
-          else callback(null, {
+          if (err) return callback(err)
+
+          callback(null, {
             root: root,
             ritual: ritual,
             shards: shards
