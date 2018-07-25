@@ -1,18 +1,18 @@
-const fs = require('fs')
 const { describe } = require('tape-plus')
-const Server = require('scuttle-testbot')
+const Server = require('../../testbot')
 
 const Publish = require('../../../root/async/publish')
 
 describe('root.async.publish', context => {
   let server
-  let params
+  let name
   let publish
 
   context.beforeEach(c => {
     server = Server()
+
     publish = Publish(server)
-    params = JSON.parse(fs.readFileSync('./test/fixtures/root.json', 'utf8'))
+    name = 'my first dark crystal'
   })
 
   context.afterEach(c => {
@@ -20,17 +20,17 @@ describe('root.async.publish', context => {
   })
 
   context('publishes a message when valid', (assert, next) => {
-    publish(params, (err, root) => {
+    publish(name, (err, root) => {
       assert.notOk(err, 'null errors')
       assert.ok(root, 'valid root object')
-      assert.deepEqual(params, root.value.content, 'root matches params')
+      assert.equal(name, root.value.content.name, 'name is inserted')
       next()
     })
   })
 
   context('fails to publish when invalid', (assert, next) => {
-    params.type = "dark-schmystal/root"
-    publish(params, (errs, root) => {
+    name = 12323232
+    publish(name, (errs, root) => {
       assert.ok(errs, 'has errors')
       assert.notOk(root, 'root is null')
       next()

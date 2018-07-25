@@ -1,6 +1,6 @@
 # Dark Crystal API
 
-Returns a set of functions as an API for validating, building, publishing and reading records dictated by [dark-crystal-schemas](https://github.com/blockades/dark-crystal').
+Returns a set of functions as an API for validating, building, publishing and reading records dictated by [ssb-dark-crystal-schema](https://github.com/blockades/dark-crystal').
 
 ```js
 const api = {
