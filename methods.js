@@ -5,6 +5,10 @@ module.exports = {
     async: {
       get: require('./root/async/get'),
       publish: require('./root/async/publish')
+    },
+    pull: {
+      roots: require('./root/pull/roots'),
+      backlinks: require('./root/pull/backlinks')
     }
   },
   ritual: {
@@ -21,7 +25,7 @@ module.exports = {
   },
   share: {
     async: {
-      share: require('./darkcrystal/async/share')
+      share: require('./share/async/share')
     }
   },
   sync: {

@@ -17,7 +17,8 @@ module.exports = function (server) {
 
     if (isRitual(content)) {
       server.private.publish(content, [server.id], (err, ritual) => {
-        callback(err, server.private.unbox(ritual))
+        if (err) callback(err)
+        else server.private.unbox(ritual, callback)
       })
     } else callback(content.errors)
   }

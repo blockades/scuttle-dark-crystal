@@ -11,7 +11,8 @@ module.exports = function (server) {
 
     if (isRoot(content)) {
       server.private.publish(content, [server.id], (err, root) => {
-        callback(err, server.private.unbox(root))
+        if (err) callback(err)
+        else server.private.unbox(root, callback)
       })
     } else callback(content.errors)
   }

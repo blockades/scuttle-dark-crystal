@@ -28,14 +28,14 @@ module.exports = function (server) {
       })
 
     const errors = getErrors(shardMsgs)
-    if (errors) return callback(new Error(errors.join(' ')))
+    if (errors) return callback(new Error(errors))
 
     pull(
       pull.values(shardMsgs),
       pull.asyncMap((shardMsg, cb) => {
         server.private.publish(shardMsg, shardMsg.recps, (err, msg) => {
           if (err) cb(err)
-          else cb(null, server.private.unbox(msg))
+          else server.private.unbox(msg, cb)
         })
       }),
       pull.collect(callback)
