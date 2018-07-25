@@ -15,9 +15,10 @@ module.exports = function (server) {
       recps: [server.id]
     }
 
-    if (isRitual(content)) server.private.publish(content,[server.id], (err,ritual) => {
-      callback(err,server.private.unbox(ritual))
-    })
-    else callback(content.errors)
+    if (isRitual(content)) {
+      server.private.publish(content, [server.id], (err, ritual) => {
+        callback(err, server.private.unbox(ritual))
+      })
+    } else callback(content.errors)
   }
 }

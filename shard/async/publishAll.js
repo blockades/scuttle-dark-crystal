@@ -32,11 +32,11 @@ module.exports = function (server) {
 
     pull(
       pull.values(shardMsgs),
-      pull.asyncMap((shardMsg, cb) => { 
+      pull.asyncMap((shardMsg, cb) => {
         server.private.publish(shardMsg, shardMsg.recps, (err, msg) => {
           if (err) cb(err)
           else cb(null, server.private.unbox(msg))
-        }) 
+        })
       }),
       pull.collect(callback)
     )

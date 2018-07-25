@@ -17,7 +17,7 @@ describe('share.async.share', context => {
       server.createFeed().id,
       server.createFeed().id
     ]
-    name = "My SBB Dark Crystal"
+    name = 'My SBB Dark Crystal'
     secret = Math.random().toString(36)
     quorum = 3
   })
@@ -52,7 +52,7 @@ describe('share.async.share', context => {
   })
 
   context('invalid recps (repeated feedIds)', (assert, next) => {
-    repeatFeed = server.createFeed().id
+    const repeatFeed = server.createFeed().id
     recps = [repeatFeed, repeatFeed]
 
     share({ name, secret, quorum, recps }, (err, data) => {
@@ -102,7 +102,7 @@ describe('share.async.share', context => {
       assert.ok(data, 'returns the data')
 
       const optsForType = (type) => {
-        return { 
+        return {
           query: [{
             $filter: { value: { content: { type } } }
           }]
@@ -112,22 +112,25 @@ describe('share.async.share', context => {
       const removeEncryptionData = (message) => {
         delete message.value.signature
         delete message.value.cyphertext
-        return message 
+        return message
       }
 
       pull(
         server.query.read(optsForType('dark-crystal/root')),
         pull.collect((err, roots) => {
+          if (err) console.error(err)
           assert.deepEqual(data.root, removeEncryptionData(roots[0]), 'publishes a root')
-         
+
           pull(
             server.query.read(optsForType('dark-crystal/ritual')),
             pull.collect((err, rituals) => {
+              if (err) console.error(err)
               assert.deepEqual(data.ritual, removeEncryptionData(rituals[0]), 'publishes a single ritual')
 
               pull(
                 server.query.read(optsForType('dark-crystal/shard')),
                 pull.collect((err, shards) => {
+                  if (err) console.error(err)
                   assert.deepEqual(data.shards, shards.map(removeEncryptionData), 'publishes a set of shards')
                   next()
                 })

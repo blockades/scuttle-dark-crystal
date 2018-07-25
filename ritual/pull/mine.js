@@ -12,7 +12,7 @@ module.exports = function (server) {
             timestamp: { gt: 0 },
             author: server.id,
             content: {
-              type: `dark-crystal/ritual`,
+              type: `dark-crystal/ritual`
             }
           }
         }
