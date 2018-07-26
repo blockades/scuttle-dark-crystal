@@ -1,11 +1,7 @@
 
-const GetRoot = require('../../root/async/get')
 const Invites = require('scuttle-invite')
-var ref = require('ssb-ref')
-
-
+const ref = require('ssb-ref')
 const pull = require('pull-stream')
-
 const { isInvite, isReply } = require('scuttle-invite-schema')
 
 module.exports = function (server) {
