@@ -1,6 +1,6 @@
 
 const GetRoot = require('../../root/async/get')
-// const Invites = require('scuttle-invite')
+const Invites = require('scuttle-invite')
 const pull = require('pull-stream')
 
 module.exports = function (server) {
@@ -13,7 +13,7 @@ module.exports = function (server) {
           $filter: {
             value: {
               content: {
-                type: 'dark-crysal/shard',
+                type: 'dark-crystal/shard',
                 root
               }
             }
@@ -27,27 +27,24 @@ module.exports = function (server) {
       pull.map((msg) => {
         // we want the recipient which is not ourself.
         const recp = msg.value.content.recps.find(r => r !== server.id)
-
         return {
           root: rootId,
           body: "Hi you've been holding a shard for me, can I please have it back?",
-          recps: msg.value.content.recps
+          recps: [recp]
         }
       }),
-      pull.collect((err, recps) => {
-        //
-        // (mix) 
-        // this is as far as I got with this.
-        // I think the collect should do a check of all invites like in publishAll
-        // and then it should run the publishing of all invites? 
-        //
-        //
-        if (err) callback(err)
-        // hopefully we now have an array of recps
-
-        // Commented out until it installs properly
-        // invites.async.private.publish(params, (err,msg) => {})
-        callback(null, params)
+      // TODO: here would be the place to validate the invites
+      pull.collect((err, requests) => {
+        pull(
+          pull.values(requests),
+          pull.asyncMap((oneRequest, cb) => {
+            invites.invites.async.private.publish(oneRequest, (err,msg) => {
+              if (err) cb(err)
+              else cb(null,msg) 
+            })
+          }),
+          pull.collect(callback)
+        )
       })
     )
   }
