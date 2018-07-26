@@ -33,11 +33,12 @@ describe('shard.async.publishAll', context => {
   })
 
   context('publishes all shards', (assert, next) => {
-    publishAll({ shards, recps, rootId }, (err, data) => {
+    publishAll({ shards, recps, rootId }, (err, publishedShards) => {
       assert.notOk(err, 'error is null')
-      assert.ok(data, 'returns some data')
-      assert.equal(data.length, shards.length, 'publishes one message for each recipient')
-      data.forEach((shardMessage) => {
+      assert.ok(Array.isArray(publishedShards), 'returns some data')
+      assert.equal(publishedShards.length, shards.length, 'publishes one message for each recipient')
+
+      publishedShards.forEach((shardMessage) => {
         assert.ok(isShard(shardMessage.value.content), 'valid shard')
       })
       next()

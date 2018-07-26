@@ -101,13 +101,11 @@ describe('share.async.share', context => {
       assert.notOk(err, 'error is null')
       assert.ok(data, 'returns the data')
 
-      const optsForType = (type) => {
-        return {
-          query: [{
-            $filter: { value: { content: { type } } }
-          }]
-        }
-      }
+      const pullType = (type) => server.query.read({
+        query: [{
+          $filter: { value: { content: { type } } }
+        }]
+      })
 
       const removeEncryptionData = (message) => {
         delete message.value.signature
@@ -116,19 +114,19 @@ describe('share.async.share', context => {
       }
 
       pull(
-        server.query.read(optsForType('dark-crystal/root')),
+        pullType('dark-crystal/root'),
         pull.collect((err, roots) => {
           if (err) console.error(err)
           assert.deepEqual(data.root, removeEncryptionData(roots[0]), 'publishes a root')
 
           pull(
-            server.query.read(optsForType('dark-crystal/ritual')),
+            pullType('dark-crystal/ritual'),
             pull.collect((err, rituals) => {
               if (err) console.error(err)
               assert.deepEqual(data.ritual, removeEncryptionData(rituals[0]), 'publishes a single ritual')
 
               pull(
-                server.query.read(optsForType('dark-crystal/shard')),
+                pullType('dark-crystal/shard'),
                 pull.collect((err, shards) => {
                   if (err) console.error(err)
                   assert.deepEqual(data.shards, shards.map(removeEncryptionData), 'publishes a set of shards')
