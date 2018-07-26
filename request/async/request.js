@@ -3,6 +3,8 @@ const GetRoot = require('../../root/async/get')
 const Invites = require('scuttle-invite')
 const pull = require('pull-stream')
 
+const { isInvite, isReply } = require('scuttle-invite-schema')
+
 module.exports = function (server) {
   const invites = Invites(server)
 
@@ -33,11 +35,17 @@ module.exports = function (server) {
           recps: [recp]
         }
       }),
-      // TODO: here would be the place to validate the invites
+      // pull.map((inv) => {
+      //   isInvite(inv) 
+      //   return inv
+      // }),
       pull.collect((err, requests) => {
+        // const errors = getErrors(requests)
+        // if (errors) return callback(new Error(errors))
         pull(
           pull.values(requests),
           pull.asyncMap((oneRequest, cb) => {
+console.log('one req',oneRequest);
             invites.invites.async.private.publish(oneRequest, (err,msg) => {
               if (err) cb(err)
               else cb(null,msg) 
@@ -50,6 +58,13 @@ module.exports = function (server) {
   }
 }
 
+function getErrors (msgs) {
+  const errors = msgs
+    .filter(s => s.errors)
+    .map(s => s.errors)
+
+  return errors.length ? errors : null
+}
 // function createBacklinkStream (id) {
 //   // how to get only messages of type 'dark-crystal/shard'?
 //   var filterQuery = {
