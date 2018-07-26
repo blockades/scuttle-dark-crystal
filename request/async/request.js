@@ -12,6 +12,7 @@ module.exports = function (server) {
   const invites = Invites(server)
 
   return function request (rootId, callback) {
+    if (!ref.isMsgId(rootId)) return callback(new Error('Invalid rootId'))
     const crystalShards = (root) => {
       return {
         query: [{
@@ -43,6 +44,7 @@ module.exports = function (server) {
           return callback(new Error('Error validating invite',inv))
       }),
       pull.collect((err, requests) => {
+        if (requests.length < 1) return callback(new Error('There are no shards associated with rootId ',rootId))
         pull(
           pull.values(requests),
           pull.asyncMap((oneRequest, cb) => {
