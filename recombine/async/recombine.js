@@ -5,6 +5,7 @@ const ref = require('ssb-ref')
 const pull = require('pull-stream')
 const { isInvite, isReply } = require('scuttle-invite-schema')
 const pullRitual = require('../../ritual/pull/mine')
+const { box } = require('ssb-keys')
 const secrets = require('secrets.js-grempe')
 
 module.exports = function (server) {
@@ -42,6 +43,13 @@ module.exports = function (server) {
         catch (err) {
           return callback(err)
         }
+     
+        // // TODO: need to write query to get shard messages
+        // // verify that the shard is the shard we sent
+        // if (shardForThatAuthor.shard != box(replyMsg.body, [replyMsg.author]))
+        //   return callback(new Error('Recieved shard does not match given shard for shardholder ',replyMsg.author))
+
+
         return replyMsg.body 
       }),
       pull.collect((err, shards) => {
