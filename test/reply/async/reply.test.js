@@ -44,10 +44,11 @@ describe('reply.async.reply', context => {
     katie.add(katiesShard, (err,shardMsg)=> {
       if (err) console.error(error)
       katie.add(katiesInvite, (err,inviteMsg)=> {
-        // reply(inviteMsg.key,rootId,(err,replyMsg) => {
-        //   assert.notOk(err, 'null errors')
-        //   assert.ok(replyMsg, 'returns a reply message')
-        // })
+        reply(inviteMsg.key,rootId,(err,replyMsg) => {
+console.log(replyMsg);
+          assert.notOk(err, 'null errors')
+          assert.ok(replyMsg, 'returns a reply message')
+        })
       })
     })
     next()
