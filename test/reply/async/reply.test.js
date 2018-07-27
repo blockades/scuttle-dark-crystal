@@ -10,23 +10,25 @@ describe('reply.async.reply', context => {
   context.beforeEach(c => {
     server = Server()
     reply = Reply(server)
+
+    // we are holding a shard from katie
     katie = server.createFeed()
 
     rootId = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
     
-    // We need to recreate an invite from katie that looks a bit like this:
+    // We need to recreate an invite from katie that looks like this:
     katiesInvite = {
       type: 'invite',
       root: rootId,
       body: 'Hi you\'ve been holding a shard for me, can I please have it back?',
       version: 'v1' 
     }
-    // and a shard with the same root id, which would look a bit like this:
+    // and a shard with the same root id, which would look like this:
     katiesShard = { 
       type: 'dark-crystal/shard',
       version: '1.0.0',
       root: rootId,
-      shard: box('imagine this is a shard', [katie.id]),
+      shard: box('imagine this is a shard', [server.id]),
       recps: [katie.id, server.id] 
     }
 
@@ -39,9 +41,9 @@ describe('reply.async.reply', context => {
   context('Publishes a reply', (assert, next) => {
 
     // Im not sure if its better to use 'add' or 'publish'
-    server.publish(katiesShard, (err,shardMsg)=> {
+    katie.publish(katiesShard, (err,shardMsg) => {
       if (err) console.error(error)
-      server.publish(katiesInvite, (err,inviteMsg)=> {
+      katie.publish(katiesInvite, (err,inviteMsg) => {
         if (err) console.error(error)
         reply(inviteMsg.key, (err,replyMsg) => {
           console.log('callback reached!',replyMsg);
