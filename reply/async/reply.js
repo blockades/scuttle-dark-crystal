@@ -1,22 +1,17 @@
 
 const Invites = require('scuttle-invite')
-
 const ref = require('ssb-ref')
+const pull = require('pull-stream')
 
+const { isInvite, isReply } = require('scuttle-invite-schema')
 
 
 module.exports = function (server) {
   const invites = Invites(server)
 
-  return function request (rootId, inviteId, callback) {
-    // Maybe we dont need to take rootId as an argument because
-    // we can get it from the invite message itself
+  return function reply (inviteId, callback) {
 
-    if (!ref.isMsgId(rootId)) return callback(new Error('Invalid rootId'))
     if (!ref.isMsgId(inviteId)) return callback(new Error('Invalid inviteId'))
-
-    // we need to write a query to find the shard message
-    // associated with rootId, and unbox the shard part
 
     const findShard = (root) => {
       return {
@@ -32,26 +27,40 @@ module.exports = function (server) {
         }]
       }
     }
-    
-    // not sure if we need a pull stream since we are 
-    // expecting to find exactly one message
-    // hmmm... 
-    msg = server.query.read(findShard(rootId))
-    
-    // should really use that module which
-    // returns just the message part
-    theDecryptedShard = server.private.unbox(msg.value.content.shard)
+   
+    server.get(inviteId, (err,inviteMsg) => {
+      if (err) return callback(new Error('Cannot find invite with given inviteId'))
+      // TODO: validate invite message with isInvite(inviteMsg)
 
-    var reply = {
-      root: rootId,
-      branch: inviteId,
-      accept: true,
-      body: theDecryptedShard
-    }
+      rootId = inviteMsg.content.root
+      
+      // find the shard associated with this rootId
+      pull(
+        server.query.read(findShard(rootId)),
+        pull.collect((err, shards) => {
+          if (shards.length < 1) return callback(new Error('There are no shards associated with rootId ',rootId))
 
-    invites.invites.async.private.reply(reply, (err,msg) => {
-      if (err) cb(err)
-      else cb(null,msg) 
+          if (err) return callback(err)
+          console.log('Shards looks like: ',shards); 
+          callback(null,shards)
+
+          // theDecryptedShard = server.private.unbox(msg.value.content.shard)
+          // should really use that module which returns just the message part
+          
+          // var reply = {
+          //   root: rootId,
+          //   branch: inviteId,
+          //   accept: true,
+          //   body: theDecryptedShard
+          // }
+          
+          
+          // invites.invites.async.private.reply(reply, (err,msg) => {
+          //   if (err) callback(err)
+          //   else callback(null,msg) 
+          // })
+        })
+      )
     })
   }
 }

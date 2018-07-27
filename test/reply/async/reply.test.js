@@ -7,11 +7,9 @@ const Reply = require('../../../reply/async/reply')
 describe('reply.async.reply', context => {
   let server, reply, katie
   let rootId, katiesInvite, katiesShard
-
   context.beforeEach(c => {
     server = Server()
     reply = Reply(server)
-
     katie = server.createFeed()
 
     rootId = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
@@ -41,18 +39,26 @@ describe('reply.async.reply', context => {
   context('Publishes a reply', (assert, next) => {
 
     // Im not sure if its better to use 'add' or 'publish'
-    katie.add(katiesShard, (err,shardMsg)=> {
+    server.publish(katiesShard, (err,shardMsg)=> {
       if (err) console.error(error)
-      katie.add(katiesInvite, (err,inviteMsg)=> {
-        reply(inviteMsg.key,rootId,(err,replyMsg) => {
-console.log(replyMsg);
+      server.publish(katiesInvite, (err,inviteMsg)=> {
+        if (err) console.error(error)
+        reply(inviteMsg.key, (err,replyMsg) => {
+          console.log('callback reached!',replyMsg);
           assert.notOk(err, 'null errors')
           assert.ok(replyMsg, 'returns a reply message')
         })
       })
-    })
+     })
     next()
   })
 
 
+  context('Throws error and published nothing when given an invalid inviteId', (assert, next) => {
+    reply('bad id', (err,replyMsg) => {
+      assert.ok(err, 'Throws error')
+      assert.notOk(replyMsg, 'data is undefined')
+    })
+    next()
+  })
 })
