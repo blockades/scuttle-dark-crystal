@@ -1,6 +1,6 @@
 const pull = require('pull-stream')
 const next = require('pull-next-query')
-const { isRitual } = require('ssb-dark-crystal-schemas')
+const { isRitual } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
   return function mine (opts) {
