@@ -27,11 +27,14 @@ module.exports = function (server) {
         }]
       }
     }
-   
+       
     server.get(inviteId, (err,inviteMsg) => {
       if (err) return callback(new Error('Cannot find invite with given inviteId'))
       // TODO: validate invite message with isInvite(inviteMsg)
 
+      // TODO: verify that the invite has the same author as the root message
+      // and the shard itself
+      
       rootId = inviteMsg.content.root
       
       // find the shard associated with this rootId
