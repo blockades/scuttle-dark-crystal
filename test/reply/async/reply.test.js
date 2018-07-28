@@ -3,6 +3,7 @@ const Server = require('../../testbot')
 const { box } = require('ssb-keys')
 
 const Reply = require('../../../reply/async/reply')
+const pull = require('pull-stream')
 
 describe('reply.async.reply', context => {
   let server, reply, katie
@@ -49,10 +50,10 @@ describe('reply.async.reply', context => {
           console.log('callback reached!',replyMsg);
           assert.notOk(err, 'null errors')
           assert.ok(replyMsg, 'returns a reply message')
+          next()
         })
       })
      })
-    next()
   })
 
 
