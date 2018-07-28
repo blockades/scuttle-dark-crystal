@@ -27,11 +27,16 @@ module.exports = function (server) {
         }]
       }
     }
-       
+    
+    // Could maybe rather use this to get the invite, which i think does some 
+    // validation but it also strips the author which we need.
+    // server.invites.getInvite(inviteId, (err,inviteMsg) => {
+    
     server.get(inviteId, (err,inviteMsg) => {
-      if (err) return callback(new Error('Cannot find invite with given inviteId'))
+      if (err) return callback(err)
+    
       // TODO: validate invite message with isInvite(inviteMsg)
-
+      
       rootId = getContent(inviteMsg).root
       
       // find the shard associated with this rootId
@@ -62,7 +67,7 @@ module.exports = function (server) {
             branch: inviteId,
             accept: true,
             body: theDecryptedShard,
-            recps: [shards[0].value.author]
+            recps: [shards[0].value.author, server.id]
           }
 
           invites.invites.async.private.reply(reply, (err,msg) => {

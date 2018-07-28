@@ -22,7 +22,8 @@ describe('reply.async.reply', context => {
       type: 'invite',
       root: rootId,
       body: 'Hi you\'ve been holding a shard for me, can I please have it back?',
-      version: 'v1' 
+      version: 'v1',
+      recps: [katie.id,server.id]
     }
     // and a shard with the same root id, which would look like this:
     katiesShard = { 
@@ -47,7 +48,6 @@ describe('reply.async.reply', context => {
       katie.publish(katiesInvite, (err,inviteMsg) => {
         if (err) console.error(error)
         reply(inviteMsg.key, (err,replyMsg) => {
-          console.log('callback reached!',replyMsg);
           assert.notOk(err, 'null errors')
           assert.ok(replyMsg, 'returns a reply message')
           next()

@@ -27,10 +27,11 @@
   },
   "homepage": "https://github.com/blockades/scuttle-dark-crystal#readme",
   "dependencies": {
-    "scuttle-invite": "0.0.1",
     "scuttle-inject": "^1.0.1",
+    "scuttle-invite": "0.0.1",
     "secrets.js-grempe": "1.1.0",
-    "ssb-dark-crystal-schema": "^1.0.3"
+    "ssb-dark-crystal-schema": "^1.0.3",
+    "ssb-msg-content": "^1.0.1"
   },
   "devDependencies": {
     "scuttle-testbot": "^1.1.6",
