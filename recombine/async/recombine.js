@@ -31,8 +31,7 @@ module.exports = function (server) {
     }
     
     // get the quorum from the ritual message
-    // TODO: use
-    // pullRitual( need to give the rootId to opts ) )    
+    // TODO: use pullRitual( need to give the rootId to opts ) )    
     
     var encryptedShards = {}
 
@@ -41,7 +40,7 @@ module.exports = function (server) {
       pull.collect((err, rituals) => {
         // TODO: verify rituals.length === 1
         var quorum = getContent(rituals[0]).quorum
-
+        // Get the encrypted shards to use in verification
         pull(
           server.query.read(findAssociatedMessages('dark-crystal/shard')),
           pull.drain((shardMsg) => {
@@ -56,7 +55,7 @@ module.exports = function (server) {
 
 
 function gotAllShards(encryptedShards) {
-  
+  // get the unencrypted shards from the reply messages 
   pull(
     server.query.read(findAssociatedMessages('invite-reply')),
     pull.map((replyMsg) => {
