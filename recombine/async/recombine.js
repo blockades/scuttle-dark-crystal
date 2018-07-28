@@ -36,6 +36,10 @@ module.exports = function (server) {
     pull(
       server.query.read(findReplies(rootId)),
       pull.map((replyMsg) => {
+
+        // TODO: this unboxed shard validation should be moved
+        // to a separate method so that it can be used independently
+
         // validate that body is a shard using secrets.js 
         try {
           var shardComponents = secrets.extractShareComponents(msg.body)
