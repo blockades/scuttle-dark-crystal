@@ -53,9 +53,19 @@ describe('reply.async.reply', context => {
           next()
         })
       })
-     })
+    })
   })
 
+  context('Throws error if associated shard does not exist', (assert, next) => {
+    katie.publish(katiesInvite, (err,inviteMsg) => {
+      if (err) console.error(error)
+      reply(inviteMsg.key, (err,replyMsg) => {
+        assert.ok(err, 'Throws error')
+        assert.notOk(replyMsg, 'Does not return a reply message')
+        next()
+      })
+    })
+  })
 
   context('Throws error and published nothing when given an invalid inviteId', (assert, next) => {
     reply('bad id', (err,replyMsg) => {
