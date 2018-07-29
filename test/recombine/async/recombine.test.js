@@ -30,15 +30,11 @@ describe('recombine.async.recombine', context => {
       carol.id
     ]
 
-    console.log('alice id ', alice.id)
-    console.log('bob   id ', bob.id)
-    console.log('carol id ', carol.id)
-
-
     name = 'My SBB Dark Crystal'
     secret = Math.random().toString(36)
     quorum = 2
 
+    
   })
 
   context.afterEach(c => {
@@ -68,12 +64,10 @@ describe('recombine.async.recombine', context => {
           }
           if (shardHolder === alice.id) {
             reply.body = unbox(shard, alice.keys)
-            console.log('alices shard',reply.body)
             replies['alice'] = reply
           }
           if (shardHolder === bob.id) {
             reply.body = unbox(shard, bob.keys)
-            console.log('Bobs shard',reply.body)
             replies['bob'] = reply
           }
         })
@@ -86,9 +80,7 @@ describe('recombine.async.recombine', context => {
           
             recombine(rootId, (err,returnedSecret) => {
               assert.notOk(err, 'error is null')
-              assert.ok(data, 'returns the secret')
-              
-              // TODO: assert equal secret,returnedSecret
+              assert.equal(secret, returnedSecret, 'returns the correct secret')     
               next()
             }) 
           })
