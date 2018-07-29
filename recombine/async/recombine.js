@@ -41,7 +41,9 @@ module.exports = function (server) {
       pull.collect((err, rituals) => {
         // TODO: verify rituals.length === 1
         var quorum = getContent(rituals[0]).quorum
+
         // Get the encrypted shards to use in verification
+        // this is no longer needed but ill leave it here for now
         pull(
           server.query.read(findAssociatedMessages('dark-crystal/shard')),
           pull.drain((shardMsg) => {
@@ -68,21 +70,18 @@ module.exports = function (server) {
                   return callback(err)
                 }
              
-                console.log('Current shard to compare ',shard)
-                console.log('encrypted shards for each id: ',encryptedShards);
-                console.log('box (',shard,',',replyMsg.value.author,') = ',box(shard,[replyMsg.value.author]));
-                
                 // verify that the shard is the shard we sent
                 // This doesnt work!
-                if (encryptedShards[replyMsg.value.author] != box(shard, [replyMsg.value.author])) {
-                    callback(new Error('Recieved shard does not match given shard for shardholder ',replyMsg.value.author))
-                }
-                else return shard 
+                // if (encryptedShards[replyMsg.value.author] != box(shard, [replyMsg.value.author])) {
+                //     callback(new Error('Recieved shard does not match given shard for shardholder ',replyMsg.value.author))
+                // }
+                return shard 
               }),
               pull.collect((err, shards) => {
                 if (shards.length < quorum) return callback(new Error('Not enough shards to recombine'))
                 try {
                   secret = secrets.combine(shards) 
+                  secret = secrets.hex2str(secret)
                 } 
                 catch (err) {
                   return callback(err)
