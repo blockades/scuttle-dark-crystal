@@ -1,33 +1,20 @@
 const ScuttleInvite = require('scuttle-invite')
 const pull = require('pull-stream')
 const getContent = require('ssb-msg-content')
+const PullShardsByRoot = require('../../shard/pull/byRoot')
 
 const { isMsgId, isFeedId } = require('ssb-ref')
 const { isInvite, isReply } = require('scuttle-invite-schema')
 
 module.exports = function (server) {
   const scuttle = ScuttleInvite(server)
+  const pullShardsByRoot = PullShardsByRoot(server)
 
   return function request (rootId, callback) {
-    if (!isMsgId(rootId)) return callback(new Error('Invalid rootId'))
-
-    const crystalShards = (root) => {
-      return {
-        query: [{
-          $filter: {
-            value: {
-              content: {
-                type: 'dark-crystal/shard',
-                root
-              }
-            }
-          }
-        }]
-      }
-    }
+    if (!isMsgId(rootId)) return callback(new Error('Invalid root'))
 
     pull(
-      server.query.read(crystalShards(rootId)),
+      pullShardsByRoot(rootId, { limit: 0 }),
       pull.map(shard => {
         return {
           root: rootId,
