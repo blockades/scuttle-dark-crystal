@@ -7,7 +7,7 @@ const { isMsgId, isFeedId } = require('ssb-ref')
 const { isInvite, isReply } = require('scuttle-invite-schema')
 
 module.exports = function (server) {
-  const scuttle = ScuttleInvite(server)
+  const invites = ScuttleInvite(server)
   const pullShardsByRoot = PullShardsByRoot(server)
 
   return function request (rootId, callback) {
@@ -32,7 +32,7 @@ module.exports = function (server) {
 
         pull(
           pull.values(requests),
-          pull.asyncMap(scuttle.invites.async.private.publish),
+          pull.asyncMap(invites.async.private.publish),
           pull.collect(callback)
         )
       })

@@ -7,7 +7,7 @@ const { isMsgId } = require('ssb-ref')
 const { isInvite, isReply } = require('scuttle-invite-schema')
 
 module.exports = function (server) {
-  const scuttle = ScuttleInvite(server)
+  const invites = ScuttleInvite(server)
   const pullShardsByRoot = PullShardsByRoot(server)
 
   return function reply (inviteId, callback) {
@@ -60,7 +60,7 @@ module.exports = function (server) {
             recps: [author, server.id]
           }
 
-          scuttle.invites.async.private.reply(reply, callback)
+          invites.async.private.reply(reply, callback)
         })
       )
     })
