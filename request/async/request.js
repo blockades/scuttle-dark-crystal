@@ -16,16 +16,16 @@ module.exports = function (server) {
     pull(
       pullShardsByRoot(rootId, { limit: 0 }),
       pull.map(shard => {
+        const content = getContent(shard)
         return {
+          type: "invite",
+          version: "v1",
           root: rootId,
           body: "Hi you've been holding a shard for me, can I please have it back?",
-          recps: getContent(shard).recps,
+          recps: content.recps,
         }
       }),
-      pull.through(request => {
-        if ((isMsgId(request.root)) && (request.recps.every(isFeedId))) return request
-        else return callback(new Error('Error validating request ', request))
-      }),
+      pull.filter(isInvite),
       pull.collect((err, requests) => {
         if (err) return callback(err)
         if (requests.length < 1) return callback(new Error('There are no shards associated with rootId ', rootId))
