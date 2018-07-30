@@ -45,6 +45,7 @@ describe('reply.async.reply', context => {
         reply(inviteMsg.key, (err, replyMsg) => {
           assert.notOk(err, 'null errors')
           assert.ok(replyMsg, 'returns a reply message')
+          assert.ok(isReply(replyMsg), 'message are valid replies')
           next()
         })
       })

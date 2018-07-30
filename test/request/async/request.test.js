@@ -38,9 +38,7 @@ describe('request.async.request', context => {
         assert.notOk(err, 'null errors')
         assert.ok(msgs, 'invites messages')
         assert.equal(msgs.length, recps.length, 'publishes a request for each shard')
-        // This won't work unless we remove parseInvite from invites.async.private.publish method (and all uses of parseInvite)
-        // Question: Should we bother parsing/decorating the invite in scuttle-invite?
-        // assert.equal(msgs.every(isInvite), true, 'all are invites')
+        assert.ok(msgs.every(isInvite), 'all messages are valid invites')
         next()
       })
     })
