@@ -8,16 +8,14 @@ const pull = require('pull-stream')
 describe('reply.async.reply', context => {
   let server, reply, katie
   let rootId, katiesInvite, katiesShard
+
   context.beforeEach(c => {
     server = Server()
     reply = Reply(server)
-
-    // we are holding a shard from katie
     katie = server.createFeed()
 
     rootId = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
-    
-    // We need to recreate an invite from katie that looks like this:
+
     katiesInvite = {
       type: 'invite',
       root: rootId,
@@ -25,7 +23,7 @@ describe('reply.async.reply', context => {
       version: 'v1',
       recps: [katie.id,server.id]
     }
-    // and a shard with the same root id, which would look like this:
+
     katiesShard = { 
       type: 'dark-crystal/shard',
       version: '1.0.0',
@@ -33,7 +31,6 @@ describe('reply.async.reply', context => {
       shard: box('imagine this is a shard', [server.id]),
       recps: [katie.id, server.id] 
     }
-
   })
 
   context.afterEach(c => {
@@ -41,13 +38,11 @@ describe('reply.async.reply', context => {
   })
 
   context('Publishes a reply', (assert, next) => {
-
-    // Im not sure if its better to use 'add' or 'publish'
-    katie.publish(katiesShard, (err,shardMsg) => {
-      if (err) console.error(error)
-      katie.publish(katiesInvite, (err,inviteMsg) => {
-        if (err) console.error(error)
-        reply(inviteMsg.key, (err,replyMsg) => {
+    katie.publish(katiesShard, (err, shardMsg) => {
+      if (err) throw err
+      katie.publish(katiesInvite, (err, inviteMsg) => {
+        if (err) throw err
+        reply(inviteMsg.key, (err, replyMsg) => {
           assert.notOk(err, 'null errors')
           assert.ok(replyMsg, 'returns a reply message')
           next()
@@ -57,8 +52,8 @@ describe('reply.async.reply', context => {
   })
 
   context('Throws error if associated shard does not exist', (assert, next) => {
-    katie.publish(katiesInvite, (err,inviteMsg) => {
-      if (err) console.error(error)
+    katie.publish(katiesInvite, (err, inviteMsg) => {
+      if (err) throw err
       reply(inviteMsg.key, (err,replyMsg) => {
         assert.ok(err, 'Throws error')
         assert.notOk(replyMsg, 'Does not return a reply message')
@@ -68,7 +63,7 @@ describe('reply.async.reply', context => {
   })
 
   context('Throws error and published nothing when given an invalid inviteId', (assert, next) => {
-    reply('bad id', (err,replyMsg) => {
+    reply('bad id', (err, replyMsg) => {
       assert.ok(err, 'Throws error')
       assert.notOk(replyMsg, 'data is undefined')
     })

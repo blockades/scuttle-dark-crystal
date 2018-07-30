@@ -1,8 +1,9 @@
-
 const { describe } = require('tape-plus')
 const Server = require('../../testbot')
 const Share = require('../../../share/async/share')
 const PublishRoot = require('../../../root/async/publish')
+
+const { isInvite } = require('scuttle-invite-schema')
 
 const Request = require('../../../request/async/request')
 
@@ -20,11 +21,11 @@ describe('request.async.request', context => {
       server.createFeed().id,
       server.createFeed().id
     ]
+
     name = 'My SBB Dark Crystal'
     secret = Math.random().toString(36)
     quorum = 3
-
-    })
+  })
 
   context.afterEach(c => {
     server.close()
@@ -36,7 +37,10 @@ describe('request.async.request', context => {
       request(rootId, (err, msgs) => {
         assert.notOk(err, 'null errors')
         assert.ok(msgs, 'invites messages')
-        // TODO: deepEqual
+        assert.equal(msgs.length, recps.length, 'publishes a request for each shard')
+        // This won't work unless we remove parseInvite from invites.async.private.publish method (and all uses of parseInvite)
+        // Question: Should we bother parsing/decorating the invite in scuttle-invite?
+        // assert.equal(msgs.every(isInvite), true, 'all are invites')
         next()
       })
     })
