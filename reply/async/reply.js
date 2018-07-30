@@ -4,7 +4,7 @@ const getContent = require('ssb-msg-content')
 const PullShardsByRoot = require('../../shard/pull/byRoot')
 
 const { isMsgId } = require('ssb-ref')
-const { isInvite, isReply } = require('scuttle-invite-schema')
+const { isInvite, isReply } = require('ssb-invite-schema')
 
 module.exports = function (server) {
   const invites = ScuttleInvite(server)

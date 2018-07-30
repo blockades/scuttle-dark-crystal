@@ -3,7 +3,7 @@ const Server = require('../../testbot')
 const Share = require('../../../share/async/share')
 const PublishRoot = require('../../../root/async/publish')
 
-const { isInvite } = require('scuttle-invite-schema')
+const { isInvite } = require('ssb-invite-schema')
 
 const Request = require('../../../request/async/request')
 
