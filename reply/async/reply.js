@@ -1,31 +1,17 @@
 const ScuttleInvite = require('scuttle-invite')
 const pull = require('pull-stream')
 const getContent = require('ssb-msg-content')
+const PullShardsByRoot = require('../../shard/pull/byRoot')
 
 const { isMsgId } = require('ssb-ref')
 const { isInvite, isReply } = require('scuttle-invite-schema')
 
 module.exports = function (server) {
   const scuttle = ScuttleInvite(server)
+  const pullShardsByRoot = PullShardsByRoot(server)
 
   return function reply (inviteId, callback) {
-
     if (!isMsgId(inviteId)) return callback(new Error('Invalid inviteId'))
-
-    const findShard = (root) => {
-      return {
-        query: [{
-          $filter: {
-            value: {
-              content: {
-                type: 'dark-crystal/shard',
-                root
-              }
-            }
-          }
-        }]
-      }
-    }
 
     server.get(inviteId, (err, invite) => {
       if (err) return callback(err)
@@ -34,7 +20,7 @@ module.exports = function (server) {
       const rootId = getContent(invite).root
 
       pull(
-        server.query.read(findShard(rootId)),
+        pullShardsByRoot(rootId, { limit: 0 }),
         pull.collect((err, shards) => {
           if (err) return callback(err)
 
@@ -48,8 +34,12 @@ module.exports = function (server) {
             return callback(error)
           }
 
-          const shardMsg = shards[0]
-          const { value: { author } } = shardMsg
+          const {
+            value: {
+              author,
+              content: { shard }
+            }
+          } = shards[0]
 
           if (author !== invite.author) {
             let error = new Error('Invite author does not match associated shard author.')
@@ -60,7 +50,6 @@ module.exports = function (server) {
           // server.get(rootId,  )
           // (currently this wont work as our test does not publish a root message)
 
-          const shard = getContent(shardMsg).shard
           const theDecryptedShard = server.private.unbox(shard)
 
           const reply = {
