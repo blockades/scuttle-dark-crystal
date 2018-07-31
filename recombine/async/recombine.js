@@ -1,14 +1,11 @@
-
-
 const Invites = require('scuttle-invite')
 const ref = require('ssb-ref')
 const pull = require('pull-stream')
-const { isInvite, isReply } = require('scuttle-invite-schema')
+const { isInvite, isReply } = require('ssb-invite-schema')
 const pullRitual = require('../../ritual/pull/mine')
 const { box } = require('ssb-keys')
 const secrets = require('secrets.js-grempe')
 const getContent = require('ssb-msg-content')
-
 
 module.exports = function (server) {
   const invites = Invites(server)
