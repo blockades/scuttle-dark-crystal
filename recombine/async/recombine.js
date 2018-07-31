@@ -77,8 +77,8 @@ module.exports = function (server) {
               pull.collect((err, shards) => {
                 if (shards.length < quorum) return callback(new Error('Not enough shards to recombine'))
                 try {
-                  secret = secrets.combine(shards) 
-                  secret = secrets.hex2str(secret)
+                  var hex = secrets.combine(shards) 
+                  var secret = secrets.hex2str(hex)
                 } 
                 catch (err) {
                   return callback(err)
