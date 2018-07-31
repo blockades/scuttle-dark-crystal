@@ -1,7 +1,7 @@
 const inject = require('scuttle-inject')
 
 const raw = require('./methods')
-const PLUGIN_DEPS = ['private', 'query', 'backlinks','invites']
+const PLUGIN_DEPS = ['private', 'query', 'backlinks']
 
 const niceMappings = {}
 
