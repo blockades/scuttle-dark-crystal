@@ -90,7 +90,6 @@ module.exports = function (server) {
         )
       })
     )
-
   }
 }
 
