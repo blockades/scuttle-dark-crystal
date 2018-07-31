@@ -1,4 +1,3 @@
-
 const { describe } = require('tape-plus')
 const Server = require('../../testbot')
 const { box, unbox } = require('ssb-keys')
@@ -33,7 +32,6 @@ describe('recombine.async.recombine', context => {
     name = 'My SBB Dark Crystal'
     secret = Math.random().toString(36)
     quorum = 2
-
     
   })
 
@@ -49,8 +47,7 @@ describe('recombine.async.recombine', context => {
       request(rootId, (err, inviteMsgs) => { 
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
-          // shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
-          var shardHolder = inviteMsg.recipient
+          var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
           var shardMsgs = data.shards.map(s => (getContent(s)))
           var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard 
           // We need to recreate replies from alice, and bob: 
