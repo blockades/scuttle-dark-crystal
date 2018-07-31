@@ -68,7 +68,6 @@ describe('recombine.async.recombine', context => {
             replies['bob'] = reply
           }
         })
-
         
         alice.publish(replies.alice, (err,aliceReply) => {
           if (err) console.error(err)
@@ -110,7 +109,6 @@ describe('recombine.async.recombine', context => {
             replies['alice'] = reply
           }
         })
-
         
         alice.publish(replies.alice, (err,aliceReply) => {
           if (err) console.error(err)
@@ -124,7 +122,7 @@ describe('recombine.async.recombine', context => {
     })
   })
 
-  context('Throws an error if quorum is not reached', (assert, next) => {
+  context('Throws an error and returns no secret if an invalid shard is found', (assert, next) => {
     var replies = {}
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
       if (err) console.error(err)
@@ -148,16 +146,72 @@ describe('recombine.async.recombine', context => {
             reply.body = unbox(shard, alice.keys)
             replies['alice'] = reply
           }
+          if (shardHolder === bob.id) {
+            reply.body = 'This is not a shard'
+            replies['bob'] = reply
+          }
         })
-
         
         alice.publish(replies.alice, (err,aliceReply) => {
           if (err) console.error(err)
-          recombine(rootId, (err,returnedSecret) => {
-            assert.ok(err, 'Throws an error')
-            assert.notOk(returnedSecret, 'Does not return a secret')
-            next()
-          }) 
+          bob.publish(replies.bob, (err,bobReply) => {
+            if (err) console.error(err)
+          
+            recombine(rootId, (err,returnedSecret) => {
+              assert.ok(err, 'Throws an error')
+              assert.notOk(returnedSecret, 'Does not return a secret')
+              next()
+            }) 
+          })
+        })
+      })
+    })
+  })
+  
+  context('Throws an error and returns no secret when reply refers to the wrong root message', (assert, next) => {
+    var replies = {}
+    share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
+      share({ name, secret: 'another secret', quorum, recps: shardHolders }, (err, otherData) => {
+        if (err) console.error(err)
+        var rootId = data.root.key
+        request(rootId, (err, inviteMsgs) => { 
+          inviteMsgs.forEach((inviteMsg) => {
+            var inviteMsgContent = getContent(inviteMsg)
+            var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
+            var shardMsgs = data.shards.map(s => (getContent(s)))
+            var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard 
+            // We need to recreate replies from alice, and bob: 
+            reply = {
+              type: 'invite-reply',
+              root: otherData.root.key,
+              branch: inviteMsg.key,
+              accept: true,
+              version: 'v1',
+              recps: inviteMsgContent.recps
+            }
+            if (shardHolder === alice.id) {
+              reply.body = unbox(shard, alice.keys)
+              replies['alice'] = reply
+            }
+            if (shardHolder === bob.id) {
+              reply.body = unbox(shard, bob.keys)
+              replies['bob'] = reply
+            }
+          })
+
+          
+          alice.publish(replies.alice, (err,aliceReply) => {
+            if (err) console.error(err)
+            bob.publish(replies.bob, (err,bobReply) => {
+              if (err) console.error(err)
+            
+              recombine(rootId, (err,returnedSecret) => {
+                assert.ok(err, 'Throws an error')
+                assert.notOk(returnedSecret, 'Does not return a secret')
+                next()
+              }) 
+            })
+          })
         })
       })
     })

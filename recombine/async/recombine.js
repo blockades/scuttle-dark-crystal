@@ -36,19 +36,19 @@ module.exports = function (server) {
     pull(
       server.query.read(findAssociatedMessages('dark-crystal/ritual')),
       pull.collect((err, rituals) => {
-        // TODO: verify rituals.length === 1
-        var quorum = getContent(rituals[0]).quorum
+        if (rituals.length != 1) {
+          let error = new Error('There must be exactly one ritual message for each root message')
+          return callback(error)
+        }
 
+        var quorum = getContent(rituals[0]).quorum
 
         // get the unencrypted shards from the reply messages 
         pull(
           server.query.read(findAssociatedMessages('invite-reply')),
           pull.map((replyMsg) => {
-
+            
             var shard = getContent(replyMsg).body
-
-            // TODO: this unboxed shard validation should be moved
-            // to a separate method so that it can be used independently
 
             // validate that shard is a shard using secrets.js 
             try {
@@ -61,7 +61,10 @@ module.exports = function (server) {
             return shard 
           }),
           pull.collect((err, shards) => {
-            if (shards.length < quorum) return callback(new Error('Not enough shards to recombine'))
+            if (shards.length < quorum) {
+              let error = new Error('Not enough shards to recombine')
+              return callback(error)
+            }
             try {
               var hex = secrets.combine(shards) 
               var secret = secrets.hex2str(hex)
