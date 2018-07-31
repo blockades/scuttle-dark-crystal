@@ -97,6 +97,44 @@ describe('recombine.async.recombine', context => {
           var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
           var shardMsgs = data.shards.map(s => (getContent(s)))
           var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard 
+          reply = {
+            type: 'invite-reply',
+            root: rootId,
+            branch: inviteMsg.key,
+            accept: true,
+            version: 'v1',
+            recps: inviteMsgContent.recps
+          }
+          if (shardHolder === alice.id) {
+            reply.body = unbox(shard, alice.keys)
+            replies['alice'] = reply
+          }
+        })
+
+        
+        alice.publish(replies.alice, (err,aliceReply) => {
+          if (err) console.error(err)
+          recombine(rootId, (err,returnedSecret) => {
+            assert.ok(err, 'Throws an error')
+            assert.notOk(returnedSecret, 'Does not return a secret')
+            next()
+          }) 
+        })
+      })
+    })
+  })
+
+  context('Throws an error if quorum is not reached', (assert, next) => {
+    var replies = {}
+    share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
+      if (err) console.error(err)
+      var rootId = data.root.key
+      request(rootId, (err, inviteMsgs) => { 
+        inviteMsgs.forEach((inviteMsg) => {
+          var inviteMsgContent = getContent(inviteMsg)
+          var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
+          var shardMsgs = data.shards.map(s => (getContent(s)))
+          var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard 
           // We need to recreate replies from alice, and bob: 
           reply = {
             type: 'invite-reply',

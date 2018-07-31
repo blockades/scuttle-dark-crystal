@@ -39,53 +39,37 @@ module.exports = function (server) {
         // TODO: verify rituals.length === 1
         var quorum = getContent(rituals[0]).quorum
 
-        // Get the encrypted shards to use in verification
-        // this is no longer needed but ill leave it here for now
+
+        // get the unencrypted shards from the reply messages 
         pull(
-          server.query.read(findAssociatedMessages('dark-crystal/shard')),
-          pull.drain((shardMsg) => {
-            var shardHolder = getContent(shardMsg).recps.find(r => (r != server.id))
-            encryptedShards[shardHolder] = getContent(shardMsg).shard
-            return true
-          }, () => {
+          server.query.read(findAssociatedMessages('invite-reply')),
+          pull.map((replyMsg) => {
 
-            // get the unencrypted shards from the reply messages 
-            pull(
-              server.query.read(findAssociatedMessages('invite-reply')),
-              pull.map((replyMsg) => {
+            var shard = getContent(replyMsg).body
 
-                var shard = getContent(replyMsg).body
+            // TODO: this unboxed shard validation should be moved
+            // to a separate method so that it can be used independently
 
-                // TODO: this unboxed shard validation should be moved
-                // to a separate method so that it can be used independently
-
-                // validate that shard is a shard using secrets.js 
-                try {
-                  var shardComponents = secrets.extractShareComponents(shard)
-                }
-                catch (err) {
-                  return callback(err)
-                }
-             
-                // verify that the shard is the shard we sent
-                // This doesnt work!
-                // if (encryptedShards[replyMsg.value.author] != box(shard, [replyMsg.value.author])) {
-                //     callback(new Error('Recieved shard does not match given shard for shardholder ',replyMsg.value.author))
-                // }
-                return shard 
-              }),
-              pull.collect((err, shards) => {
-                if (shards.length < quorum) return callback(new Error('Not enough shards to recombine'))
-                try {
-                  var hex = secrets.combine(shards) 
-                  var secret = secrets.hex2str(hex)
-                } 
-                catch (err) {
-                  return callback(err)
-                } 
-                callback(null,secret)
-              })
-            )
+            // validate that shard is a shard using secrets.js 
+            try {
+              var shardComponents = secrets.extractShareComponents(shard)
+            }
+            catch (err) {
+              return callback(err)
+            }
+         
+            return shard 
+          }),
+          pull.collect((err, shards) => {
+            if (shards.length < quorum) return callback(new Error('Not enough shards to recombine'))
+            try {
+              var hex = secrets.combine(shards) 
+              var secret = secrets.hex2str(hex)
+            } 
+            catch (err) {
+              return callback(err)
+            } 
+            callback(null,secret)
           })
         )
       })
