@@ -13,11 +13,17 @@ module.exports = function (server) {
   return function reply (inviteId, callback) {
     if (!isMsgId(inviteId)) return callback(new Error('Invalid inviteId'))
 
-    server.get(inviteId, (err, invite) => {
+    invites.async.getInvite(inviteId, (err, invite) => {
       if (err) return callback(err)
-      if (!isInvite(invite)) return callback(new Error('This record is not an invite'))
 
-      const rootId = getContent(invite).root
+      const {
+        value: {
+          author: inviteAuthor,
+          content: {
+            root: rootId
+          }
+        }
+      } = invite
 
       pull(
         pullShardsByRoot(rootId, { limit: 0 }),
@@ -41,7 +47,7 @@ module.exports = function (server) {
             }
           } = shards[0]
 
-          if (author !== invite.author) {
+          if (author !== inviteAuthor) {
             let error = new Error('Invite author does not match associated shard author.')
             return callback(error)
           }
@@ -60,7 +66,7 @@ module.exports = function (server) {
             recps: [author, server.id]
           }
 
-          invites.async.private.reply(reply, callback)
+          invites.async.private.reply(inviteId, reply, callback)
         })
       )
     })

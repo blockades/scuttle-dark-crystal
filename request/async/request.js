@@ -19,7 +19,7 @@ module.exports = function (server) {
         const content = getContent(shard)
         return {
           type: "invite",
-          version: "v1",
+          version: "1",
           root: rootId,
           body: "Hi you've been holding a shard for me, can I please have it back?",
           recps: content.recps,

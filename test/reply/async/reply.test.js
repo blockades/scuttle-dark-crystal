@@ -5,6 +5,8 @@ const { box } = require('ssb-keys')
 const Reply = require('../../../reply/async/reply')
 const pull = require('pull-stream')
 
+const { isReply } = require('ssb-invite-schema')
+
 describe('reply.async.reply', context => {
   let server, reply, katie
   let rootId, katiesInvite, katiesShard
@@ -20,7 +22,7 @@ describe('reply.async.reply', context => {
       type: 'invite',
       root: rootId,
       body: 'Hi you\'ve been holding a shard for me, can I please have it back?',
-      version: 'v1',
+      version: '1',
       recps: [katie.id,server.id]
     }
 
@@ -55,7 +57,7 @@ describe('reply.async.reply', context => {
   context('Throws error if associated shard does not exist', (assert, next) => {
     katie.publish(katiesInvite, (err, inviteMsg) => {
       if (err) throw err
-      reply(inviteMsg.key, (err,replyMsg) => {
+      reply(inviteMsg.key, (err, replyMsg) => {
         assert.ok(err, 'Throws error')
         assert.notOk(replyMsg, 'Does not return a reply message')
         next()
