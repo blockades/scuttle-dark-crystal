@@ -14,7 +14,7 @@ module.exports = {
       publish: require('./root/async/publish')
     },
     pull: {
-      roots: require('./root/pull/roots'),
+      mine: require('./root/pull/mine'),
       backlinks: require('./root/pull/backlinks')
     }
   },
