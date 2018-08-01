@@ -22,12 +22,18 @@ module.exports = {
     async: {
       get: require('./ritual/async/get'),
       publish: require('./ritual/async/publish')
+    },
+    pull: {
+      mine: require('./ritual/pull/mine')
     }
   },
   shard: {
     async: {
       get: require('./shard/async/get'),
       publishAll: require('./shard/async/publishAll')
+    },
+    pull: {
+      byRoot: require('./shard/pull/byRoot')
     }
   },
   share: {
