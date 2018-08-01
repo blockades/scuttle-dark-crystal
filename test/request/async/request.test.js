@@ -44,7 +44,6 @@ describe('request.async.request', context => {
     })
   })
 
-
   context('Throws errors and publishes nothing when rootId is invalid', (assert, next) => {
     share({ name, secret, quorum, recps }, (err, data) => {
       var rootId = 'invalid rootId'
@@ -58,7 +57,7 @@ describe('request.async.request', context => {
 
   context('Publishes nothing when given a rootId which has no associated shards', (assert, next) => {
     publishRoot(name, (err, data) => {
-      var rootId = data.key 
+      var rootId = data.key
       request(rootId, (err, msgs) => {
         assert.ok(err, 'Throws errors')
         assert.notOk(msgs, 'Publishes nothing')

@@ -23,15 +23,15 @@ describe('reply.async.reply', context => {
       root: rootId,
       body: 'Hi you\'ve been holding a shard for me, can I please have it back?',
       version: '1',
-      recps: [katie.id,server.id]
+      recps: [katie.id, server.id]
     }
 
-    katiesShard = { 
+    katiesShard = {
       type: 'dark-crystal/shard',
       version: '1.0.0',
       root: rootId,
       shard: box('imagine this is a shard', [server.id]),
-      recps: [katie.id, server.id] 
+      recps: [katie.id, server.id]
     }
   })
 

@@ -9,8 +9,8 @@ const Share = require('../../../share/async/share')
 const Recombine = require('../../../recombine/async/recombine')
 
 describe('recombine.async.recombine', context => {
-  let server, recombine, request, alice, bob, carol 
-  let shardHolders,name, secret,quorum, share
+  let server, recombine, request, alice, bob, carol
+  let shardHolders, name, secret, quorum, share
 
   context.beforeEach(c => {
     server = Server()
@@ -32,7 +32,6 @@ describe('recombine.async.recombine', context => {
     name = 'My SBB Dark Crystal'
     secret = Math.random().toString(36)
     quorum = 2
-    
   })
 
   context.afterEach(c => {
@@ -44,13 +43,13 @@ describe('recombine.async.recombine', context => {
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
-      request(rootId, (err, inviteMsgs) => { 
+      request(rootId, (err, inviteMsgs) => {
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
           var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
           var shardMsgs = data.shards.map(s => (getContent(s)))
-          var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard 
-          // We need to recreate replies from alice, and bob: 
+          var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard
+          // We need to recreate replies from alice, and bob:
           reply = {
             type: 'invite-reply',
             root: rootId,
@@ -68,34 +67,34 @@ describe('recombine.async.recombine', context => {
             replies['bob'] = reply
           }
         })
-        
-        alice.publish(replies.alice, (err,aliceReply) => {
+
+        alice.publish(replies.alice, (err, aliceReply) => {
           if (err) console.error(err)
-          bob.publish(replies.bob, (err,bobReply) => {
+          bob.publish(replies.bob, (err, bobReply) => {
             if (err) console.error(err)
-          
-            recombine(rootId, (err,returnedSecret) => {
+
+            recombine(rootId, (err, returnedSecret) => {
               assert.notOk(err, 'error is null')
-              assert.equal(secret, returnedSecret, 'returns the correct secret')     
+              assert.equal(secret, returnedSecret, 'returns the correct secret')
               next()
-            }) 
+            })
           })
         })
       })
     })
   })
-  
+
   context('Throws an error if quorum is not reached', (assert, next) => {
     var replies = {}
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
-      request(rootId, (err, inviteMsgs) => { 
+      request(rootId, (err, inviteMsgs) => {
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
           var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
           var shardMsgs = data.shards.map(s => (getContent(s)))
-          var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard 
+          var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard
           reply = {
             type: 'invite-reply',
             root: rootId,
@@ -109,14 +108,14 @@ describe('recombine.async.recombine', context => {
             replies['alice'] = reply
           }
         })
-        
-        alice.publish(replies.alice, (err,aliceReply) => {
+
+        alice.publish(replies.alice, (err, aliceReply) => {
           if (err) console.error(err)
-          recombine(rootId, (err,returnedSecret) => {
+          recombine(rootId, (err, returnedSecret) => {
             assert.ok(err, 'Throws an error')
             assert.notOk(returnedSecret, 'Does not return a secret')
             next()
-          }) 
+          })
         })
       })
     })
@@ -127,13 +126,13 @@ describe('recombine.async.recombine', context => {
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
-      request(rootId, (err, inviteMsgs) => { 
+      request(rootId, (err, inviteMsgs) => {
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
           var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
           var shardMsgs = data.shards.map(s => (getContent(s)))
-          var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard 
-          // We need to recreate replies from alice, and bob: 
+          var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard
+          // We need to recreate replies from alice, and bob:
           reply = {
             type: 'invite-reply',
             root: rootId,
@@ -151,36 +150,36 @@ describe('recombine.async.recombine', context => {
             replies['bob'] = reply
           }
         })
-        
-        alice.publish(replies.alice, (err,aliceReply) => {
+
+        alice.publish(replies.alice, (err, aliceReply) => {
           if (err) console.error(err)
-          bob.publish(replies.bob, (err,bobReply) => {
+          bob.publish(replies.bob, (err, bobReply) => {
             if (err) console.error(err)
-          
-            recombine(rootId, (err,returnedSecret) => {
+
+            recombine(rootId, (err, returnedSecret) => {
               assert.ok(err, 'Throws an error')
               assert.notOk(returnedSecret, 'Does not return a secret')
               next()
-            }) 
+            })
           })
         })
       })
     })
   })
-  
+
   context('Throws an error and returns no secret when reply refers to the wrong root message', (assert, next) => {
     var replies = {}
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
       share({ name, secret: 'another secret', quorum, recps: shardHolders }, (err, otherData) => {
         if (err) console.error(err)
         var rootId = data.root.key
-        request(rootId, (err, inviteMsgs) => { 
+        request(rootId, (err, inviteMsgs) => {
           inviteMsgs.forEach((inviteMsg) => {
             var inviteMsgContent = getContent(inviteMsg)
             var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
             var shardMsgs = data.shards.map(s => (getContent(s)))
-            var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard 
-            // We need to recreate replies from alice, and bob: 
+            var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard
+            // We need to recreate replies from alice, and bob:
             reply = {
               type: 'invite-reply',
               root: otherData.root.key,
@@ -199,17 +198,16 @@ describe('recombine.async.recombine', context => {
             }
           })
 
-          
-          alice.publish(replies.alice, (err,aliceReply) => {
+          alice.publish(replies.alice, (err, aliceReply) => {
             if (err) console.error(err)
-            bob.publish(replies.bob, (err,bobReply) => {
+            bob.publish(replies.bob, (err, bobReply) => {
               if (err) console.error(err)
-            
-              recombine(rootId, (err,returnedSecret) => {
+
+              recombine(rootId, (err, returnedSecret) => {
                 assert.ok(err, 'Throws an error')
                 assert.notOk(returnedSecret, 'Does not return a secret')
                 next()
-              }) 
+              })
             })
           })
         })

@@ -1,10 +1,8 @@
 const ScuttleInvite = require('scuttle-invite')
 const pull = require('pull-stream')
-const getContent = require('ssb-msg-content')
 const PullShardsByRoot = require('../../shard/pull/byRoot')
 
 const { isMsgId } = require('ssb-ref')
-const { isInvite, isReply } = require('ssb-invite-schema')
 
 module.exports = function (server) {
   const invites = ScuttleInvite(server)
@@ -31,7 +29,7 @@ module.exports = function (server) {
           if (err) return callback(err)
 
           if (shards.length < 1) {
-            let error = new Error('There are no shards associated with rootId ',rootId)
+            let error = new Error('There are no shards associated with rootId ', rootId)
             return callback(error)
           }
 
