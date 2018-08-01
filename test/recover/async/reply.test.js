@@ -1,9 +1,9 @@
 const { describe } = require('tape-plus')
-const Server = require('../../testbot')
+const pull = require('pull-stream')
 const { box } = require('ssb-keys')
 
-const Reply = require('../../../reply/async/reply')
-const pull = require('pull-stream')
+const Server = require('../../testbot')
+const Reply = require('../../../recover/async/reply')
 
 const { isReply } = require('ssb-invite-schema')
 

@@ -1,12 +1,12 @@
 const { describe } = require('tape-plus')
-const Server = require('../../testbot')
 const { box, unbox } = require('ssb-keys')
 const getContent = require('ssb-msg-content')
 const pull = require('pull-stream')
-const Request = require('../../../request/async/request')
-const Share = require('../../../share/async/share')
 
-const Recombine = require('../../../recombine/async/recombine')
+const Server = require('../../testbot')
+const Share = require('../../../share/async/share')
+const Request = require('../../../recover/async/request')
+const Recombine = require('../../../recover/async/recombine')
 
 describe('recombine.async.recombine', context => {
   let server, recombine, request, alice, bob, carol

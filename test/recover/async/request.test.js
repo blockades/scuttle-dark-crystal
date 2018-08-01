@@ -1,14 +1,14 @@
 const { describe } = require('tape-plus')
+const { isInvite } = require('ssb-invite-schema')
+
 const Server = require('../../testbot')
 const Share = require('../../../share/async/share')
 const PublishRoot = require('../../../root/async/publish')
-
-const { isInvite } = require('ssb-invite-schema')
-
-const Request = require('../../../request/async/request')
+const Request = require('../../../recover/async/request')
 
 describe('request.async.request', context => {
-  let server, share, request
+  let server, share, request, publishRoot
+  let recps, name, secret, quorum
 
   context.beforeEach(c => {
     server = Server()

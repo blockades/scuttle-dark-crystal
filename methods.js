@@ -1,6 +1,13 @@
 const { isRitual, isRoot, isShard } = require('ssb-dark-crystal-schema')
 
 module.exports = {
+  recover: {
+    async: {
+      recombine: require('./recover/async/recombine'),
+      reply: require('./recover/async/reply'),
+      request: require('./recover/async/request')
+    }
+  },
   root: {
     async: {
       get: require('./root/async/get'),
