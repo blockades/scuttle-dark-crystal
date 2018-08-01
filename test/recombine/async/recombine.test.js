@@ -198,7 +198,6 @@ describe('recombine.async.recombine', context => {
               replies['bob'] = reply
             }
           })
-
           
           alice.publish(replies.alice, (err,aliceReply) => {
             if (err) console.error(err)
@@ -215,5 +214,14 @@ describe('recombine.async.recombine', context => {
         })
       })
     })
+  })
+  
+  context('Throws an error when given a rootId for which there is no root message', (assert, next) => {
+    rootId = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
+    recombine(rootId, (err,returnedSecret) => {
+      assert.ok(err, 'Throws an error')
+      assert.notOk(returnedSecret, 'Does not return a secret')
+      next()
+    }) 
   })
 })

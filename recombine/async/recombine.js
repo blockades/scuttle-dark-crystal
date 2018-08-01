@@ -28,9 +28,6 @@ module.exports = function (server) {
       }
     }
     
-    // get the quorum from the ritual message
-    // TODO: use pullRitual( need to give the rootId to opts ) )    
-    
     var encryptedShards = {}
 
     pull(
