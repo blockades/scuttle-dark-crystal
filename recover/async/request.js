@@ -20,6 +20,8 @@ module.exports = function (server) {
       if (feedIds.length < recipients.length) return callback(new Error(`All recipients must be a feedId`))
     } else if (recipients) return callback(new Error(`Recipients must either be an array of feed Ids or falsey`))
 
+    // TODO: verifiy that recipients.indexOf(server.id) < 0
+
     pull(
       pullShardsByRoot(rootId),
       pull.filter(s => {
