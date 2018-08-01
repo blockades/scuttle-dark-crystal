@@ -1,4 +1,5 @@
 const pull = require('pull-stream')
+const next = require('pull-next-query')
 const { isRoot } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
@@ -17,7 +18,7 @@ module.exports = function (server) {
     // NOTE - this could benefit from a deeper merge?
 
     return pull(
-      server.query.read(_opts),
+      next(server.query.read, _opts),
       pull.filter(isRoot)
     )
   }

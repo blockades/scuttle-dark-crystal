@@ -1,10 +1,10 @@
 const ScuttleInvite = require('scuttle-invite')
 const pull = require('pull-stream')
 const getContent = require('ssb-msg-content')
-const PullShardsByRoot = require('../../shard/pull/byRoot')
+const { isMsgId } = require('ssb-ref')
+const { isInvite } = require('ssb-invite-schema')
 
-const { isMsgId, isFeedId } = require('ssb-ref')
-const { isInvite, isReply } = require('ssb-invite-schema')
+const PullShardsByRoot = require('../../shard/pull/byRoot')
 
 module.exports = function (server) {
   const invites = ScuttleInvite(server)
@@ -14,15 +14,15 @@ module.exports = function (server) {
     if (!isMsgId(rootId)) return callback(new Error('Invalid root'))
 
     pull(
-      pullShardsByRoot(rootId, { limit: 0 }),
+      pullShardsByRoot(rootId),
       pull.map(shard => {
-        const content = getContent(shard)
+        const { recps } = getContent(shard)
         return {
-          type: "invite",
-          version: "1",
+          type: 'invite', // is over-written by invites.async.private.publish
+          version: '1', // ditto
           root: rootId,
-          body: "Hi you've been holding a shard for me, can I please have it back?",
-          recps: content.recps,
+          recps,
+          body: "Hi you've been holding a shard for me, can I please have it back?"
         }
       }),
       pull.filter(isInvite),

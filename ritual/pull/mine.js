@@ -3,7 +3,7 @@ const next = require('pull-next-query')
 const { isRitual } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
-  return function mine (opts) {
+  return function mine (opts = {}) {
     const _opts = Object.assign({}, {
       limit: 100,
       query: [{

@@ -26,7 +26,7 @@ module.exports = function (server) {
       } = invite
 
       pull(
-        pullShardsByRoot(rootId, { limit: 0 }),
+        pullShardsByRoot(rootId),
         pull.collect((err, shards) => {
           if (err) return callback(err)
 
