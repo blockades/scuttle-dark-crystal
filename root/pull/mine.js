@@ -3,7 +3,7 @@ const next = require('pull-next-query')
 const { isRoot } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
-  return function pullRoots (opts = {}) {
+  return function mine (opts = {}) {
     const query = [{
       $filter: {
         value: {
