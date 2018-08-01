@@ -10,11 +10,23 @@ module.exports = function (server) {
   const invites = ScuttleInvite(server)
   const pullShardsByRoot = PullShardsByRoot(server)
 
-  return function request (rootId, callback) {
+  return function Request (rootId, recipients, callback) {
     if (!isMsgId(rootId)) return callback(new Error('Invalid root'))
+    if (Array.isArray(recipients)) {
+      let feedIds = recipients
+        .map(recp => typeof recp === 'string' ? recp : recp.link)
+        .filter(Boolean)
+        .filter(isFeed)
+      if (feedIds.length < recipients.length) return callback(new Error(`All recipients must be a feedId`))
+    } else if (recipients) return callback(new Error(`Recipients must either be an array of feed Ids or falsey`))
 
     pull(
       pullShardsByRoot(rootId),
+      pull.filter(shard => {
+        if (recipients) {
+          return getContent(shard).recps.find(r => recipients.indexOf(r))
+        } else return shard
+      }),
       pull.map(shard => {
         const { recps } = getContent(shard)
         return {
