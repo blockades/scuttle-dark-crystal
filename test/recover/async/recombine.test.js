@@ -43,7 +43,7 @@ describe('recombine.async.recombine', context => {
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
-      request(rootId, (err, inviteMsgs) => {
+      request(rootId, null, (err, inviteMsgs) => {
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
           var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
@@ -89,7 +89,7 @@ describe('recombine.async.recombine', context => {
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
-      request(rootId, (err, inviteMsgs) => {
+      request(rootId, null, (err, inviteMsgs) => {
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
           var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
@@ -126,7 +126,7 @@ describe('recombine.async.recombine', context => {
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
-      request(rootId, (err, inviteMsgs) => {
+      request(rootId, null, (err, inviteMsgs) => {
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
           var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
@@ -173,7 +173,7 @@ describe('recombine.async.recombine', context => {
       share({ name, secret: 'another secret', quorum, recps: shardHolders }, (err, otherData) => {
         if (err) console.error(err)
         var rootId = data.root.key
-        request(rootId, (err, inviteMsgs) => {
+        request(rootId, null, (err, inviteMsgs) => {
           inviteMsgs.forEach((inviteMsg) => {
             var inviteMsgContent = getContent(inviteMsg)
             var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]

@@ -1,7 +1,7 @@
 const ScuttleInvite = require('scuttle-invite')
 const pull = require('pull-stream')
 const getContent = require('ssb-msg-content')
-const { isMsgId } = require('ssb-ref')
+const { isMsgId, isFeed } = require('ssb-ref')
 const { isInvite } = require('ssb-invite-schema')
 
 const PullShardsByRoot = require('../../shard/pull/byRoot')
@@ -22,10 +22,10 @@ module.exports = function (server) {
 
     pull(
       pullShardsByRoot(rootId),
-      pull.filter(shard => {
-        if (recipients) {
-          return getContent(shard).recps.find(r => recipients.indexOf(r))
-        } else return shard
+      pull.filter(s => {
+         if (recipients) {
+           return (getContent(s).recps.find(r => (recipients.indexOf(r) > -1))) 
+         } else return true
       }),
       pull.map(shard => {
         const { recps } = getContent(shard)
