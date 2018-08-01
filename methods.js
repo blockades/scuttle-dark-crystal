@@ -6,6 +6,9 @@ module.exports = {
       recombine: require('./recover/async/recombine'),
       reply: require('./recover/async/reply'),
       request: require('./recover/async/request')
+    },
+    pull: {
+      requests: require('./recover/pull/requests')
     }
   },
   root: {
