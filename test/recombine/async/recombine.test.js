@@ -56,7 +56,7 @@ describe('recombine.async.recombine', context => {
             root: rootId,
             branch: inviteMsg.key,
             accept: true,
-            version: 'v1',
+            version: '1',
             recps: inviteMsgContent.recps
           }
           if (shardHolder === alice.id) {
@@ -101,7 +101,7 @@ describe('recombine.async.recombine', context => {
             root: rootId,
             branch: inviteMsg.key,
             accept: true,
-            version: 'v1',
+            version: '1',
             recps: inviteMsgContent.recps
           }
           if (shardHolder === alice.id) {
@@ -139,7 +139,7 @@ describe('recombine.async.recombine', context => {
             root: rootId,
             branch: inviteMsg.key,
             accept: true,
-            version: 'v1',
+            version: '1',
             recps: inviteMsgContent.recps
           }
           if (shardHolder === alice.id) {
@@ -186,7 +186,7 @@ describe('recombine.async.recombine', context => {
               root: otherData.root.key,
               branch: inviteMsg.key,
               accept: true,
-              version: 'v1',
+              version: '1',
               recps: inviteMsgContent.recps
             }
             if (shardHolder === alice.id) {

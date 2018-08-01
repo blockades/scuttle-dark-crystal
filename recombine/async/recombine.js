@@ -43,8 +43,8 @@ module.exports = function (server) {
         // get the unencrypted shards from the reply messages 
         pull(
           server.query.read(findAssociatedMessages('invite-reply')),
+          pull.filter(isReply),         
           pull.map((replyMsg) => {
-            
             var shard = getContent(replyMsg).body
 
             // validate that shard is a shard using secrets.js 
