@@ -30,6 +30,7 @@ module.exports = function (server) {
     pull(
       server.query.read(findAssociatedMessages('dark-crystal/ritual')),
       pull.collect((err, rituals) => {
+        if (err) return callback(err)
         if (rituals.length !== 1) {
           let error = new Error('There must be exactly one ritual message for each root message')
           return callback(error)
@@ -53,6 +54,7 @@ module.exports = function (server) {
             return shard
           }),
           pull.collect((err, shards) => {
+            if (err) return callback(err)
             if (shards.length < quorum) {
               let error = new Error('Not enough shards to recombine')
               return callback(error)

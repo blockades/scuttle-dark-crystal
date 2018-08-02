@@ -56,11 +56,11 @@ describe('recover.async.request', context => {
       })
     })
   })
-  
+
   context('Publishes a multiple requests when given multiple recipients', (assert, next) => {
     share({ name, secret, quorum, recps }, (err, data) => {
       var rootId = data.root.key
-      request(rootId, [recps[1],recps[2]], (err, msgs) => {
+      request(rootId, [recps[1], recps[2]], (err, msgs) => {
         assert.notOk(err, 'null errors')
         assert.ok(msgs, 'invite message')
         assert.equal(msgs.length, 2, 'publishes multiple messages')
