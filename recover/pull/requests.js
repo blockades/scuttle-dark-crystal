@@ -9,7 +9,7 @@ module.exports = function (server) {
       query: [{
         $filter: {
           value: {
-            timestamp: { gt: 0 },
+            timestamp: { $gt: 0 },
             author: server.id,
             content: {
               type: 'invite',
@@ -21,7 +21,7 @@ module.exports = function (server) {
     }, opts)
 
     return pull(
-      next(server.query.read, opts),
+      next(server.query.read, _opts),
       pull.filter(isInvite)
     )
   }
