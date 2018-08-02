@@ -1,7 +1,6 @@
 const { describe } = require('tape-plus')
-const { box, unbox } = require('ssb-keys')
+const { unbox } = require('ssb-keys')
 const getContent = require('ssb-msg-content')
-const pull = require('pull-stream')
 
 const Server = require('../../testbot')
 const Share = require('../../../share/async/share')
@@ -43,14 +42,14 @@ describe('recombine.async.recombine', context => {
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
-      request(rootId, null, (err, inviteMsgs) => {
+      request(rootId, (err, inviteMsgs) => {
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
-          var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
+          var shardHolder = inviteMsgContent.recps.filter(recp => recp !== server.id)[0]
           var shardMsgs = data.shards.map(s => (getContent(s)))
           var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard
           // We need to recreate replies from alice, and bob:
-          reply = {
+          const reply = {
             type: 'invite-reply',
             root: rootId,
             branch: inviteMsg.key,
@@ -89,13 +88,13 @@ describe('recombine.async.recombine', context => {
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
-      request(rootId, null, (err, inviteMsgs) => {
+      request(rootId, (err, inviteMsgs) => {
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
-          var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
+          var shardHolder = inviteMsgContent.recps.filter(recp => recp !== server.id)[0]
           var shardMsgs = data.shards.map(s => (getContent(s)))
           var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard
-          reply = {
+          const reply = {
             type: 'invite-reply',
             root: rootId,
             branch: inviteMsg.key,
@@ -126,7 +125,7 @@ describe('recombine.async.recombine', context => {
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
-      request(rootId, null, (err, inviteMsgs) => {
+      request(rootId, (err, inviteMsgs) => {
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
           var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
@@ -173,7 +172,7 @@ describe('recombine.async.recombine', context => {
       share({ name, secret: 'another secret', quorum, recps: shardHolders }, (err, otherData) => {
         if (err) console.error(err)
         var rootId = data.root.key
-        request(rootId, null, (err, inviteMsgs) => {
+        request(rootId, (err, inviteMsgs) => {
           inviteMsgs.forEach((inviteMsg) => {
             var inviteMsgContent = getContent(inviteMsg)
             var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]

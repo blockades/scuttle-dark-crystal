@@ -25,6 +25,8 @@ The secret is sharded and a root message, ritual message and one shard message f
 
 This method publishes `invite` messages with a request to return a shard. If `recipients` is falsey, invite messages to all shardholders associated with the given rootId will be published.  If `recipients` is an array containing one or more feedIds, invite messages to only the given recipients will be published, provided they hold shards associated with the given rootId.  If successful, the published invite messages are passed to the callback.
 
+This method can also be called : `darkCrystal.recover.async.request(rootId, callback)` and it will send requests to al shard-holders
+
 ### `darkCrystal.recover.async.reply(inviteId,callback)`
 
 This will respond to a given invite message, by decrypting the associated shard and publishing an `invite-reply` message providing the shard in the `body` property.  If successful, the reply message is passed to the callback.

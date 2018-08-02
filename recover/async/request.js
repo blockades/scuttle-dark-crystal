@@ -11,24 +11,21 @@ module.exports = function (server) {
   const pullShardsByRoot = PullShardsByRoot(server)
 
   return function Request (rootId, recipients, callback) {
+    if (callback === undefined && typeof recipients === 'function') return Request(rootId, null, recipients)
+    // if only 2 args, run the function with recipients set to null
+
     if (!isMsgId(rootId)) return callback(new Error('Invalid root'))
-    if (Array.isArray(recipients)) {
-      let feedIds = recipients
-        .map(recp => typeof recp === 'string' ? recp : recp.link)
-        .filter(Boolean)
-        .filter(isFeed)
-      if (feedIds.length < recipients.length) return callback(new Error(`All recipients must be a feedId`))
-    } else if (recipients) return callback(new Error(`Recipients must either be an array of feed Ids or falsey`))
+    if (recipients && !Array.isArray(recipients)) return callback(new Error(`Recipients must either be an Array of feed Ids or falsey`))
+
+    if (!recpsValid(recipients)) return callback(new Error(`All recipients must be a feedId`))
 
     // TODO: verifiy that recipients.indexOf(server.id) < 0
 
     pull(
       pullShardsByRoot(rootId),
-      pull.filter(s => {
-         if (recipients) {
-           return (getContent(s).recps.find(r => (recipients.indexOf(r) > -1))) 
-         } else return true
-      }),
+      recipients
+        ? pull.filter(isShardForNamedRecipient)
+        : pull.through(),
       pull.map(shard => {
         const { recps } = getContent(shard)
         return {
@@ -51,5 +48,22 @@ module.exports = function (server) {
         )
       })
     )
+
+    function isShardForNamedRecipient (shard) {
+      const { recps } = getContent(shard)
+
+      return recps.some(r => recipients.includes(r))
+    }
   }
+}
+
+function recpsValid (recipients) {
+  if (!recipients) return true
+
+  const feedIds = recipients
+    .map(recp => typeof recp === 'string' ? recp : recp.link)
+    .filter(Boolean)
+    .filter(isFeed)
+
+  return feedIds.length === recipients.length
 }
