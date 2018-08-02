@@ -36,7 +36,8 @@ module.exports = {
       publishAll: require('./shard/async/publishAll')
     },
     pull: {
-      byRoot: require('./shard/pull/byRoot')
+      byRoot: require('./shard/pull/byRoot'),
+      myCustodianship: require('./shard/pull/myCustodianship')
     }
   },
   share: {
