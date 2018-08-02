@@ -12,7 +12,7 @@ describe('root.async.publish', context => {
     server = Server()
 
     publish = Publish(server)
-    name = 'my first dark crystal'
+    name = 'my-first-dark-crystal'
   })
 
   context.afterEach(c => {
