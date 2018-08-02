@@ -1,6 +1,6 @@
 {
   "name": "scuttle-dark-crystal",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "socially sharing secrets / backups on secure scuttlebutt",
   "main": "index.js",
   "scripts": {
