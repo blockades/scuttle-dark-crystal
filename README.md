@@ -59,6 +59,10 @@ Takes an object with properties:
 
 For each shard, a shard message will be published to both the recipient and the sender.  If successful, the published messages will be passed to the callback.  In the case of at least one validation error, no messages will be published.
 
+## `darkCrystal.shard.pull.myCustodianship(opts)`
+
+Returns a stream of shards others have shared with you. Takes `opts` - standard stream options like `live`, `reverse` etc.
+
 ### `darkCrystal.sync.isRitual(ritual)`, `darkCrystal.sync.isRoot(root)`, `darkCrystal.sync.isShard(shard)`
 
 These are validation methods for each message type as described in [ssb-dark-crystal-schema](https://github.com/blockades/dark-crystal').
