@@ -9,7 +9,7 @@ module.exports = function (server) {
       query: [{
         $filter: {
           value: {
-            timestamp: { gt: 0 },
+            timestamp: { $gt: 0 },
             author: server.id,
             content: {
               type: `dark-crystal/ritual`
