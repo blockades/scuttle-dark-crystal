@@ -2,6 +2,7 @@ const pull = require('pull-stream')
 const ref = require('ssb-ref')
 const secrets = require('secrets.js-grempe')
 const getContent = require('ssb-msg-content')
+const { isReply } = require('ssb-invite-schema')
 
 // const pullRitual = require('../../ritual/pull/mine')
 
@@ -41,6 +42,7 @@ module.exports = function (server) {
         // get the unencrypted shards from the reply messages
         pull(
           server.query.read(findAssociatedMessages('invite-reply')),
+          pull.filter(isReply),
           pull.map((replyMsg) => {
             var shard = getContent(replyMsg).body
 
