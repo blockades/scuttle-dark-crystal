@@ -6,7 +6,7 @@ const Share = require('../../../share/async/share')
 const PublishRoot = require('../../../root/async/publish')
 const Request = require('../../../recover/async/request')
 
-describe('request.async.request', context => {
+describe('recover.async.request', context => {
   let server, share, request, publishRoot
   let recps, name, secret, quorum
 
@@ -38,6 +38,32 @@ describe('request.async.request', context => {
         assert.notOk(err, 'null errors')
         assert.ok(msgs, 'invites messages')
         assert.equal(msgs.length, recps.length, 'publishes a request for each shard')
+        assert.ok(msgs.every(isInvite), 'all messages are valid invites')
+        next()
+      })
+    })
+  })
+
+  context('Publishes a single request when given a single recipient', (assert, next) => {
+    share({ name, secret, quorum, recps }, (err, data) => {
+      var rootId = data.root.key
+      request(rootId, [recps[1]], (err, msgs) => {
+        assert.notOk(err, 'null errors')
+        assert.ok(msgs, 'invite message')
+        assert.equal(msgs.length, 1, 'publishes a single message')
+        assert.ok(msgs.every(isInvite), 'all messages are valid invites')
+        next()
+      })
+    })
+  })
+
+  context('Publishes a multiple requests when given multiple recipients', (assert, next) => {
+    share({ name, secret, quorum, recps }, (err, data) => {
+      var rootId = data.root.key
+      request(rootId, [recps[1], recps[2]], (err, msgs) => {
+        assert.notOk(err, 'null errors')
+        assert.ok(msgs, 'invite message')
+        assert.equal(msgs.length, 2, 'publishes multiple messages')
         assert.ok(msgs.every(isInvite), 'all messages are valid invites')
         next()
       })

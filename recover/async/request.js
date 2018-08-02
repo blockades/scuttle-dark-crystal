@@ -1,7 +1,7 @@
 const ScuttleInvite = require('scuttle-invite')
 const pull = require('pull-stream')
 const getContent = require('ssb-msg-content')
-const { isMsgId } = require('ssb-ref')
+const { isMsgId, isFeed } = require('ssb-ref')
 const { isInvite } = require('ssb-invite-schema')
 
 const PullShardsByRoot = require('../../shard/pull/byRoot')
@@ -10,11 +10,22 @@ module.exports = function (server) {
   const invites = ScuttleInvite(server)
   const pullShardsByRoot = PullShardsByRoot(server)
 
-  return function request (rootId, callback) {
+  return function Request (rootId, recipients, callback) {
+    if (callback === undefined && typeof recipients === 'function') return Request(rootId, null, recipients)
+    // if only 2 args, run the function with recipients set to null
+
     if (!isMsgId(rootId)) return callback(new Error('Invalid root'))
+    if (recipients && !Array.isArray(recipients)) return callback(new Error(`Recipients must either be an Array of feed Ids or falsey`))
+
+    if (!recpsValid(recipients)) return callback(new Error(`All recipients must be a feedId`))
+
+    // TODO: verifiy that recipients.indexOf(server.id) < 0
 
     pull(
       pullShardsByRoot(rootId),
+      recipients
+        ? pull.filter(isShardForNamedRecipient)
+        : pull.through(),
       pull.map(shard => {
         const { recps } = getContent(shard)
         return {
@@ -37,5 +48,22 @@ module.exports = function (server) {
         )
       })
     )
+
+    function isShardForNamedRecipient (shard) {
+      const { recps } = getContent(shard)
+
+      return recps.some(r => recipients.includes(r))
+    }
   }
+}
+
+function recpsValid (recipients) {
+  if (!recipients) return true
+
+  const feedIds = recipients
+    .map(recp => typeof recp === 'string' ? recp : recp.link)
+    .filter(Boolean)
+    .filter(isFeed)
+
+  return feedIds.length === recipients.length
 }
