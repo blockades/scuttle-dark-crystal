@@ -37,7 +37,7 @@ module.exports = {
     },
     pull: {
       byRoot: require('./shard/pull/byRoot'),
-      myCustodianship: require('./shard/pull/myCustodianship')
+      friends: require('./shard/pull/friends')
     }
   },
   share: {
