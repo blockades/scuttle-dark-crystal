@@ -8,7 +8,8 @@ module.exports = {
       request: require('./recover/async/request')
     },
     pull: {
-      requests: require('./recover/pull/requests')
+      requests: require('./recover/pull/requests'),
+      replies: require('./recover/pull/replies')
     }
   },
   root: {
@@ -27,7 +28,8 @@ module.exports = {
       publish: require('./ritual/async/publish')
     },
     pull: {
-      mine: require('./ritual/pull/mine')
+      mine: require('./ritual/pull/mine'),
+      byRoot: require('./ritual/pull/byRoot')
     }
   },
   shard: {
