@@ -14,6 +14,6 @@ module.exports = function (server) {
         if (err) callback(err)
         else server.private.unbox(root, callback)
       })
-    } else callback(content.errors)
+    } else callback(isRoot.errors)
   }
 }

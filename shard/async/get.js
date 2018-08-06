@@ -1,4 +1,3 @@
-
 const { isShard } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
@@ -7,7 +6,7 @@ module.exports = function (server) {
       if (err) return callback(err)
       const content = value.content
       if (isShard(content)) callback(null, { key, value })
-      else callback(new Error(content.errors.join(', ')))
+      else callback(new Error(isShard.errors.join(', ')))
     })
   }
 }
