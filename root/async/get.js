@@ -6,7 +6,7 @@ module.exports = function (server) {
       if (err) return callback(err)
       const content = value.content
       if (isRoot(content)) callback(null, { key, value })
-      else callback(new Error(content.errors.join(', ')))
+      else callback(new Error(isRoot.errors.join(', ')))
     })
   }
 }

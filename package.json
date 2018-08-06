@@ -30,7 +30,7 @@
     "scuttle-inject": "^1.0.3",
     "scuttle-invite": "0.1.3",
     "secrets.js-grempe": "1.1.0",
-    "ssb-dark-crystal-schema": "^1.0.3",
+    "ssb-dark-crystal-schema": "^1.1.0",
     "ssb-msg-content": "^1.0.1"
   },
   "devDependencies": {

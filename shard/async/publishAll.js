@@ -23,7 +23,7 @@ module.exports = function (server) {
         }
       })
       .map(shard => {
-        isShard(shard) // isShard adds errors to shard if there are any
+        isShard(shard, {attachErrors: true})
         return shard
       })
 

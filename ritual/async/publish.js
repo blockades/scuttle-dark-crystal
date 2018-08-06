@@ -20,6 +20,6 @@ module.exports = function (server) {
         if (err) callback(err)
         else server.private.unbox(ritual, callback)
       })
-    } else callback(content.errors)
+    } else callback(isRitual.errors)
   }
 }
