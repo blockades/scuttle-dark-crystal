@@ -42,13 +42,21 @@ module.exports = function (server) {
         // get the unencrypted shards from the reply messages
         pull(
           server.query.read(findAssociatedMessages('invite-reply')),
-          pull.filter(isReply),
-          pull.map((replyMsg) => getContent(replyMsg).body),
-          pull.collect((err, shards) => {
+          pull.collect((err, replyLikeMsgs) => {
             if (err) return callback(err)
+            var shards = replyLikeMsgs
+              .filter(isReply)
+              .map((replyMsg) => getContent(replyMsg).body)
+
             if (shards.length < quorum) {
-              let error = new Error('Not enough shards to recombine')
-              return callback(error)
+              var errorMsg = 'Not enough shards to recombine.'
+              if (shards.length < replyLikeMsgs.length) {
+                // TODO: give more details - who are the bad shards from?
+                //       what exactly is wrong with them
+                const numberInvalidReplies = replyLikeMsgs.length - shards.length
+                errorMsg += ' You have ' + String(numberInvalidReplies) + ' invalid reply message(s).'
+              }
+              return callback(new Error(errorMsg))
             }
             try {
               var hex = secrets.combine(shards)
