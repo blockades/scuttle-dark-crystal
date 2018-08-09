@@ -2,7 +2,7 @@ const pull = require('pull-stream')
 const ref = require('ssb-ref')
 const secrets = require('secrets.js-grempe')
 const getContent = require('ssb-msg-content')
-const isReply = require('scuttle-invite/isReply')
+const isReply = require('../../isReply')
 
 // const pullRitual = require('../../ritual/pull/mine')
 
@@ -43,18 +43,7 @@ module.exports = function (server) {
         pull(
           server.query.read(findAssociatedMessages('invite-reply')),
           pull.filter(isReply),
-          pull.map((replyMsg) => {
-            var shard = getContent(replyMsg).body
-
-            // validate that shard is a shard using secrets.js
-            try {
-              secrets.extractShareComponents(shard)
-            } catch (err) {
-              return callback(err)
-            }
-
-            return shard
-          }),
+          pull.map((replyMsg) => getContent(replyMsg).body),
           pull.collect((err, shards) => {
             if (err) return callback(err)
             if (shards.length < quorum) {
