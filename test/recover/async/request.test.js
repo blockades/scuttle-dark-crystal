@@ -33,6 +33,7 @@ describe('recover.async.request', context => {
 
   context('Publishes requests when given a rootId which has some related shards published', (assert, next) => {
     share({ name, secret, quorum, recps }, (err, data) => {
+      if (err) console.error(err)
       var rootId = data.root.key
       request(rootId, (err, msgs) => {
         assert.notOk(err, 'null errors')
@@ -46,6 +47,7 @@ describe('recover.async.request', context => {
 
   context('Publishes a single request when given a single recipient', (assert, next) => {
     share({ name, secret, quorum, recps }, (err, data) => {
+      if (err) console.error(err)
       var rootId = data.root.key
       request(rootId, [recps[1]], (err, msgs) => {
         assert.notOk(err, 'null errors')
@@ -59,6 +61,7 @@ describe('recover.async.request', context => {
 
   context('Publishes a multiple requests when given multiple recipients', (assert, next) => {
     share({ name, secret, quorum, recps }, (err, data) => {
+      if (err) console.error(err)
       var rootId = data.root.key
       request(rootId, [recps[1], recps[2]], (err, msgs) => {
         assert.notOk(err, 'null errors')
@@ -72,6 +75,7 @@ describe('recover.async.request', context => {
 
   context('Throws errors and publishes nothing when rootId is invalid', (assert, next) => {
     share({ name, secret, quorum, recps }, (err, data) => {
+      if (err) console.error(err)
       var rootId = 'invalid rootId'
       request(rootId, (err, msgs) => {
         assert.ok(err, 'Throws errors')
@@ -83,6 +87,7 @@ describe('recover.async.request', context => {
 
   context('Publishes nothing when given a rootId which has no associated shards', (assert, next) => {
     publishRoot(name, (err, data) => {
+      if (err) console.error(err)
       var rootId = data.key
       request(rootId, (err, msgs) => {
         assert.ok(err, 'Throws errors')
