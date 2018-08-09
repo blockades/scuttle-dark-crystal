@@ -51,17 +51,19 @@ module.exports = function (server) {
           // server.get(rootId,  )
           // (currently this wont work as our test does not publish a root message)
 
-          const theDecryptedShard = server.private.unbox(shard)
+          server.private.unbox(shard, (err, theDecryptedShard) => {
+            if (err) return callback(err)
 
-          const reply = {
-            root: rootId,
-            branch: inviteId,
-            accept: true,
-            body: theDecryptedShard,
-            recps: [author, server.id]
-          }
+            const reply = {
+              root: rootId,
+              branch: inviteId,
+              accept: true,
+              body: theDecryptedShard,
+              recps: [author, server.id]
+            }
 
-          invites.async.private.reply(inviteId, reply, callback)
+            invites.async.private.reply(inviteId, reply, callback)
+          })
         })
       )
     })
