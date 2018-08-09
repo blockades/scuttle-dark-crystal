@@ -1,5 +1,5 @@
 const { describe } = require('tape-plus')
-const { isInvite } = require('ssb-invite-schema')
+const isInvite = require('scuttle-invite/isInvite')
 
 const Server = require('../../testbot')
 const Share = require('../../../share/async/share')

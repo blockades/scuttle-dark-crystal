@@ -3,7 +3,7 @@ const Server = require('../../testbot')
 const secrets = require('secrets.js-grempe')
 const {isShard} = require('ssb-dark-crystal-schema')
 
-const PublishAll = require('../../../shard/async/publishAll')
+const PublishAll = require('../../../shard/async/publish-all')
 
 describe('shard.async.publishAll', context => {
   let server

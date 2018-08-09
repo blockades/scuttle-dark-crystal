@@ -1,11 +1,10 @@
 const { describe } = require('tape-plus')
-const pull = require('pull-stream')
 const { box } = require('ssb-keys')
 
 const Server = require('../../testbot')
 const Reply = require('../../../recover/async/reply')
 
-const { isReply } = require('ssb-invite-schema')
+const isReply = require('scuttle-invite/isReply')
 
 describe('reply.async.reply', context => {
   let server, reply, katie

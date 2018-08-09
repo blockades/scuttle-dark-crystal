@@ -2,7 +2,7 @@ const pull = require('pull-stream')
 const ref = require('ssb-ref')
 const secrets = require('secrets.js-grempe')
 const getContent = require('ssb-msg-content')
-const { isReply } = require('ssb-invite-schema')
+const isReply = require('scuttle-invite/isReply')
 
 // const pullRitual = require('../../ritual/pull/mine')
 
