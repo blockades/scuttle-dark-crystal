@@ -29,17 +29,17 @@ module.exports = {
     },
     pull: {
       mine: require('./ritual/pull/mine'),
-      byRoot: require('./ritual/pull/byRoot')
+      byRoot: require('./ritual/pull/by-root')
     }
   },
   shard: {
     async: {
       get: require('./shard/async/get'),
-      publishAll: require('./shard/async/publishAll')
+      publishAll: require('./shard/async/publish-all')
     },
     pull: {
-      byRoot: require('./shard/pull/byRoot'),
-      friends: require('./shard/pull/friends')
+      byRoot: require('./shard/pull/by-root'),
+      fromOthers: require('./shard/pull/from-others')
     }
   },
   share: {

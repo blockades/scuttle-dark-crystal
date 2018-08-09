@@ -2,7 +2,7 @@ const secrets = require('secrets.js-grempe')
 
 const PublishRoot = require('../../root/async/publish')
 const PublishRitual = require('../../ritual/async/publish')
-const PublishAllShards = require('../../shard/async/publishAll')
+const PublishAllShards = require('../../shard/async/publish-all')
 
 const { isFeed } = require('ssb-ref')
 

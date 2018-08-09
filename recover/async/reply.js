@@ -1,16 +1,13 @@
 const ScuttleInvite = require('scuttle-invite')
 const pull = require('pull-stream')
-const PullShardsByRoot = require('../../shard/pull/byRoot')
 
-const { isMsgId } = require('ssb-ref')
+const PullShardsByRoot = require('../../shard/pull/by-root')
 
 module.exports = function (server) {
   const invites = ScuttleInvite(server)
   const pullShardsByRoot = PullShardsByRoot(server)
 
   return function reply (inviteId, callback) {
-    if (!isMsgId(inviteId)) return callback(new Error('Invalid inviteId'))
-
     invites.async.getInvite(inviteId, (err, invite) => {
       if (err) return callback(err)
 

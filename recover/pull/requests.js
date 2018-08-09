@@ -1,6 +1,6 @@
 const pull = require('pull-stream')
 const next = require('pull-next-query')
-const { isInvite } = require('ssb-invite-schema')
+const isInvite = require('scuttle-invite/isInvite')
 
 module.exports = function (server) {
   return function requests (rootId, opts = {}) {
@@ -10,11 +10,16 @@ module.exports = function (server) {
         $filter: {
           value: {
             timestamp: { $gt: 0 },
-            author: server.id,
             content: {
               type: 'invite',
               root: rootId
             }
+          }
+        }
+      }, {
+        $filter: {
+          value: {
+            author: { $ne: server.id }
           }
         }
       }]

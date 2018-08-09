@@ -1,6 +1,6 @@
 const pull = require('pull-stream')
 const next = require('pull-next-query')
-const { isReply } = require('ssb-invite-schema')
+const isReply = require('scuttle-invite/isReply')
 
 module.exports = function (server) {
   return function replies (rootId, opts = {}) {
