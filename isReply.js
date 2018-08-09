@@ -1,7 +1,17 @@
 const isReply = require('scuttle-invite/isReply')
 const getContent = require('ssb-msg-content')
+const secrets = require('secrets.js-grempe')
 
-// TODO write an actual schema for replies in the dc context
 module.exports = function (msg) {
-  return isReply(msg) && getContent(msg).body
+  return isReply(msg) && validateShard(msg)
+}
+
+function validateShard (possibleReply) {
+  const shard = getContent(possibleReply).body
+  try {
+    secrets.extractShareComponents(shard)
+  } catch (err) {
+    return false
+  }
+  return true
 }

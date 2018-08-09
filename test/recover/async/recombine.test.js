@@ -43,6 +43,7 @@ describe('recombine.async.recombine', context => {
       if (err) console.error(err)
       var rootId = data.root.key
       request(rootId, (err, inviteMsgs) => {
+        if (err) console.error(err)
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
           var shardHolder = inviteMsgContent.recps.filter(recp => recp !== server.id)[0]
@@ -89,6 +90,7 @@ describe('recombine.async.recombine', context => {
       if (err) console.error(err)
       var rootId = data.root.key
       request(rootId, (err, inviteMsgs) => {
+        if (err) console.error(err)
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
           var shardHolder = inviteMsgContent.recps.filter(recp => recp !== server.id)[0]
@@ -126,13 +128,14 @@ describe('recombine.async.recombine', context => {
       if (err) console.error(err)
       var rootId = data.root.key
       request(rootId, (err, inviteMsgs) => {
+        if (err) console.error(err)
         inviteMsgs.forEach((inviteMsg) => {
           var inviteMsgContent = getContent(inviteMsg)
-          var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
+          var shardHolder = inviteMsgContent.recps.filter(recp => recp !== server.id)[0]
           var shardMsgs = data.shards.map(s => (getContent(s)))
           var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard
           // We need to recreate replies from alice, and bob:
-          reply = {
+          var reply = {
             type: 'invite-reply',
             root: rootId,
             branch: inviteMsg.key,
@@ -169,17 +172,19 @@ describe('recombine.async.recombine', context => {
   context('Throws an error and returns no secret when reply refers to the wrong root message', (assert, next) => {
     var replies = {}
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
+      if (err) console.log(err)
       share({ name, secret: 'another secret', quorum, recps: shardHolders }, (err, otherData) => {
         if (err) console.error(err)
         var rootId = data.root.key
         request(rootId, (err, inviteMsgs) => {
+          if (err) console.log(err)
           inviteMsgs.forEach((inviteMsg) => {
             var inviteMsgContent = getContent(inviteMsg)
-            var shardHolder = inviteMsgContent.recps.filter(recp => recp != server.id)[0]
+            var shardHolder = inviteMsgContent.recps.filter(recp => recp !== server.id)[0]
             var shardMsgs = data.shards.map(s => (getContent(s)))
             var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard
             // We need to recreate replies from alice, and bob:
-            reply = {
+            var reply = {
               type: 'invite-reply',
               root: otherData.root.key,
               branch: inviteMsg.key,
@@ -215,11 +220,11 @@ describe('recombine.async.recombine', context => {
   })
 
   context('Throws an error when given a rootId for which there is no root message', (assert, next) => {
-    rootId = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
-    recombine(rootId, (err,returnedSecret) => {
+    const rootId = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
+    recombine(rootId, (err, returnedSecret) => {
       assert.ok(err, 'Throws an error')
       assert.notOk(returnedSecret, 'Does not return a secret')
       next()
-    }) 
+    })
   })
 })
