@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "scuttle-testbot": "^1.1.6",
-    "ssb-private": "^0.2.1",
+    "ssb-private": "^0.2.3",
     "ssb-query": "^2.1.0",
     "standard": "^11.0.1",
     "tap-diff": "^0.1.1",
