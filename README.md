@@ -1,6 +1,6 @@
 # Dark Crystal API
 
-Returns a set of functions as an API for validating, building, publishing and reading records dictated by [ssb-dark-crystal-schema](https://github.com/blockades/ssb-dark-crystal-schema').
+Returns a set of functions as an API for validating, building, publishing and reading records dictated by [ssb-dark-crystal-schema](https://github.com/blockades/ssb-dark-crystal-schema).
 
 ## Instantiate
 
@@ -65,5 +65,5 @@ Returns a stream of shards others have shared with you. Takes `opts` - standard 
 
 ### `darkCrystal.sync.isRitual(ritual)`, `darkCrystal.sync.isRoot(root)`, `darkCrystal.sync.isShard(shard)`
 
-These are validation methods for each message type as described in [ssb-dark-crystal-schema](https://github.com/blockades/ssb-dark-crystal-schema').
+These are validation methods for each message type as described in [ssb-dark-crystal-schema](https://github.com/blockades/ssb-dark-crystal-schema).
 
