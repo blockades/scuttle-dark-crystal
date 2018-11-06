@@ -2,6 +2,8 @@ const pull = require('pull-stream')
 const ref = require('ssb-ref')
 const secrets = require('secrets.js-grempe')
 const getContent = require('ssb-msg-content')
+const crypto = require('crypto')
+
 const isReply = require('../../isReply')
 
 // const pullRitual = require('../../ritual/pull/mine')
@@ -59,8 +61,12 @@ module.exports = function (server) {
               return callback(new Error(errorMsg))
             }
             try {
-              var hex = secrets.combine(shards)
-              var secret = secrets.hex2str(hex)
+              const hex = secrets.combine(shards)
+              const hashOfSecret = hex.slice(-40)
+              var secret = secrets.hex2str(hex.slice(0, -40))
+              if (crypto.createHash('sha1').update(secret, 'binary').digest('hex') !== hashOfSecret) {
+                throw new Error('This does not look like a secret')
+              }
             } catch (err) {
               return callback(err)
             }
