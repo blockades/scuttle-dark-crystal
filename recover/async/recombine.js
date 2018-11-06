@@ -1,8 +1,7 @@
 const pull = require('pull-stream')
 const ref = require('ssb-ref')
-const secrets = require('secrets.js-grempe')
+const secrets = require('../../secretsWrapper')
 const getContent = require('ssb-msg-content')
-const crypto = require('crypto')
 
 const isReply = require('../../isReply')
 
@@ -61,12 +60,7 @@ module.exports = function (server) {
               return callback(new Error(errorMsg))
             }
             try {
-              const hex = secrets.combine(shards)
-              const hashOfSecret = hex.slice(-40)
-              var secret = secrets.hex2str(hex.slice(0, -40))
-              if (crypto.createHash('sha1').update(secret, 'binary').digest('hex') !== hashOfSecret) {
-                throw new Error('This does not look like a secret')
-              }
+              var secret = secrets.combine(shards)
             } catch (err) {
               return callback(err)
             }
