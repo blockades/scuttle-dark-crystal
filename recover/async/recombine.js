@@ -1,7 +1,8 @@
 const pull = require('pull-stream')
 const ref = require('ssb-ref')
-const secrets = require('secrets.js-grempe')
+const secrets = require('../../secretsWrapper')
 const getContent = require('ssb-msg-content')
+
 const isReply = require('../../isReply')
 
 // const pullRitual = require('../../ritual/pull/mine')
@@ -59,8 +60,7 @@ module.exports = function (server) {
               return callback(new Error(errorMsg))
             }
             try {
-              var hex = secrets.combine(shards)
-              var secret = secrets.hex2str(hex)
+              var secret = secrets.combine(shards)
             } catch (err) {
               return callback(err)
             }

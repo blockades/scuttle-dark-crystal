@@ -1,4 +1,4 @@
-const secrets = require('secrets.js-grempe')
+const secrets = require('../../secretsWrapper')
 
 const PublishRoot = require('../../root/async/publish')
 const PublishRitual = require('../../ritual/async/publish')
@@ -37,8 +37,7 @@ module.exports = function (server) {
 
     const numOfShards = recps.length
 
-    const hexSecret = secrets.str2hex(secret)
-    const shards = secrets.share(hexSecret, numOfShards, quorum)
+    const shards = secrets.share(secret, numOfShards, quorum)
 
     publishRoot(name, (err, root) => {
       if (err) return callback(err)
