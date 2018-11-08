@@ -11,9 +11,9 @@ module.exports = function (server) {
     }
 
     if (isForward(content)) {
-      server.private.publish(content, [server.id], (err, root) => {
+      server.private.publish(content, [server.id], (err, forward) => {
         if (err) callback(err)
-        else server.private.unbox(root, callback)
+        else server.private.unbox(forward, callback)
       })
     } else callback(isForward.errors)
   }
