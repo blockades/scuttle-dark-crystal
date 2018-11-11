@@ -4,7 +4,7 @@
   "description": "socially sharing secrets / backups on secure scuttlebutt",
   "main": "index.js",
   "scripts": {
-    "test": "tape test/**/*.test.js | tap-diff",
+    "test": "tape 'test/**/*.test.js' | tap-diff",
     "lint": "standard --fix"
   },
   "repository": {
