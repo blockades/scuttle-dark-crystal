@@ -76,11 +76,10 @@ Returns a stream of shards others have shared with you. Takes `opts` - standard 
 
 ### Shard forward methods 
 
-#### `darkCrystal.forward.async.publish(root, shard, recp, callback)`
+#### `darkCrystal.forward.async.publish(root, recp, callback)`
 
 Takes arguments
-- `root` the id of the root message
-- `shard` the decrypted shard
+- `root` the id of the root message with which the shard is associated
 - `recp` the feedId of the recipient of the forwarded shard
 
 Publishes a forward message which allows a shard to be sent to someone other than the owner of the secret.
