@@ -67,6 +67,11 @@ Returns a stream of shard messages identified by root id.  Takes `opts` - standa
 
 Returns a stream of shards others have shared with you. Takes `opts` - standard stream options like `live`, `reverse` etc.
 
+
+#### `darkCrystal.recover.async.recombineForward(rootId, callback)`
+
+Attempts to recover a secret from forwarded messages with the given `rootId`. If successful, the secret will be passed to the callback, otherwise, an error will be passed.
+
 ### `darkCrystal.sync.isRitual(ritual)`, `darkCrystal.sync.isRoot(root)`, `darkCrystal.sync.isShard(shard)`
 
 These are validation methods for each message type as described in [ssb-dark-crystal-schema](https://github.com/blockades/ssb-dark-crystal-schema).
