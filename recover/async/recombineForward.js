@@ -31,13 +31,6 @@ module.exports = function (server) {
           .filter(isForward)
           .map((forwardMsg) => getContent(forwardMsg).shard)
 
-        // if (shards.length < replyLikeMsgs.length) {
-        //   // TODO: give more details - who are the bad shards from?
-        //   //       what exactly is wrong with them
-        //   const numberInvalidReplies = replyLikeMsgs.length - shards.length
-        //   errorMsg += ' You have ' + String(numberInvalidReplies) + ' invalid reply message(s).'
-        // }
-        // return callback(new Error(errorMsg))
         try {
           var secret = secrets.combine(shards)
         } catch (err) {
