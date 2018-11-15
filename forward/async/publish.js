@@ -24,9 +24,15 @@ module.exports = function (server) {
 
         const {
           value: {
+            author,
             content: { shard }
           }
         } = shards[0]
+
+        if (author === recp) {
+          let error = new Error('You may not forward a shard to its author. Use reply instead.')
+          return callback(error)
+        }
 
         server.private.unbox(shard, (err, theDecryptedShard) => {
           if (err) return callback(err)
