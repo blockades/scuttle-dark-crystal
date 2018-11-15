@@ -30,16 +30,16 @@ describe('recombine.async.recombine', context => {
     shards = secrets.share(secret, 3, 2)
 
     root = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
-
-    shardHolders.forEach(shardHolder => {
-      forwardMessages[shardHolder] = {
+    forwardMessages = shardHolders.reduce((acc, shardHolder) => {
+      acc[shardHolder] = {
         type: 'dark-crystal/forward',
         version: SCHEMA_VERSION,
         root,
         shard: shards.pop(),
         recps: [shardHolder, server.id]
       }
-    })
+      return acc
+    }, {})
   })
 
   context.afterEach(c => {
