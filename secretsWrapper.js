@@ -1,5 +1,5 @@
 const secrets = require('secrets.js-grempe')
-const crypto = require('crypto')
+const sodium = require('chloride')
 
 const packShard = shard => {
   const shardData = shard.slice(3)
@@ -16,7 +16,7 @@ const unpackShard = shard => {
 module.exports = {
   share: function (secret, numOfShards, quorum) {
     const hexSecret = secrets.str2hex(secret)
-    const hashOfSecret = crypto.createHash('sha1').update(secret, 'binary').digest('hex')
+    const hashOfSecret = sodium.crypto_hash_sha256(Buffer.from(secret)).slice(-16).toString('hex')
     const shardsHex = secrets.share(hexSecret + hashOfSecret, numOfShards, quorum)
 
     const shardsBase64 = shardsHex.map(packShard)
@@ -27,9 +27,9 @@ module.exports = {
     const shards = shardsBase64.map(unpackShard)
     // this could probably be improved by checking the hash before converting to hex
     const hex = secrets.combine(shards)
-    const hashOfSecret = hex.slice(-40)
-    var secret = secrets.hex2str(hex.slice(0, -40))
-    if (crypto.createHash('sha1').update(secret, 'binary').digest('hex') !== hashOfSecret) {
+    const hashOfSecret = hex.slice(-32)
+    var secret = secrets.hex2str(hex.slice(0, -32))
+    if (sodium.crypto_hash_sha256(Buffer.from(secret)).slice(-16).toString('hex') !== hashOfSecret) {
       throw new Error('This does not look like a secret')
     } else {
       return secret
