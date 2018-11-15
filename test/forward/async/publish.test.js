@@ -54,4 +54,15 @@ describe('forward.async.publish', context => {
       next()
     })
   })
+
+  context('fails to publish when shard is forwarded to its author', (assert, next) => {
+    bob.publish(bobShard, (err, bobReply) => {
+      if (err) console.error(err)
+      publish(root, bob.id, (err, forward) => {
+        assert.ok(err, 'throws error')
+        assert.notOk(forward, 'forward is null')
+        next()
+      })
+    })
+  })
 })
