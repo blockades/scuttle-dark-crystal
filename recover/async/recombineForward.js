@@ -25,18 +25,14 @@ module.exports = function (server) {
 
     pull(
       server.query.read(findAssociatedMessages('dark-crystal/forward')),
-      pull.collect((err, forwardLikeMsgs) => {
+      pull.filter(isForward),
+      pull.map(getContent),
+      pull.map(content => content.shard),
+      pull.collect((err, shards) => {
         if (err) return callback(err)
-        var shards = forwardLikeMsgs
-          .filter(isForward)
-          .map((forwardMsg) => getContent(forwardMsg).shard)
-
         try {
-          var secret = secrets.combine(shards)
-        } catch (err) {
-          return callback(err)
-        }
-        callback(null, secret)
+          return callback(null, secrets.combine(shards))
+        } catch (err) { return callback(err) }
       })
     )
   }
