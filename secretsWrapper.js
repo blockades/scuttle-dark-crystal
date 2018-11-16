@@ -24,7 +24,6 @@ module.exports = {
   },
 
   combine: function (shards, version) {
-console.log('here', version)
     if (version === '1.0.0') {
       const unpackedShards = shards.map(unpackShard)
       // this could probably be improved by checking the hash before converting to hex

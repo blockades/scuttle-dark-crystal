@@ -60,7 +60,6 @@ module.exports = function (server) {
               return callback(new Error(errorMsg))
             }
             try {
-              console.log(version)
               var secret = secrets.combine(shards, version)
             } catch (err) {
               return callback(err)

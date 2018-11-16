@@ -8,6 +8,8 @@ module.exports = function (server) {
   return function recombine (rootId, callback) {
     if (!ref.isMsgId(rootId)) return callback(new Error('Invalid rootId'))
 
+    let version
+
     const findAssociatedMessages = (type) => {
       return {
         query: [{
@@ -27,11 +29,15 @@ module.exports = function (server) {
       server.query.read(findAssociatedMessages('dark-crystal/forward')),
       pull.filter(isForward),
       pull.map(getContent),
-      pull.map(content => content.shard),
+      pull.map(content => {
+        version = content.version
+        return content.shard
+      }),
       pull.collect((err, shards) => {
         if (err) return callback(err)
         try {
-          return callback(null, secrets.combine(shards))
+          if (shards.length < 1) throw new Error('No foward messages associated with this rootId')
+          return callback(null, secrets.combine(shards, version))
         } catch (err) { return callback(err) }
       })
     )
