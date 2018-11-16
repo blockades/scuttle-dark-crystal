@@ -4,7 +4,7 @@ const { box } = require('ssb-keys')
 const Server = require('../../testbot')
 const Reply = require('../../../recover/async/reply')
 
-const isReply = require('scuttle-invite/isReply')
+const isReply = require('../../../isReply')
 
 describe('reply.async.reply', context => {
   let server, reply, katie
