@@ -36,6 +36,10 @@ module.exports = {
         return secret
       }
     }
+    // else if (version === '1.0.0') {
+    //   const hex = secrets.combine(shards)
+    //   return secrets.hex2str(hex)
+    // }
   },
   validateShard: function (shard, version) {
     if (version === '1.0.0') {
@@ -47,5 +51,13 @@ module.exports = {
       }
       return true
     }
+    // else if (version === '1.0.0') {
+    //   try {
+    //     secrets.extractShareComponents(shard)
+    //   } catch (err) {
+    //     return false
+    //   }
+    //   return true
+    // }
   }
 }
