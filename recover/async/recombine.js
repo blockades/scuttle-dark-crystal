@@ -38,7 +38,7 @@ module.exports = function (server) {
           return callback(error)
         }
 
-        var quorum = getContent(rituals[0]).quorum
+        const { quorum, version } = getContent(rituals[0])
 
         // get the unencrypted shards from the reply messages
         pull(
@@ -46,7 +46,7 @@ module.exports = function (server) {
           pull.collect((err, replyLikeMsgs) => {
             if (err) return callback(err)
             var shards = replyLikeMsgs
-              .filter(isReply)
+              .filter(r => isReply(r, version))
               .map((replyMsg) => getContent(replyMsg).body)
 
             if (shards.length < quorum) {

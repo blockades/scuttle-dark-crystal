@@ -19,7 +19,7 @@ describe('forward.async.publish', context => {
     alice = server.createFeed()
     bob = server.createFeed()
     root = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
-    shard = 'imagine this is a shard'
+    shard = '803imagine this is a shard'
 
     bobShard = {
       type: 'dark-crystal/shard',
