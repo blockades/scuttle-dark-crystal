@@ -23,25 +23,29 @@ module.exports = {
     return shardsBase64
   },
 
-  combine: function (shardsBase64) {
-    const shards = shardsBase64.map(unpackShard)
-    // this could probably be improved by checking the hash before converting to hex
-    const hex = secrets.combine(shards)
-    const hashOfSecret = hex.slice(-32)
-    var secret = secrets.hex2str(hex.slice(0, -32))
-    if (sodium.crypto_hash_sha256(Buffer.from(secret)).slice(-16).toString('hex') !== hashOfSecret) {
-      throw new Error('This does not look like a secret')
-    } else {
-      return secret
+  combine: function (shards, version) {
+    if (version === '1.0.0') {
+      const unpackedShards = shards.map(unpackShard)
+      // this could probably be improved by checking the hash before converting to hex
+      const hex = secrets.combine(unpackedShards)
+      const hashOfSecret = hex.slice(-32)
+      var secret = secrets.hex2str(hex.slice(0, -32))
+      if (sodium.crypto_hash_sha256(Buffer.from(secret)).slice(-16).toString('hex') !== hashOfSecret) {
+        throw new Error('This does not look like a secret')
+      } else {
+        return secret
+      }
     }
   },
-  validateShard: function (shardBase64) {
-    const shard = unpackShard(shardBase64)
-    try {
-      secrets.extractShareComponents(shard)
-    } catch (err) {
-      return false
+  validateShard: function (shard, version) {
+    if (version === '1.0.0') {
+      const unpackedShard = unpackShard(shard)
+      try {
+        secrets.extractShareComponents(unpackedShard)
+      } catch (err) {
+        return false
+      }
+      return true
     }
-    return true
   }
 }
