@@ -29,7 +29,7 @@ describe('reply.async.reply', context => {
       type: 'dark-crystal/shard',
       version: '1.0.0',
       root: rootId,
-      shard: box('imagine this is a shard', [server.id]),
+      shard: box('803imagine this is a shard', [server.id]),
       recps: [katie.id, server.id]
     }
   })
