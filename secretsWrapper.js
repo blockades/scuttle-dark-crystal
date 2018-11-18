@@ -24,7 +24,7 @@ module.exports = {
   },
 
   combine: function (shards, version) {
-    if (version === '1.0.0') {
+    if (version === '2.0.0') {
       const unpackedShards = shards.map(unpackShard)
       // this could probably be improved by checking the hash before converting to hex
       const hex = secrets.combine(unpackedShards)
@@ -35,14 +35,13 @@ module.exports = {
       } else {
         return secret
       }
+    } else if (version === '1.0.0') {
+      const hex = secrets.combine(shards)
+      return secrets.hex2str(hex)
     }
-    // else if (version === '1.0.0') {
-    //   const hex = secrets.combine(shards)
-    //   return secrets.hex2str(hex)
-    // }
   },
   validateShard: function (shard, version) {
-    if (version === '1.0.0') {
+    if (version === '2.0.0') {
       const unpackedShard = unpackShard(shard)
       try {
         secrets.extractShareComponents(unpackedShard)
@@ -51,13 +50,13 @@ module.exports = {
       }
       return true
     }
-    // else if (version === '1.0.0') {
-    //   try {
-    //     secrets.extractShareComponents(shard)
-    //   } catch (err) {
-    //     return false
-    //   }
-    //   return true
-    // }
+    else if (version === '1.0.0') {
+      try {
+        secrets.extractShareComponents(shard)
+      } catch (err) {
+        return false
+      }
+      return true
+    }
   }
 }
