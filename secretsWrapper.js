@@ -49,8 +49,7 @@ module.exports = {
         return false
       }
       return true
-    }
-    else if (version === '1.0.0') {
+    } else if (version === '1.0.0') {
       try {
         secrets.extractShareComponents(shard)
       } catch (err) {
