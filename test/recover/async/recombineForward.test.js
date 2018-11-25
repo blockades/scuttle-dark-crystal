@@ -5,7 +5,7 @@ const Recombine = require('../../../recover/async/recombineForward')
 const secrets = require('../../../secretsWrapper')
 const { SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
 
-describe('recombine.async.recombine', context => {
+describe('recombine.async.recombineForward', context => {
   let server, recombine, alice, bob, carol, root
   let shardHolders, secret, shards, forwardMessages
 

@@ -172,12 +172,12 @@ describe('recombine.async.recombine', context => {
   context('Throws an error and returns no secret when reply refers to the wrong root message', (assert, next) => {
     var replies = {}
     share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
-      if (err) console.log(err)
+      if (err) console.error(err)
       share({ name, secret: 'another secret', quorum, recps: shardHolders }, (err, otherData) => {
         if (err) console.error(err)
         var rootId = data.root.key
         request(rootId, (err, inviteMsgs) => {
-          if (err) console.log(err)
+          if (err) console.error(err)
           inviteMsgs.forEach((inviteMsg) => {
             var inviteMsgContent = getContent(inviteMsg)
             var shardHolder = inviteMsgContent.recps.filter(recp => recp !== server.id)[0]

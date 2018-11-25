@@ -51,7 +51,6 @@ module.exports = function (server) {
         // RESOLUTION: Extracted reducer into a publishAll function
         //
         publishAllShards({ shards, recps: recipients, rootId }, (err, shards) => {
-          console.error(err)
           if (err) return callback(err)
 
           callback(null, {

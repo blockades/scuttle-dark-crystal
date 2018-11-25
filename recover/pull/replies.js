@@ -21,7 +21,7 @@ module.exports = function (server) {
 
     return pull(
       next(server.query.read, _opts),
-      pull.filter(isReply)
+      pull.filter(isReply())
     )
   }
 }

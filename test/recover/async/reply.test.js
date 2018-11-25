@@ -1,10 +1,11 @@
 const { describe } = require('tape-plus')
 const { box } = require('ssb-keys')
+const { SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
 
 const Server = require('../../testbot')
 const Reply = require('../../../recover/async/reply')
 
-const isReply = require('scuttle-invite/isReply')
+const isReply = require('../../../isReply')
 
 describe('reply.async.reply', context => {
   let server, reply, katie
@@ -27,9 +28,9 @@ describe('reply.async.reply', context => {
 
     katiesShard = {
       type: 'dark-crystal/shard',
-      version: '1.0.0',
+      version: SCHEMA_VERSION,
       root: rootId,
-      shard: box('imagine this is a shard', [server.id]),
+      shard: box('803imagine this is a shard', [server.id]),
       recps: [katie.id, server.id]
     }
   })
@@ -46,7 +47,7 @@ describe('reply.async.reply', context => {
         reply(inviteMsg.key, (err, replyMsg) => {
           assert.notOk(err, 'null errors')
           assert.ok(replyMsg, 'returns a reply message')
-          assert.ok(isReply(replyMsg), 'message are valid replies')
+          assert.ok(isReply(replyMsg, SCHEMA_VERSION), 'message are valid replies')
           next()
         })
       })

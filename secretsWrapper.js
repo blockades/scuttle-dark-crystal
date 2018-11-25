@@ -1,5 +1,6 @@
 const secrets = require('secrets.js-grempe')
 const sodium = require('chloride')
+const MAC_LENGTH = 32
 
 const packShard = shard => {
   const shardData = shard.slice(3)
@@ -16,32 +17,46 @@ const unpackShard = shard => {
 module.exports = {
   share: function (secret, numOfShards, quorum) {
     const hexSecret = secrets.str2hex(secret)
-    const hashOfSecret = sodium.crypto_hash_sha256(Buffer.from(secret)).slice(-16).toString('hex')
-    const shardsHex = secrets.share(hexSecret + hashOfSecret, numOfShards, quorum)
+    const mac = sodium.crypto_hash_sha256(Buffer.from(secret)).toString('hex').slice(-1 * MAC_LENGTH)
+    const shardsHex = secrets.share(hexSecret + mac, numOfShards, quorum)
 
     const shardsBase64 = shardsHex.map(packShard)
     return shardsBase64
   },
 
-  combine: function (shardsBase64) {
-    const shards = shardsBase64.map(unpackShard)
-    // this could probably be improved by checking the hash before converting to hex
-    const hex = secrets.combine(shards)
-    const hashOfSecret = hex.slice(-32)
-    var secret = secrets.hex2str(hex.slice(0, -32))
-    if (sodium.crypto_hash_sha256(Buffer.from(secret)).slice(-16).toString('hex') !== hashOfSecret) {
-      throw new Error('This does not look like a secret')
-    } else {
-      return secret
+  combine: function (shards, version) {
+    if (version === '2.0.0') {
+      const unpackedShards = shards.map(unpackShard)
+      // this could probably be improved by checking the hash before converting to hex
+      const hex = secrets.combine(unpackedShards)
+      const mac = hex.slice(-1 * MAC_LENGTH)
+      var secret = secrets.hex2str(hex.slice(0, -1 * MAC_LENGTH))
+      if (sodium.crypto_hash_sha256(Buffer.from(secret)).toString('hex').slice(-1 * MAC_LENGTH) !== mac) {
+        throw new Error('This does not look like a secret')
+      } else {
+        return secret
+      }
+    } else if (version === '1.0.0') {
+      const hex = secrets.combine(shards)
+      return secrets.hex2str(hex)
     }
   },
-  validateShard: function (shardBase64) {
-    const shard = unpackShard(shardBase64)
-    try {
-      secrets.extractShareComponents(shard)
-    } catch (err) {
-      return false
+  validateShard: function (shard, version) {
+    if (version === '2.0.0') {
+      const unpackedShard = unpackShard(shard)
+      try {
+        secrets.extractShareComponents(unpackedShard)
+      } catch (err) {
+        return false
+      }
+      return true
+    } else if (version === '1.0.0') {
+      try {
+        secrets.extractShareComponents(shard)
+      } catch (err) {
+        return false
+      }
+      return true
     }
-    return true
   }
 }
