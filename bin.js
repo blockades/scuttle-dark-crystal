@@ -4,18 +4,18 @@ const pull = require('pull-stream')
 const ssbServer = require('./test/testbot')()
 const darkCrystal = require('.')(ssbServer)
 
+// abstract `console.log` for easy replacement
+const log = console.log
+
+// default callback for asynchronous calls
 const callback = (err, res) => {
   if (err) throw err
-  console.log(res)
+  log(res)
   ssbServer.close()
 }
 
-const pullback = (stream) => {
-  pull(
-    stream,
-    pull.collect(callback)
-  )
-}
+// sink for stream sources, which calls the above callback
+const pullback = (stream) => pull(stream, pull.collect(callback))
 
 const yargargs = yargs // eslint-disable-line
   .command('share', 'shard secret and publish root message, ritual message, and one shard message for each recipient', (yargs) => {
@@ -132,7 +132,7 @@ const yargargs = yargs // eslint-disable-line
         type: 'string'
       })
   }, (argv) => {
-    console.log(darkCrystal.sync.isRitual(argv.ritual))
+    log(darkCrystal.sync.isRitual(argv.ritual))
     ssbServer.close()
   })
 
@@ -142,7 +142,7 @@ const yargargs = yargs // eslint-disable-line
         type: 'string'
       })
   }, (argv) => {
-    console.log(darkCrystal.sync.isRoot(argv.root))
+    log(darkCrystal.sync.isRoot(argv.root))
     ssbServer.close()
   })
   .command('isShard <shard>', 'validate shard', (yargs) => {
@@ -151,7 +151,7 @@ const yargargs = yargs // eslint-disable-line
         type: 'string'
       })
   }, (argv) => {
-    console.log(darkCrystal.sync.isShard(argv.shard))
+    log(darkCrystal.sync.isShard(argv.shard))
     ssbServer.close()
   })
   .argv
