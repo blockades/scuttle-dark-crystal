@@ -28,10 +28,10 @@
   },
   "homepage": "https://github.com/blockades/scuttle-dark-crystal#readme",
   "dependencies": {
-    "chloride": "^2.2.10",
     "scuttle-inject": "^1.0.3",
     "scuttle-invite": "^1.0.1",
     "secrets.js-grempe": "1.1.0",
+    "sodium-native": "^2.2.3",
     "ssb-dark-crystal-schema": "^1.2.2",
     "ssb-msg-content": "^1.0.1"
   },
