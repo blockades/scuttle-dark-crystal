@@ -1,9 +1,9 @@
-
 const { SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
 const { describe } = require('tape-plus')
-const secrets = require('../secretsWrapper')
 
-describe('secretsWrapper', context => {
+const secrets = require('../../lib/secrets-wrapper')
+
+describe('secrets-wrapper', context => {
   let secret, numRecps, quorum
 
   context.beforeEach(c => {

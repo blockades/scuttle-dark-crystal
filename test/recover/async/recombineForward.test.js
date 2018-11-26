@@ -1,9 +1,9 @@
 const { describe } = require('tape-plus')
+const { SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
 
 const Server = require('../../testbot')
 const Recombine = require('../../../recover/async/recombineForward')
-const secrets = require('../../../secretsWrapper')
-const { SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
+const secrets = require('../../../lib/secrets-wrapper')
 
 describe('recombine.async.recombineForward', context => {
   let server, recombine, alice, bob, carol, root

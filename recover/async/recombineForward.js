@@ -1,8 +1,8 @@
 const pull = require('pull-stream')
 const ref = require('ssb-ref')
-const secrets = require('../../secretsWrapper')
 const getContent = require('ssb-msg-content')
 const { isForward } = require('ssb-dark-crystal-schema')
+const secrets = require('../../lib/secrets-wrapper')
 
 module.exports = function (server) {
   return function recombine (rootId, callback) {

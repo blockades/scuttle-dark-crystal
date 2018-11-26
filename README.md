@@ -13,13 +13,13 @@ var darkCrystal = DarkCrystal(server) // a scuttlebutt server or connection to o
 
 ### Secret share method
 
-#### `darkCrystal.share.async.share({name,secret,quorum,recps}, callback)`
+#### `darkCrystal.share.async.share(opts, callback)`
 
-Takes an object with properties:
+Where `opts` is an object with required properties:
 - `name` a name referring to the secret
 - `secret` the secret string itself
-- `quorum` the minimum number of shards required to recombine
 - `recps` an array of ssb feedIds for the shard recipients
+- `quorum` the minimum number of shards required to recombine
 
 The secret is sharded and a root message, ritual message and one shard message for each recipient are published.  If successful, the published messages will be passed as an object to the callback.
 
@@ -31,7 +31,7 @@ This method publishes `invite` messages with a request to return a shard. If `re
 
 This method can also be called : `darkCrystal.recover.async.request(rootId, callback)` and it will send requests to al shard-holders
 
-#### `darkCrystal.recover.async.reply(inviteId,callback)`
+#### `darkCrystal.recover.async.reply(inviteId, callback)`
 
 This will respond to a given invite message, by decrypting the associated shard and publishing an `invite-reply` message providing the shard in the `body` property.  If successful, the reply message is passed to the callback.
 
@@ -41,7 +41,7 @@ This will attempt to recombine the decrypted shards included in reply messages a
 
 ### Root methods
 
-#### `darkCrystal.root.async.publish(name,callback)`
+#### `darkCrystal.root.async.publish(name, callback)`
 
 Takes a secret name as an argument and publishes a root message.  If successful, the published message will be passed to the callback.
 

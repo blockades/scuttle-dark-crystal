@@ -1,11 +1,10 @@
-const secrets = require('../../secretsWrapper')
+const { isFeed } = require('ssb-ref')
 
 const PublishRoot = require('../../root/async/publish')
 const PublishRitual = require('../../ritual/async/publish')
 const PublishAllShards = require('../../shard/async/publish-all')
 
-const { isFeed } = require('ssb-ref')
-
+const secrets = require('../../lib/secrets-wrapper')
 const isNumber = require('../../lib/isNumber')
 const isString = require('../../lib/isString')
 const isFunction = require('../../lib/isFunction')

@@ -1,6 +1,6 @@
 const isReply = require('scuttle-invite/isReply')
 const getContent = require('ssb-msg-content')
-const { validateShard } = require('./secretsWrapper')
+const { validateShard } = require('./lib/secrets-wrapper')
 
 module.exports = function (msg, version) {
   const msgContent = getContent(msg)
