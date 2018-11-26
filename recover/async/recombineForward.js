@@ -5,28 +5,26 @@ const { isForward } = require('ssb-dark-crystal-schema')
 const secrets = require('../../lib/secrets-wrapper')
 
 module.exports = function (server) {
-  return function recombine (rootId, callback) {
-    if (!ref.isMsgId(rootId)) return callback(new Error('Invalid rootId'))
+  return function recombine (root, callback) {
+    if (!ref.isMsgId(root)) return callback(new Error('Invalid root'))
 
     let version
 
-    const findAssociatedMessages = (type) => {
-      return {
-        query: [{
-          $filter: {
-            value: {
-              content: {
-                type,
-                root: rootId
-              }
+    const opts = {
+      query: [{
+        $filter: {
+          value: {
+            content: {
+              type: 'dark-crystal/forward',
+              root
             }
           }
-        }]
-      }
+        }
+      }]
     }
 
     pull(
-      server.query.read(findAssociatedMessages('dark-crystal/forward')),
+      server.query.read(opts),
       pull.filter(isForward),
       pull.map(getContent),
       pull.map(content => {

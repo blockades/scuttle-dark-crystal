@@ -1,5 +1,4 @@
 const pull = require('pull-stream')
-const next = require('pull-next-query')
 const { isForward } = require('ssb-dark-crystal-schema')
 const { isMsgId } = require('ssb-ref')
 
@@ -20,10 +19,10 @@ module.exports = function (server) {
       }
     }]
 
-    const _opts = Object.assign({}, { query, limit: 100 }, opts)
+    const _opts = Object.assign({}, { query }, opts)
 
     return pull(
-      next(server.query.read, _opts),
+      server.query.read(_opts),
       pull.filter(isForward)
     )
   }

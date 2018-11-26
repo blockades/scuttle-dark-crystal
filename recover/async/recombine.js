@@ -8,29 +8,14 @@ const isReply = require('../../isReply')
 // const pullRitual = require('../../ritual/pull/mine')
 
 module.exports = function (server) {
-  return function recombine (rootId, callback) {
-    if (!ref.isMsgId(rootId)) return callback(new Error('Invalid rootId'))
-
-    const findAssociatedMessages = (type) => {
-      return {
-        query: [{
-          $filter: {
-            value: {
-              content: {
-                type,
-                root: rootId
-              }
-            }
-          }
-        }]
-      }
-    }
+  return function recombine (root, callback) {
+    if (!ref.isMsgId(root)) return callback(new Error('Invalid root'))
 
     // get the quorum from the ritual message
-    // TODO: use pullRitual( need to give the rootId to opts ) )
+    // TODO: use pullRitual( need to give the root to opts ) )
 
     pull(
-      server.query.read(findAssociatedMessages('dark-crystal/ritual')),
+      pullAssociatedMessages('dark-crystal/ritual'),
       pull.collect((err, rituals) => {
         if (err) return callback(err)
         if (rituals.length !== 1) {
@@ -42,7 +27,7 @@ module.exports = function (server) {
 
         // get the unencrypted shards from the reply messages
         pull(
-          server.query.read(findAssociatedMessages('invite-reply')),
+          pullAssociatedMessages('invite-reply'),
           pull.collect((err, replyLikeMsgs) => {
             if (err) return callback(err)
             var shards = replyLikeMsgs
@@ -69,5 +54,22 @@ module.exports = function (server) {
         )
       })
     )
+
+    function pullAssociatedMessages (type) {
+      const opts = {
+        query: [{
+          $filter: {
+            value: {
+              content: {
+                type,
+                root
+              }
+            }
+          }
+        }]
+      }
+
+      return server.query.read(opts)
+    }
   }
 }

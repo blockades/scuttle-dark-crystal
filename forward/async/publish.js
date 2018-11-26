@@ -13,13 +13,11 @@ module.exports = function (server) {
         if (err) return callback(err)
 
         if (shards.length < 1) {
-          let error = new Error('There are no shards associated with rootId ', root)
-          return callback(error)
+          return callback(new Error('There are no shards associated with rootId ', root))
         }
 
         if (shards.length > 1) {
-          let error = new Error('You have more than one shard for this secret, not yet supported')
-          return callback(error)
+          return callback(new Error('You have more than one shard for this secret, not yet supported'))
         }
 
         const {
@@ -30,8 +28,7 @@ module.exports = function (server) {
         } = shards[0]
 
         if (author === recp) {
-          let error = new Error('You may not forward a shard to its author. Use reply instead.')
-          return callback(error)
+          return callback(new Error('You may not forward a shard to its author. Use reply instead.'))
         }
 
         server.private.unbox(shard, (err, theDecryptedShard) => {
@@ -46,7 +43,7 @@ module.exports = function (server) {
           }
 
           if (isForward(content)) {
-            server.private.publish(content, [server.id], (err, forward) => {
+            server.private.publish(content, content.recps, (err, forward) => {
               if (err) callback(err)
               else server.private.unbox(forward, callback)
             })
