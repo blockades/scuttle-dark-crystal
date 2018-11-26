@@ -40,7 +40,7 @@ This method can also be called : `darkCrystal.recover.async.request(rootId, call
 
 This will respond to a given invite message, by decrypting the associated shard and publishing an `invite-reply` message providing the shard in the `body` property.  If successful, the reply message is passed to the callback.
 
-#### `darkCrystal.recover.async.recombine(rootId,callback)`
+#### `darkCrystal.recover.async.recombine(rootId, callback)`
 
 This will attempt to recombine the decrypted shards included in reply messages associated with a given rootId.  If successful the secret will be passed to the callback.
 

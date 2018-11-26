@@ -1,11 +1,10 @@
 const { describe } = require('tape-plus')
-const Server = require('../../testbot')
-const { SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
 const { box } = require('ssb-keys')
 
 const Publish = require('../../../forward/async/publish')
+const Server = require('../../testbot')
 
-describe('forward.async.publish', context => {
+describe('forward.async.publish (v2)', context => {
   let server
   let publish
   let alice, bob
@@ -23,7 +22,7 @@ describe('forward.async.publish', context => {
 
     bobShard = {
       type: 'dark-crystal/shard',
-      version: SCHEMA_VERSION,
+      version: '2.0.0',
       root,
       shard: box(shard, [ server.id ]),
       recps: [server.id, bob.id]

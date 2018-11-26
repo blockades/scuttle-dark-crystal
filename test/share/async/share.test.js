@@ -128,7 +128,7 @@ describe('share.async.share', context => {
               pull(
                 pullType('dark-crystal/shard'),
                 pull.collect((err, shards) => {
-                  if (err) console.error(err)
+                  assert.notOk(err, 'no error')
                   assert.deepEqual(data.shards, shards.map(removeEncryptionData), 'publishes a set of shards')
                   next()
                 })
