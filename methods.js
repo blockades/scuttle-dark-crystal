@@ -1,4 +1,6 @@
-const { isRitual, isRoot, isShard } = require('ssb-dark-crystal-schema')
+const { isRitual, isRoot, isShard, isForward } = require('ssb-dark-crystal-schema')
+const isRequest = require('./isRequest')
+const isReply = require('./isReply')
 
 module.exports = {
   recover: {
@@ -13,7 +15,6 @@ module.exports = {
   },
   root: {
     async: {
-      get: require('./root/async/get'),
       publish: require('./root/async/publish')
     },
     pull: {
@@ -31,7 +32,6 @@ module.exports = {
   },
   shard: {
     async: {
-      get: require('./shard/async/get'),
       publishAll: require('./shard/async/publish-all')
     },
     pull: {
@@ -47,6 +47,8 @@ module.exports = {
   sync: {
     isRitual: () => isRitual,
     isRoot: () => isRoot,
-    isShard: () => isShard
+    isShard: () => isShard,
+    isForward: () => isForward,
+    isReply: () => isReply
   }
 }

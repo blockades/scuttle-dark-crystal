@@ -11,6 +11,9 @@ var darkCrystal = DarkCrystal(server) // a scuttlebutt server or connection to o
 
 ## API Methods
 
+The easiest way to see which methods are exposed is to check out `./methods.js`
+
+
 ### Secret share method
 
 #### `darkCrystal.share.async.share(opts, callback)`
@@ -22,6 +25,8 @@ Where `opts` is an object with required properties:
 - `quorum` the minimum number of shards required to recombine
 
 The secret is sharded and a root message, ritual message and one shard message for each recipient are published.  If successful, the published messages will be passed as an object to the callback.
+
+
 
 ### Secret recovery methods
 
@@ -39,6 +44,8 @@ This will respond to a given invite message, by decrypting the associated shard 
 
 This will attempt to recombine the decrypted shards included in reply messages associated with a given rootId.  If successful the secret will be passed to the callback.
 
+
+
 ### Root methods
 
 #### `darkCrystal.root.async.publish(name, callback)`
@@ -53,6 +60,8 @@ Takes an object with properties:
 - `quorum` the minimum number of shards required to recombine
 
 A ritual message is published.  If successful, the published message will be passed to the callback.
+
+
 
 ### Shard methods
 
@@ -73,6 +82,8 @@ Returns a stream of shard messages identified by root id.  Takes `opts` - standa
 #### `darkCrystal.shard.pull.fromOthers(opts)`
 
 Returns a stream of shards others have shared with you. Takes `opts` - standard stream options like `live`, `reverse` etc.
+
+
 
 ### Shard forward methods 
 
@@ -96,7 +107,24 @@ Returns a stream of all forwarded shards you have recieved. Takes `opts` - stand
 
 Attempts to recover a secret from forwarded messages with the given `rootId`. If successful, the secret will be passed to the callback, otherwise, an error will be passed.
 
-### `darkCrystal.sync.isRitual(ritual)`, `darkCrystal.sync.isRoot(root)`, `darkCrystal.sync.isShard(shard)`
+
+
+### Validators
+
+#### `darkCrystal.sync.isRitual(ritual)`
+
+#### `darkCrystal.sync.isRoot(root)`
+
+####`darkCrystal.sync.isShard(shard)`
+
+####`darkCrystal.sync.isForward(shard)`
 
 These are validation methods for each message type as described in [ssb-dark-crystal-schema](https://github.com/blockades/ssb-dark-crystal-schema).
+
+####`darkCrystal.sync.isRequest(shard)`
+
+####`darkCrystal.sync.isReply(shard)`
+
+The request + reply schema is described by [ssb-invite-schema](https://github.com/blockades/ssb-dark-crystal-schema), but there's additional validation added by the module to check the payload is _shard-like_
+
 
