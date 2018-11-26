@@ -49,6 +49,7 @@ module.exports = {
     isRoot: () => isRoot,
     isShard: () => isShard,
     isForward: () => isForward,
+    isRequest: () => isRequest,
     isReply: () => isReply
   }
 }
