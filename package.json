@@ -34,7 +34,7 @@
     "ssb-dark-crystal-schema": "^1.2.2",
     "ssb-keys": "^7.1.3",
     "ssb-msg-content": "^1.0.1",
-    "ssb-ref": "^2.13.6"
+    "ssb-ref": "^2.13.7"
   },
   "devDependencies": {
     "scuttle-testbot": "^1.1.6",
