@@ -1,10 +1,11 @@
 const { describe } = require('tape-plus')
 const { box } = require('ssb-keys')
 
-const Publish = require('../../../forward/async/publish')
-const Server = require('../../testbot')
+const Publish = require('../../../../forward/async/publish')
+const Server = require('../../../testbot')
+const { share: shareV2 } = require('../../../../lib/secrets-wrapper/v2')
 
-describe('forward.async.publish (v2)', context => {
+describe('forward.async.publish (v2 shard)', context => {
   let server
   let publish
   let alice, bob
@@ -18,7 +19,7 @@ describe('forward.async.publish (v2)', context => {
     alice = server.createFeed()
     bob = server.createFeed()
     root = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
-    shard = '803imagine this is a shard'
+    shard = shareV2('my secret', 3, 2)[0]
 
     bobShard = {
       type: 'dark-crystal/shard',
@@ -39,6 +40,7 @@ describe('forward.async.publish (v2)', context => {
       publish(root, alice.id, (err, forward) => {
         assert.notOk(err, 'null errors')
         assert.ok(forward, 'valid forward object')
+        assert.equal('2.0.0', forward.value.content.version, 'correct version')
         assert.equal(shard, forward.value.content.shard, 'shard is inserted')
         next()
       })

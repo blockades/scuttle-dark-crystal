@@ -1,25 +1,24 @@
-const { isRitual, SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
-const tool = 'secrets.js-grempe'
-const toolVersion = require('../../package.json').dependencies[tool]
+const { isRitual } = require('ssb-dark-crystal-schema')
+const TOOL = 'secrets.js-grempe'
+const toolVersion = require('../../package.json').dependencies[TOOL]
+const publish = require('../../lib/publish-msg')
+
+if (!toolVersion) throw new Error('LOOK OUT, you need to update which tool is being backed into ritual messages!')
 
 module.exports = function (server) {
-  return function publish (params, callback) {
-    const { root, shards, quorum } = params
+  return function publishRitual ({ root, shards, quorum }, callback) {
     var content = {
       type: 'dark-crystal/ritual',
-      version: SCHEMA_VERSION,
+      version: '2.0.0',
       root,
       shards,
       quorum,
-      tool: `${tool}@${toolVersion}`,
+      tool: `${TOOL}@${toolVersion}`,
       recps: [server.id]
     }
 
-    if (isRitual(content)) {
-      server.private.publish(content, [server.id], (err, ritual) => {
-        if (err) callback(err)
-        else server.private.unbox(ritual, callback)
-      })
-    } else callback(isRitual.errors)
+    if (!isRitual(content)) return callback(isRitual.errors)
+
+    publish(server)(content, callback)
   }
 }

@@ -2,6 +2,7 @@ const pull = require('pull-stream')
 const { isMsg, isFeed } = require('ssb-ref')
 
 const buildShard = require('../async/build')
+const publish = require('../../lib/publish-msg')
 
 module.exports = function (server) {
   return function publishAll ({ shards, recps, rootId }, callback) {
@@ -26,13 +27,7 @@ module.exports = function (server) {
     function publishAll (shards) {
       pull(
         pull.values(shards),
-        pull.asyncMap((shardMsg, cb) => {
-          server.private.publish(shardMsg, shardMsg.recps, (err, msg) => {
-            if (err) cb(err)
-            else server.private.unbox(msg, cb)
-          })
-        }),
-        // pull.through(console.log),
+        pull.asyncMap(publish(server)),
         pull.collect(callback)
       )
     }

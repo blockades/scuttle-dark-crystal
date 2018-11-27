@@ -1,11 +1,13 @@
-const { isForward, SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
 const pull = require('pull-stream')
-const PullShardsByRoot = require('../../shard/pull/by-root')
 const ref = require('ssb-ref')
+const get = require('lodash.get')
+const PullShardsByRoot = require('../../shard/pull/by-root')
+const buildForward = require('./build')
+const publish = require('../../lib/publish-msg')
 
 module.exports = function (server) {
   const pullShardsByRoot = PullShardsByRoot(server)
-  return function publish (root, recp, callback) {
+  return function publishForward (root, recp, callback) {
     if (!ref.isMsgId(root)) return callback(new Error('Invalid rootId'))
     pull(
       pullShardsByRoot(root),
@@ -20,34 +22,16 @@ module.exports = function (server) {
           return callback(new Error('You have more than one shard for this secret, not yet supported'))
         }
 
-        const {
-          value: {
-            author,
-            content: { shard }
-          }
-        } = shards[0]
-
-        if (author === recp) {
+        if (get(shards[0], 'value.author') === recp) {
           return callback(new Error('You may not forward a shard to its author. Use reply instead.'))
         }
 
-        server.private.unbox(shard, (err, theDecryptedShard) => {
+        const shard = get(shards[0], 'value.content.shard')
+
+        buildForward(server)({ root, shard, recp }, (err, content) => {
           if (err) return callback(err)
 
-          var content = {
-            type: 'dark-crystal/forward',
-            version: SCHEMA_VERSION,
-            root,
-            shard: theDecryptedShard,
-            recps: [recp, server.id]
-          }
-
-          if (isForward(content)) {
-            server.private.publish(content, content.recps, (err, forward) => {
-              if (err) callback(err)
-              else server.private.unbox(forward, callback)
-            })
-          } else callback(isForward.errors)
+          publish(server)(content, callback)
         })
       })
     )

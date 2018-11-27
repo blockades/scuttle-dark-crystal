@@ -1,13 +1,12 @@
 const { describe } = require('tape-plus')
 const { box } = require('ssb-keys')
-const { SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
 
-const Server = require('../../testbot')
-const Reply = require('../../../recover/async/reply')
+const Server = require('../../../testbot')
+const Reply = require('../../../../recover/async/reply')
+const isReply = require('../../../../isReply')
+const { share } = require('../../../../lib/secrets-wrapper/v1')
 
-const isReply = require('../../../isReply')
-
-describe('reply.async.reply', context => {
+describe('recover.async.reply (v1)', context => {
   let server, reply, katie
   let rootId, katiesInvite, katiesShard
 
@@ -26,11 +25,13 @@ describe('reply.async.reply', context => {
       recps: [katie.id, server.id]
     }
 
+    const shards = share('here is ma secret!', 5, 2)
+
     katiesShard = {
       type: 'dark-crystal/shard',
-      version: SCHEMA_VERSION,
+      version: '1.0.0',
       root: rootId,
-      shard: box('803imagine this is a shard', [server.id]),
+      shard: box(shards[0], [server.id]),
       recps: [katie.id, server.id]
     }
   })
@@ -47,7 +48,7 @@ describe('reply.async.reply', context => {
         reply(inviteMsg.key, (err, replyMsg) => {
           assert.notOk(err, 'null errors')
           assert.ok(replyMsg, 'returns a reply message')
-          assert.ok(isReply(replyMsg, SCHEMA_VERSION), 'message are valid replies')
+          assert.ok(isReply(replyMsg, '1.0.0'), 'message are valid replies')
           next()
         })
       })

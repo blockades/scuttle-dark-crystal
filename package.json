@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run test:js && npm run test:lint",
-    "test:js": "tape 'test/**/*.test.js' | tap-diff",
+    "test:js": "tape 'test/**/*.test.js' | tap-spec",
     "test:lint": "standard",
     "lint": "standard --fix"
   },
@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/blockades/scuttle-dark-crystal#readme",
   "dependencies": {
+    "lodash.get": "^4.4.2",
     "scuttle-inject": "^1.0.3",
     "scuttle-invite": "^1.0.1",
     "secrets.js-grempe": "1.1.0",
@@ -40,7 +41,7 @@
     "ssb-private": "^0.2.3",
     "ssb-query": "^2.1.0",
     "standard": "^11.0.1",
-    "tap-diff": "^0.1.1",
+    "tap-spec": "^5.0.0",
     "tape": "^4.9.1",
     "tape-plus": "^1.0.0"
   }

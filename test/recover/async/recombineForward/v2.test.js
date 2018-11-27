@@ -1,11 +1,10 @@
 const { describe } = require('tape-plus')
-const { SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
 
-const Server = require('../../testbot')
-const Recombine = require('../../../recover/async/recombineForward')
-const secrets = require('../../../lib/secrets-wrapper')
+const Server = require('../../../testbot')
+const Recombine = require('../../../../recover/async/recombineForward')
+const { share } = require('../../../../lib/secrets-wrapper/v2')
 
-describe('recombine.async.recombineForward', context => {
+describe('recombine.async.recombineForward (v2)', context => {
   let server, recombine, alice, bob, carol, root
   let shardHolders, secret, shards, forwardMessages
 
@@ -27,15 +26,15 @@ describe('recombine.async.recombineForward', context => {
     forwardMessages = {}
 
     secret = Math.random().toString(36)
-    shards = secrets.share(secret, 3, 2)
+    shards = share(secret, 3, 2)
 
     root = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
     forwardMessages = shardHolders.reduce((acc, shardHolder) => {
       acc[shardHolder] = {
         type: 'dark-crystal/forward',
-        version: SCHEMA_VERSION,
+        version: '2.0.0',
         root,
-        shard: shards.pop(),
+        shard: shards.pop(), // fwdd shards are currently totally open
         recps: [shardHolder, server.id]
       }
       return acc
@@ -44,6 +43,11 @@ describe('recombine.async.recombineForward', context => {
 
   context.afterEach(c => {
     server.close()
+  })
+
+  context('Recombining v1 fwdd shards', (assert, next) => {
+    assert.fail('WRITE TESTS')
+    // HERE OR IN v1.test.js?
   })
 
   context('Returns the recombined secret', (assert, next) => {
