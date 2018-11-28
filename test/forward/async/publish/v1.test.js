@@ -40,8 +40,7 @@ describe('forward.async.publish (v1 shard)', context => {
       publish(root, alice.id, (err, forward) => {
         assert.notOk(err, 'null errors')
         assert.ok(forward, 'valid forward object')
-        assert.equal('1.0.0', forward.value.content.version, 'correct version')
-        // I propose that we have the version of the forward message be a refelection of the version of the shard? or add a new field
+        assert.equal('1.0.0', forward.value.content.shardVersion, 'correct version')
         assert.equal(shard, forward.value.content.shard, 'shard is inserted')
         next()
       })
