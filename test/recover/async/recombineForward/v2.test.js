@@ -35,6 +35,7 @@ describe('recombine.async.recombineForward (v2)', context => {
         version: '2.0.0',
         root,
         shard: shards.pop(), // fwdd shards are currently totally open
+        shardVersion: '2.0.0',
         recps: [shardHolder, server.id]
       }
       return acc
