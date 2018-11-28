@@ -40,7 +40,7 @@ describe('forward.async.publish (v2 shard)', context => {
       publish(root, alice.id, (err, forward) => {
         assert.notOk(err, 'null errors')
         assert.ok(forward, 'valid forward object')
-        assert.equal('2.0.0', forward.value.content.version, 'correct version')
+        assert.equal('2.0.0', forward.value.content.shardVersion, 'correct version')
         assert.equal(shard, forward.value.content.shard, 'shard is inserted')
         next()
       })
