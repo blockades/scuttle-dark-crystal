@@ -27,8 +27,10 @@ module.exports = function (server) {
         }
 
         const shard = get(shards[0], 'value.content.shard')
+        const shardVersion = get(shards[0], 'value.content.version')
 
-        buildForward(server)({ root, shard, recp }, (err, content) => {
+
+        buildForward(server)({ root, shard, shardVersion, recp }, (err, content) => {
           if (err) return callback(err)
 
           publish(server)(content, callback)
