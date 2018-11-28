@@ -28,7 +28,7 @@ module.exports = function (server) {
       pull.filter(isForward),
       pull.map(getContent),
       pull.map(content => {
-        version = content.version
+        version = content.shardVersion
         return content.shard
       }),
       pull.collect((err, shards) => {
