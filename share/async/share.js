@@ -1,11 +1,10 @@
-const secrets = require('secrets.js-grempe')
+const { isFeed } = require('ssb-ref')
 
 const PublishRoot = require('../../root/async/publish')
 const PublishRitual = require('../../ritual/async/publish')
 const PublishAllShards = require('../../shard/async/publish-all')
 
-const { isFeed } = require('ssb-ref')
-
+const secrets = require('../../lib/secrets-wrapper')
 const isNumber = require('../../lib/isNumber')
 const isString = require('../../lib/isString')
 const isFunction = require('../../lib/isFunction')
@@ -37,8 +36,7 @@ module.exports = function (server) {
 
     const numOfShards = recps.length
 
-    const hexSecret = secrets.str2hex(secret)
-    const shards = secrets.share(hexSecret, numOfShards, quorum)
+    const shards = secrets.share(secret, numOfShards, quorum)
 
     publishRoot(name, (err, root) => {
       if (err) return callback(err)
@@ -52,7 +50,6 @@ module.exports = function (server) {
         // RESOLUTION: Extracted reducer into a publishAll function
         //
         publishAllShards({ shards, recps: recipients, rootId }, (err, shards) => {
-          console.error(err)
           if (err) return callback(err)
 
           callback(null, {

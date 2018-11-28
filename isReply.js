@@ -1,17 +1,17 @@
-const isReply = require('scuttle-invite/isReply')
+const _isReply = require('scuttle-invite/isReply')
 const getContent = require('ssb-msg-content')
-const secrets = require('secrets.js-grempe')
+const { validateShard } = require('./lib/secrets-wrapper')
 
-module.exports = function (msg) {
-  return isReply(msg) && validateShard(msg)
-}
+module.exports = function isReply (msg, version) {
+  const msgContent = getContent(msg)
+  const shard = msgContent.body
 
-function validateShard (possibleReply) {
-  const shard = getContent(possibleReply).body
-  try {
-    secrets.extractShareComponents(shard)
-  } catch (err) {
-    return false
-  }
-  return true
+  const errors = []
+  if (!_isReply(msg)) errors.push(_isReply.errors)
+  if (!validateShard(shard, version)) errors.push(new Error('invalid shard'))
+
+  if (!errors.length) return true
+
+  isReply.errors = errors
+  return false
 }
