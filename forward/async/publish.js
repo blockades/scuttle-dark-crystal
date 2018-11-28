@@ -26,9 +26,12 @@ module.exports = function (server) {
           return callback(new Error('You may not forward a shard to its author. Use reply instead.'))
         }
 
-        const shard = get(shards[0], 'value.content.shard')
         const shardVersion = get(shards[0], 'value.content.version')
+        if (shardVersion === '1.0.0') {
+          return callback(new Error('You cannot forward version 1.0.0 shards.'))
+        }
 
+        const shard = get(shards[0], 'value.content.shard')
 
         buildForward(server)({ root, shard, shardVersion, recp }, (err, content) => {
           if (err) return callback(err)
