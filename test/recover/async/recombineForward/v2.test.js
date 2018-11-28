@@ -46,11 +46,6 @@ describe('recombine.async.recombineForward (v2)', context => {
     server.close()
   })
 
-  context('Recombining v1 fwdd shards', (assert, next) => {
-    assert.fail('WRITE TESTS')
-    // HERE OR IN v1.test.js?
-  })
-
   context('Returns the recombined secret', (assert, next) => {
     alice.publish(forwardMessages[alice.id], (err, aliceForward) => {
       if (err) console.error(err)
