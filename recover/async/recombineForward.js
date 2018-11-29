@@ -28,7 +28,6 @@ module.exports = function (server) {
       pull.filter(isForward),
       pull.map(getContent),
       pull.through(content => versions.push(content.shardVersion)),
-      pull.map(content => content),
       pull.collect((err, contents) => {
         if (err) return callback(err)
         let version = mode(versions)
