@@ -8,7 +8,7 @@ module.exports = function (server) {
   return function recombine (root, callback) {
     if (!ref.isMsgId(root)) return callback(new Error('Invalid root'))
 
-    let version
+    let versions = []
 
     const opts = {
       query: [{
@@ -27,12 +27,11 @@ module.exports = function (server) {
       server.query.read(opts),
       pull.filter(isForward),
       pull.map(getContent),
-      pull.map(content => {
-        version = content.shardVersion
-        return content.shard
-      }),
+      pull.through(content => versions.push(content.shardVersion)),
+      pull.map(content => content.shard),
       pull.collect((err, shards) => {
         if (err) return callback(err)
+        let version = mode(versions)
         try {
           if (shards.length < 1) throw new Error('No foward messages associated with this rootId')
           return callback(null, secrets.combine(shards, version))
@@ -40,4 +39,11 @@ module.exports = function (server) {
       })
     )
   }
+}
+
+function mode (array) {
+  return array.sort((a, b) => (
+    array.filter(v => v === a).length -
+      array.filter(v => v === b).length
+  )).pop();
 }
