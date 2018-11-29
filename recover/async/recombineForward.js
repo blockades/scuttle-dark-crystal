@@ -28,12 +28,16 @@ module.exports = function (server) {
       pull.filter(isForward),
       pull.map(getContent),
       pull.through(content => versions.push(content.shardVersion)),
-      pull.map(content => content.shard),
-      pull.collect((err, shards) => {
+      pull.map(content => content),
+      pull.collect((err, contents) => {
         if (err) return callback(err)
         let version = mode(versions)
+        let shards = contents.filter(content => content.shardVersion === version)
+          .map(content => content.shard)
         try {
           if (shards.length < 1) throw new Error('No foward messages associated with this rootId')
+          if (!version) throw new Error('No versions available')
+
           return callback(null, secrets.combine(shards, version))
         } catch (err) { return callback(err) }
       })
