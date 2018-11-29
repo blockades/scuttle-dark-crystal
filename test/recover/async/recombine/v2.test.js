@@ -7,7 +7,7 @@ const Share = require('../../../../share/async/share')
 const Request = require('../../../../recover/async/request')
 const Recombine = require('../../../../recover/async/recombine')
 
-describe('recombine.async.recombine (with v2 shards)', context => {
+describe('recover.async.recombine (with v2 shards)', context => {
   let server, recombine, request, alice, bob, carol
   let shardHolders, name, secret, quorum, share
 

@@ -4,7 +4,7 @@ const Server = require('../../../testbot')
 const Recombine = require('../../../../recover/async/recombineForward')
 const { share } = require('../../../../lib/secrets-wrapper/v2')
 
-describe('recombine.async.recombineForward (v2)', context => {
+describe('recover.async.recombineForward (v2)', context => {
   let server, recombine, alice, bob, carol, root
   let shardHolders, secret, shards, forwardMessages
 
