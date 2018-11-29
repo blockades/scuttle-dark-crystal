@@ -9,6 +9,10 @@
     "test:lint": "standard",
     "lint": "standard --fix"
   },
+  "bin": {
+    "darkcrystal": "./bin.js",
+    "dark-crystal": "./bin.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/blockades/dark-crystal.git"
@@ -28,18 +32,21 @@
   },
   "homepage": "https://github.com/blockades/scuttle-dark-crystal#readme",
   "dependencies": {
+    "lodash.get": "^4.4.2",
+    "lodash.merge": "^4.6.1",
     "pull-next-query": "^1.0.0",
     "pull-stream": "^3.6.9",
     "scuttle-inject": "^1.0.3",
     "scuttle-invite": "^1.0.1",
     "secrets.js-grempe": "1.1.0",
+    "sodium-native": "^2.2.3",
+    "ssb-client": "^4.6.0",
+    "ssb-config": "^2.3.7",
     "ssb-dark-crystal-schema": "^1.2.2",
     "ssb-keys": "^7.1.3",
     "ssb-msg-content": "^1.0.1",
     "ssb-ref": "^2.13.7",
-    "yargs": "^12.0.5",
-    "lodash.get": "^4.4.2",
-    "sodium-native": "^2.2.3"
+    "yargs": "^12.0.5"
   },
   "devDependencies": {
     "scuttle-testbot": "^1.1.6",
