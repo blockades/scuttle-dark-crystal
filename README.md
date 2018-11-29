@@ -115,15 +115,15 @@ Attempts to recover a secret from forwarded messages with the given `rootId`. If
 
 #### `darkCrystal.sync.isRoot(root)`
 
-####`darkCrystal.sync.isShard(shard)`
+#### `darkCrystal.sync.isShard(shard)`
 
-####`darkCrystal.sync.isForward(shard)`
+#### `darkCrystal.sync.isForward(shard)`
 
 These are validation methods for each message type as described in [ssb-dark-crystal-schema](https://github.com/blockades/ssb-dark-crystal-schema).
 
-####`darkCrystal.sync.isRequest(shard)`
+#### `darkCrystal.sync.isRequest(shard)`
 
-####`darkCrystal.sync.isReply(shard)`
+#### `darkCrystal.sync.isReply(shard)`
 
 The request + reply schema is described by [ssb-invite-schema](https://github.com/blockades/ssb-dark-crystal-schema), but there's additional validation added by the module to check the payload is _shard-like_
 
