@@ -27,9 +27,6 @@ module.exports = function (server) {
         }
 
         const shardVersion = get(shards[0], 'value.content.version')
-        if (shardVersion === '1.0.0') {
-          return callback(new Error('You cannot forward version 1.0.0 shards.'))
-        }
 
         const shard = get(shards[0], 'value.content.shard')
 
