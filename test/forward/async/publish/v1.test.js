@@ -34,12 +34,34 @@ describe('forward.async.publish (v1 shard)', context => {
     server.close()
   })
 
-  context('fails to publish a version 1.0.0 shard', (assert, next) => {
+  context('publishes a message when valid', (assert, next) => {
     bob.publish(bobShard, (err, bobReply) => {
       if (err) console.error(err)
       publish(root, alice.id, (err, forward) => {
-        assert.notOk(forward, 'forward message is null')
-        assert.ok(err, 'Returns error')
+        assert.notOk(err, 'null errors')
+        assert.ok(forward, 'valid forward object')
+        assert.equal('1.0.0', forward.value.content.shardVersion, 'correct version')
+        assert.equal(shard, forward.value.content.shard, 'shard is inserted')
+        next()
+      })
+    })
+  })
+
+  context('fails to publish when invalid', (assert, next) => {
+    root = 'this is not a root'
+    publish(root, alice.id, (errs, forward) => {
+      assert.ok(errs, 'has errors')
+      assert.notOk(forward, 'forward is null')
+      next()
+    })
+  })
+
+  context('fails to publish when shard is forwarded to its author', (assert, next) => {
+    bob.publish(bobShard, (err, bobReply) => {
+      if (err) console.error(err)
+      publish(root, bob.id, (err, forward) => {
+        assert.ok(err, 'throws error')
+        assert.notOk(forward, 'forward is null')
         next()
       })
     })
