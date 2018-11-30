@@ -32,4 +32,16 @@ describe('secrets-wrapper (v2)', context => {
     assert.notEqual(result, secret, 'secret not recovered')
     next()
   })
+
+  context('secret cannot be reproduced when an invalid shard is given', (assert, next) => {
+    try {
+      var shards = share(secret, numRecps, quorum)
+      shards[1] = 'this is not a shard'
+      var result = combine(shards)
+    } catch (err) {
+      assert.ok(err, 'throws an error')
+    }
+    assert.notEqual(result, secret, 'secret not recovered')
+    next()
+  })
 })
