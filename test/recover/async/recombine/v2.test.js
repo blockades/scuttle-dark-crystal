@@ -9,7 +9,7 @@ const Recombine = require('../../../../recover/async/recombine')
 
 describe('recover.async.recombine (with v2 shards)', context => {
   let server, recombine, request, alice, bob, carol
-  let shardHolders, name, secret, quorum, share
+  let custodians, name, secret, quorum, share
 
   context.beforeEach(c => {
     server = Server()
@@ -22,7 +22,7 @@ describe('recover.async.recombine (with v2 shards)', context => {
     bob = server.createFeed()
     carol = server.createFeed()
 
-    shardHolders = [
+    custodians = [
       alice.id,
       bob.id,
       carol.id
@@ -39,7 +39,7 @@ describe('recover.async.recombine (with v2 shards)', context => {
 
   context('Returns the recombined secret', (assert, next) => {
     var replies = {}
-    share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
+    share({ name, secret, quorum, recps: custodians }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
 
@@ -89,7 +89,7 @@ describe('recover.async.recombine (with v2 shards)', context => {
 
   context('calls back with an error if quorum is not reached', (assert, next) => {
     var replies = {}
-    share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
+    share({ name, secret, quorum, recps: custodians }, (err, data) => {
       if (err) console.error(err)
 
       var rootId = data.root.key
@@ -130,7 +130,7 @@ describe('recover.async.recombine (with v2 shards)', context => {
 
   context('calls back with an error and returns no secret if an invalid shard is found', (assert, next) => {
     var replies = {}
-    share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
+    share({ name, secret, quorum, recps: custodians }, (err, data) => {
       if (err) console.error(err)
 
       var rootId = data.root.key
@@ -180,9 +180,9 @@ describe('recover.async.recombine (with v2 shards)', context => {
 
   context('calls back with an error and returns no secret when reply refers to the wrong root message', (assert, next) => {
     var replies = {}
-    share({ name, secret, quorum, recps: shardHolders }, (err, data) => {
+    share({ name, secret, quorum, recps: custodians }, (err, data) => {
       if (err) console.error(err)
-      share({ name, secret: 'another secret', quorum, recps: shardHolders }, (err, otherData) => {
+      share({ name, secret: 'another secret', quorum, recps: custodians }, (err, otherData) => {
         if (err) console.error(err)
         var rootId = data.root.key
         request(rootId, (err, inviteMsgs) => {

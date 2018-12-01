@@ -43,6 +43,7 @@
     "standard": "^11.0.1",
     "tap-spec": "^5.0.0",
     "tape": "^4.9.1",
-    "tape-plus": "^1.0.0"
+    "tape-plus": "^1.0.0",
+    "scuttle-dark-crystal": "^0.1.11"
   }
 }
