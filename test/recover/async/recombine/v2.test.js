@@ -36,7 +36,8 @@ describe('recover.async.recombine (with v2 shards)', context => {
       if (err) console.error(err)
       var rootId = data.root.key
 
-      request(rootId, (err, invites) => { if (err) console.error(err)
+      request(rootId, (err, invites) => {
+        if (err) console.error(err)
 
         var replies = invites.reduce((collection, invite) => (
           buildReplies(collection, invite, data, rootId)
@@ -95,9 +96,6 @@ describe('recover.async.recombine (with v2 shards)', context => {
         var replies = invites.reduce((collection, invite) => {
           var content = getContent(invite)
           var custodianId = content.recps.find(notMe)
-          var shard = data.shards.map(getContent)
-            .find(shard => shard.recps.find(recp => recp === custodianId))
-            .shard
 
           collection[custodianId] = {
             type: 'invite-reply',
@@ -105,7 +103,7 @@ describe('recover.async.recombine (with v2 shards)', context => {
             branch: invite.key,
             accept: true,
             version: '1',
-            body: "This is not a valid shard",
+            body: 'This is not a valid shard',
             recps: content.recps
           }
 
@@ -141,9 +139,9 @@ describe('recover.async.recombine (with v2 shards)', context => {
         request(rootId, (err, invites) => {
           if (err) console.error(err)
 
-        var replies = invites.reduce((collection, invite) => (
-          buildReplies(collection, invite, data, otherRootId)
-        ), {})
+          var replies = invites.reduce((collection, invite) => (
+            buildReplies(collection, invite, data, otherRootId)
+          ), {})
 
           alice.publish(replies.alice, (err, aliceReply) => {
             if (err) console.error(err)
