@@ -17,19 +17,13 @@ describe('recover.async.recombine (with v2 shards)', context => {
     request = Request(server)
     share = Share(server)
 
-    // we are holding some shards from alice, bob and carol
     alice = server.createFeed()
     bob = server.createFeed()
     carol = server.createFeed()
 
-    custodians = [
-      alice.id,
-      bob.id,
-      carol.id
-    ]
-
     name = 'My SBB Dark Crystal'
     secret = Math.random().toString(36)
+    custodians = [alice, bob, carol]
     quorum = 2
   })
 
@@ -38,42 +32,20 @@ describe('recover.async.recombine (with v2 shards)', context => {
   })
 
   context('Returns the recombined secret', (assert, next) => {
-    var replies = {}
-    share({ name, secret, quorum, recps: custodians }, (err, data) => {
+    share({ name, secret, quorum, recps: custodians.map(id) }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
 
-      request(rootId, (err, inviteMsgs) => {
-        if (err) console.error(err)
+      request(rootId, (err, invites) => { if (err) console.error(err)
 
-        inviteMsgs.forEach((inviteMsg) => {
-          var inviteMsgContent = getContent(inviteMsg)
-          var shardHolder = inviteMsgContent.recps.filter(recp => recp !== server.id)[0]
-          var shardMsgs = data.shards.map(s => (getContent(s)))
-          var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard
-          // We need to recreate replies from alice, and bob:
-          const reply = {
-            type: 'invite-reply',
-            root: rootId,
-            branch: inviteMsg.key,
-            accept: true,
-            version: '1',
-            recps: inviteMsgContent.recps
-          }
-          if (shardHolder === alice.id) {
-            reply.body = unbox(shard, alice.keys)
-            replies['alice'] = reply
-          }
-          if (shardHolder === bob.id) {
-            reply.body = unbox(shard, bob.keys)
-            replies['bob'] = reply
-          }
-        })
+        var replies = invites.reduce((collection, invite) => (
+          buildReplies(collection, invite, data, rootId)
+        ), {})
 
-        alice.publish(replies.alice, (err, aliceReply) => {
+        alice.publish(replies[alice.id], (err, aliceReply) => {
           if (err) console.error(err)
 
-          bob.publish(replies.bob, (err, bobReply) => {
+          bob.publish(replies[bob.id], (err, bobReply) => {
             if (err) console.error(err)
 
             recombine(rootId, (err, returnedSecret) => {
@@ -88,34 +60,18 @@ describe('recover.async.recombine (with v2 shards)', context => {
   })
 
   context('calls back with an error if quorum is not reached', (assert, next) => {
-    var replies = {}
-    share({ name, secret, quorum, recps: custodians }, (err, data) => {
+    share({ name, secret, quorum, recps: custodians.map(id) }, (err, data) => {
       if (err) console.error(err)
 
       var rootId = data.root.key
-      request(rootId, (err, inviteMsgs) => {
+      request(rootId, (err, invites) => {
         if (err) console.error(err)
 
-        inviteMsgs.forEach((inviteMsg) => {
-          var inviteMsgContent = getContent(inviteMsg)
-          var shardHolder = inviteMsgContent.recps.filter(recp => recp !== server.id)[0]
-          var shardMsgs = data.shards.map(s => (getContent(s)))
-          var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard
-          const reply = {
-            type: 'invite-reply',
-            root: rootId,
-            branch: inviteMsg.key,
-            accept: true,
-            version: '1',
-            recps: inviteMsgContent.recps
-          }
-          if (shardHolder === alice.id) {
-            reply.body = unbox(shard, alice.keys)
-            replies['alice'] = reply
-          }
-        })
+        var replies = invites.reduce((collection, invite) => (
+          buildReplies(collection, invite, data, rootId)
+        ), {})
 
-        alice.publish(replies.alice, (err, aliceReply) => {
+        alice.publish(replies[alice.id], (err, aliceReply) => {
           if (err) console.error(err)
 
           recombine(rootId, (err, returnedSecret) => {
@@ -129,42 +85,37 @@ describe('recover.async.recombine (with v2 shards)', context => {
   })
 
   context('calls back with an error and returns no secret if an invalid shard is found', (assert, next) => {
-    var replies = {}
-    share({ name, secret, quorum, recps: custodians }, (err, data) => {
+    share({ name, secret, quorum, recps: custodians.map(id) }, (err, data) => {
       if (err) console.error(err)
 
       var rootId = data.root.key
-      request(rootId, (err, inviteMsgs) => {
+      request(rootId, (err, invites) => {
         if (err) console.error(err)
 
-        inviteMsgs.forEach((inviteMsg) => {
-          var inviteMsgContent = getContent(inviteMsg)
-          var shardHolder = inviteMsgContent.recps.filter(recp => recp !== server.id)[0]
-          var shardMsgs = data.shards.map(s => (getContent(s)))
-          var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard
-          // We need to recreate replies from alice, and bob:
-          var reply = {
+        var replies = invites.reduce((collection, invite) => {
+          var content = getContent(invite)
+          var custodianId = content.recps.find(notMe)
+          var shard = data.shards.map(getContent)
+            .find(shard => shard.recps.find(recp => recp === custodianId))
+            .shard
+
+          collection[custodianId] = {
             type: 'invite-reply',
             root: rootId,
-            branch: inviteMsg.key,
+            branch: invite.key,
             accept: true,
             version: '1',
-            recps: inviteMsgContent.recps
+            body: "This is not a valid shard",
+            recps: content.recps
           }
-          if (shardHolder === alice.id) {
-            reply.body = unbox(shard, alice.keys)
-            replies['alice'] = reply
-          }
-          if (shardHolder === bob.id) {
-            reply.body = 'This is not a shard'
-            replies['bob'] = reply
-          }
-        })
 
-        alice.publish(replies.alice, (err, aliceReply) => {
+          return collection
+        }, {})
+
+        alice.publish(replies[alice.id], (err, aliceReply) => {
           if (err) console.error(err)
 
-          bob.publish(replies.bob, (err, bobReply) => {
+          bob.publish(replies[bob.id], (err, bobReply) => {
             if (err) console.error(err)
 
             recombine(rootId, (err, returnedSecret) => {
@@ -179,37 +130,20 @@ describe('recover.async.recombine (with v2 shards)', context => {
   })
 
   context('calls back with an error and returns no secret when reply refers to the wrong root message', (assert, next) => {
-    var replies = {}
-    share({ name, secret, quorum, recps: custodians }, (err, data) => {
+    share({ name, secret, quorum, recps: custodians.map(id) }, (err, data) => {
       if (err) console.error(err)
-      share({ name, secret: 'another secret', quorum, recps: custodians }, (err, otherData) => {
+      var rootId = data.root.key
+
+      share({ name, secret: 'another secret', quorum, recps: custodians.map(id) }, (err, otherData) => {
         if (err) console.error(err)
-        var rootId = data.root.key
-        request(rootId, (err, inviteMsgs) => {
+        var otherRootId = otherData.root.key
+
+        request(rootId, (err, invites) => {
           if (err) console.error(err)
-          inviteMsgs.forEach((inviteMsg) => {
-            var inviteMsgContent = getContent(inviteMsg)
-            var shardHolder = inviteMsgContent.recps.filter(recp => recp !== server.id)[0]
-            var shardMsgs = data.shards.map(s => (getContent(s)))
-            var shard = shardMsgs.filter(s => (s.recps.find(r => (r === shardHolder))))[0].shard
-            // We need to recreate replies from alice, and bob:
-            var reply = {
-              type: 'invite-reply',
-              root: otherData.root.key,
-              branch: inviteMsg.key,
-              accept: true,
-              version: '1',
-              recps: inviteMsgContent.recps
-            }
-            if (shardHolder === alice.id) {
-              reply.body = unbox(shard, alice.keys)
-              replies['alice'] = reply
-            }
-            if (shardHolder === bob.id) {
-              reply.body = unbox(shard, bob.keys)
-              replies['bob'] = reply
-            }
-          })
+
+        var replies = invites.reduce((collection, invite) => (
+          buildReplies(collection, invite, data, otherRootId)
+        ), {})
 
           alice.publish(replies.alice, (err, aliceReply) => {
             if (err) console.error(err)
@@ -217,7 +151,7 @@ describe('recover.async.recombine (with v2 shards)', context => {
               if (err) console.error(err)
 
               recombine(rootId, (err, returnedSecret) => {
-                assert.ok(err, 'has erro')
+                assert.ok(err, 'an error')
                 assert.notOk(returnedSecret, 'Does not return a secret')
                 next()
               })
@@ -236,4 +170,36 @@ describe('recover.async.recombine (with v2 shards)', context => {
       next()
     })
   })
+
+  function id (feed) {
+    return feed.id
+  }
+
+  function notMe (recp) {
+    return recp !== server.id
+  }
+
+  function findCustodian (custodianId) {
+    return custodians.find(c => c.id === custodianId)
+  }
+
+  function buildReplies (collection, invite, data, rootId) {
+    var content = getContent(invite)
+    var custodianId = content.recps.find(notMe)
+    var shard = data.shards.map(getContent)
+      .find(shard => shard.recps.find(recp => recp === custodianId))
+      .shard
+
+    collection[custodianId] = {
+      type: 'invite-reply',
+      root: rootId,
+      branch: invite.key,
+      accept: true,
+      version: '1',
+      body: unbox(shard, findCustodian(custodianId).keys),
+      recps: content.recps
+    }
+
+    return collection
+  }
 })
