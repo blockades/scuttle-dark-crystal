@@ -4,26 +4,24 @@ const isInvite = require('scuttle-invite/isInvite')
 
 module.exports = function (server) {
   return function requests (rootId, opts = {}) {
-    const _opts = Object.assign({}, {
-      limit: 100,
-      query: [{
-        $filter: {
-          value: {
-            timestamp: { $gt: 0 },
-            content: {
-              type: 'invite',
-              root: rootId
-            }
-          }
+    const query = [{
+      $filter: {
+        value: {
+          timestamp: { $gt: 0 },
+          content: rootId
+            ? { type: 'invite', root: rootId }
+            : { type: 'invite' }
         }
-      }, {
-        $filter: {
-          value: {
-            author: { $ne: server.id }
-          }
+      }
+    }, {
+      $filter: {
+        value: {
+          author: { $ne: server.id }
         }
-      }]
-    }, opts)
+      }
+    }]
+
+    const _opts = Object.assign({ limit: 100 }, opts, { query })
 
     return pull(
       next(server.query.read, _opts),
