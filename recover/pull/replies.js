@@ -1,26 +1,21 @@
 const pull = require('pull-stream')
-const next = require('pull-next-query')
 const isReply = require('scuttle-invite/isReply')
 
 module.exports = function (server) {
   return function replies (rootId, opts = {}) {
-    const _opts = Object.assign({}, {
-      limit: 100,
-      query: [{
-        $filter: {
-          value: {
-            timestamp: { $gt: 0 },
-            content: {
-              type: 'invite-reply',
-              root: rootId
-            }
-          }
+    const query = [{
+      $filter: {
+        value: {
+          timestamp: { $gt: 0 },
+          content: rootId
+            ? { type: 'invite-reply', root: rootId }
+            : { type: 'invite-reply' }
         }
-      }]
-    }, opts)
+      }
+    }]
 
     return pull(
-      next(server.query.read, _opts),
+      server.query.read(Object.assign({}, opts, { query })),
       pull.filter(isReply)
     )
   }
