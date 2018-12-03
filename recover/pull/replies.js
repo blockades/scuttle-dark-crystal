@@ -1,4 +1,5 @@
 const pull = require('pull-stream')
+const next = require('pull-next-query')
 const isReply = require('scuttle-invite/isReply')
 
 module.exports = function (server) {
@@ -14,8 +15,10 @@ module.exports = function (server) {
       }
     }]
 
+    const _opts = Object.assign({ limit: 100 }, opts, { query })
+
     return pull(
-      server.query.read(Object.assign({}, opts, { query })),
+      next(server.query.read, _opts),
       pull.filter(isReply)
     )
   }
