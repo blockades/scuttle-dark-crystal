@@ -4,6 +4,7 @@ const getContent = require('ssb-msg-content')
 
 const Server = require('../../../testbot')
 const ScuttleV1 = require('scuttle-dark-crystal') // for future can we specify a version in the require?
+const Recombine = require('../../../../recover/async/recombine')
 
 describe('recover.async.recombine (v1)', context => {
   let server, share, recombine, request
@@ -14,7 +15,7 @@ describe('recover.async.recombine (v1)', context => {
     server = Server()
     var scuttle = ScuttleV1(server)
     share = scuttle.share.async.share
-    recombine = scuttle.recover.async.recombine
+    recombine = Recombine(server)
     request = scuttle.recover.async.request
 
     alice = server.createFeed()
@@ -36,7 +37,6 @@ describe('recover.async.recombine (v1)', context => {
     share({ name, secret, quorum, recps: custodians.map(id) }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
-
       request(rootId, (err, invites) => {
         if (err) console.error(err)
 
