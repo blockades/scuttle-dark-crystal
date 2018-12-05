@@ -21,6 +21,7 @@ module.exports = function (server) {
     if (!Array.isArray(recps)) throw new Error('recps must be an array')
     if (!isFunction(callback)) throw new Error('callback is not a function')
     if (!nickname) nickname = name
+    if (!isString(nickname)) throw new Error('nickname must be a string')
 
     let feedIds = recps
       .map(recp => typeof recp === 'string' ? recp : recp.link)
