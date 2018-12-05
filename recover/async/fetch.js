@@ -103,4 +103,4 @@ function getBacklinks (server) {
   }
 }
 
-function log (msg) { console.log(JSON.stringify(msg, null, 2)) }
+// function log (msg) { console.log(JSON.stringify(msg, null, 2)) }
