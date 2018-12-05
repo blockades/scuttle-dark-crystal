@@ -3,7 +3,7 @@ const { unbox } = require('ssb-keys')
 const getContent = require('ssb-msg-content')
 
 const Server = require('../../../testbot')
-const ScuttleV1 = require('scuttle-dark-crystal') // for future can we specify a version in the require?
+const Scuttle = require('../../../../') // for future can we specify a version in the require?
 
 describe('recover.async.recombine (v1)', context => {
   let server, share, recombine, request
@@ -12,7 +12,7 @@ describe('recover.async.recombine (v1)', context => {
 
   context.beforeEach(c => {
     server = Server()
-    var scuttle = ScuttleV1(server)
+    var scuttle = Scuttle(server)
     share = scuttle.share.async.share
     recombine = scuttle.recover.async.recombine
     request = scuttle.recover.async.request
