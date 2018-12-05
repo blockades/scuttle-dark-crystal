@@ -139,4 +139,48 @@ describe('share.async.share', context => {
       )
     })
   })
+  context('publishes a root, a ritual and the shards, when a nickname is given', (assert, next) => {
+    const nickname = 'Give this key to your nearest and dearest'
+    share({ name, secret, quorum, nickname, recps }, (err, data) => {
+      assert.notOk(err, 'error is null')
+      assert.ok(data, 'returns the data')
+
+      const pullType = (type) => server.query.read({
+        query: [{
+          $filter: { value: { content: { type } } }
+        }]
+      })
+
+      const removeEncryptionData = (message) => {
+        delete message.value.signature
+        delete message.value.cyphertext
+        return message
+      }
+
+      pull(
+        pullType('dark-crystal/root'),
+        pull.collect((err, roots) => {
+          if (err) console.error(err)
+          assert.deepEqual(data.root, removeEncryptionData(roots[0]), 'publishes a root')
+
+          pull(
+            pullType('dark-crystal/ritual'),
+            pull.collect((err, rituals) => {
+              if (err) console.error(err)
+              assert.deepEqual(data.ritual, removeEncryptionData(rituals[0]), 'publishes a single ritual')
+
+              pull(
+                pullType('dark-crystal/shard'),
+                pull.collect((err, shards) => {
+                  assert.notOk(err, 'no error')
+                  assert.deepEqual(data.shards, shards.map(removeEncryptionData), 'publishes a set of shards')
+                  next()
+                })
+              )
+            })
+          )
+        })
+      )
+    })
+  })
 })
