@@ -14,12 +14,13 @@ module.exports = function (server) {
   const publishRitual = PublishRitual(server)
   const publishAllShards = PublishAllShards(server)
 
-  return function ({ name, secret, quorum, recps }, callback) {
+  return function ({ name, secret, quorum, nickname, recps }, callback) {
     if (!name && !isString(name)) throw new Error('name must be a string')
     if (!secret && !isString(secret)) throw new Error('secret must be a string')
     if (!isNumber(quorum)) throw new Error('quorum must be a number')
     if (!Array.isArray(recps)) throw new Error('recps must be an array')
     if (!isFunction(callback)) throw new Error('callback is not a function')
+    if (!nickname) nickname = name
 
     let feedIds = recps
       .map(recp => typeof recp === 'string' ? recp : recp.link)
@@ -36,7 +37,9 @@ module.exports = function (server) {
 
     const numOfShards = recps.length
 
-    const shards = secrets.share(secret, numOfShards, quorum)
+    const secretWithName = JSON.stringify({ secret, nickname })
+
+    const shards = secrets.share(secretWithName, numOfShards, quorum)
 
     publishRoot(name, (err, root) => {
       if (err) return callback(err)
