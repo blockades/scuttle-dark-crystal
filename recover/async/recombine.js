@@ -49,7 +49,13 @@ module.exports = function (server) {
             } catch (err) {
               return callback(err)
             }
-            callback(null, secret)
+            let secretObject
+            try {
+              secretObject = JSON.parse(secret)
+            } catch (err) {
+              secretObject = { secret }
+            }
+            callback(null, secretObject)
           })
         )
       })
