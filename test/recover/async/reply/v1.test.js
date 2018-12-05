@@ -4,6 +4,7 @@ const { box } = require('ssb-keys')
 const Server = require('../../../testbot')
 const Reply = require('../../../../recover/async/reply')
 const isReply = require('../../../../isReply')
+const isShard = require('../../../../isShard')
 const { share } = require('../../../../lib/secrets-wrapper/v1')
 
 describe('recover.async.reply (v1)', context => {
@@ -41,6 +42,9 @@ describe('recover.async.reply (v1)', context => {
   })
 
   context('Publishes a reply', (assert, next) => {
+    assert.ok(isShard(katiesShard), 'is a v1 shard')
+    // TODO - check it's a v1 invite?
+
     katie.publish(katiesShard, (err, shardMsg) => {
       if (err) throw err
       katie.publish(katiesInvite, (err, inviteMsg) => {
