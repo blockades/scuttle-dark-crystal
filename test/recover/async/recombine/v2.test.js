@@ -172,7 +172,7 @@ describe('recover.async.recombine (with v2 shards)', context => {
           buildReplies(collection, invite, data, rootId)
         ), {})
 
-        replies[alice.id].shardVersion = '3.0.0'
+        replies[alice.id].shardVersion = '1111.0.0'
 
         alice.publish(replies[alice.id], (err, aliceReply) => {
           if (err) console.error(err)
