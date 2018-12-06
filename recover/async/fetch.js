@@ -7,6 +7,37 @@ const isShard = require('../../isShard')
 const isRequest = require('../../isRequest')
 const isReply = require('../../isReply')
 
+// calls back with an object of form:
+//
+// {
+//   root,
+//   ritual,
+//   shards: [
+//     {
+//       feedId,
+//       shard,
+//       requests: [
+//         { request } // request with no reply
+//         { request, reply }, // later request paired with a reply
+//       ]
+//     },
+//     {
+//       feedId,
+//       shard,
+//       requests: [
+//         { request, reply }
+//       ]
+//     },
+//     {
+//       feedId,
+//       shard,
+//       requests: [
+//         { request }
+//       ]
+//     },
+//   ]
+// }
+
 module.exports = function fetch (server) {
   return function (rootId, cb) {
     getRoot(server)(rootId, (err, root) => {
