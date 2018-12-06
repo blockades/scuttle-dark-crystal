@@ -3,6 +3,7 @@ const ref = require('ssb-ref')
 const getContent = require('ssb-msg-content')
 const { isForward } = require('ssb-dark-crystal-schema')
 const secrets = require('../../lib/secrets-wrapper')
+const secretObject = require('../../lib/secretObject')
 
 module.exports = function (server) {
   return function recombine (root, callback) {
@@ -35,8 +36,9 @@ module.exports = function (server) {
         if (err) return callback(err)
         try {
           if (shards.length < 1) throw new Error('No foward messages associated with this rootId')
-          return callback(null, secrets.combine(shards, version))
+          var secret = secrets.combine(shards, version)
         } catch (err) { return callback(err) }
+        callback(null, secretObject(secret))
       })
     )
   }
