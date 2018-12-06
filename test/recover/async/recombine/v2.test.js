@@ -194,6 +194,7 @@ describe('recover.async.recombine (with v2 shards)', context => {
       branch: invite.key,
       accept: true,
       version: '1',
+      shardVersion: '2.0.0',
       body: unbox(shard, findCustodian(custodianId).keys),
       recps: content.recps
     }
