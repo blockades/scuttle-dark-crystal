@@ -84,6 +84,8 @@ function buildProposed (server, custodians) {
   return { root, ritual, shards, requestPairs }
 }
 
+// NOTE - this is publishing messages publicly (unless using a modern sbot/ ssb-database)
+
 function publishAll (server) {
   return function ({ root, ritual, shards, requestPairs }, cb) {
     if (!isRoot(root)) console.log('problem with root', isRoot.errors)

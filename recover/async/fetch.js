@@ -1,7 +1,8 @@
-const pull = require('pull-stream')
 const { isFeed } = require('ssb-ref')
 
-const isRoot = require('../../isRoot')
+const getBacklinks = require('../../lib/get-backlinks')
+const getRoot = require('../../root/async/get')
+
 const isRitual = require('../../isRitual')
 const isShard = require('../../isShard')
 const isRequest = require('../../isRequest')
@@ -88,50 +89,3 @@ function getBranch (msg) {
     : msg.value.content.branch
 }
 
-function getRoot (server) {
-  return function (rootId, cb) {
-    const query = [{
-      $filter: {
-        key: rootId,
-        value: {
-          author: server.id,
-          content: {
-            type: 'dark-crystal/root'
-          }
-        }
-      }
-    }]
-
-    pull(
-      server.query.read({ query }),
-      pull.collect((err, roots) => {
-        if (err) return cb(err)
-        const root = roots[0]
-        if (!isRoot(root)) return cb(isRoot.errors)
-
-        cb(null, root)
-      })
-    )
-  }
-}
-
-function getBacklinks (server) {
-  return function (rootId, cb) {
-    const query = [{
-      $filter: {
-        dest: rootId,
-        value: {
-          content: { root: rootId }
-        }
-      }
-    }]
-
-    pull(
-      server.backlinks.read({ query }),
-      // pull.through(log),
-      pull.collect(cb)
-    )
-  }
-}
-
-// function log (msg) { console.log(JSON.stringify(msg, null, 2)) }

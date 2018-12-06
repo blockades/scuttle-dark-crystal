@@ -21,9 +21,16 @@ module.exports = function mend (data, cb) {
 
   if (!_shards.length) return cb(new Error('no valid shards provided to mend'))
 
-  const secret = combine(_shards, version)
-  if (secret) cb(null, secret)
-  else cb(new Error('unable to successfully mend shards'))
+  var secret
+  try {
+    secret = combine(_shards, version)
+  } catch (err) {
+    return cb(err)
+  }
+
+  if (!secret) return cb(new Error('unable to successfully mend shards'))
+
+  cb(null, secret)
 }
 
 // mix: TODO is root or ritual or shard the best place to know the sharding version?
