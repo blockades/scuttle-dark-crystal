@@ -7,6 +7,7 @@ const { share } = require('../../../../lib/secrets-wrapper/v2')
 describe('recombine.async.recombineForward (v2)', context => {
   let server, recombine, alice, bob, carol, root
   let shardHolders, secret, shards, forwardMessages
+  let secretWithNickname
 
   context.beforeEach(c => {
     server = Server()
@@ -26,7 +27,8 @@ describe('recombine.async.recombineForward (v2)', context => {
     forwardMessages = {}
 
     secret = Math.random().toString(36)
-    shards = share(secret, 3, 2)
+    secretWithNickname = JSON.stringify({ secret, nickname: 'a great secret' })
+    shards = share(secretWithNickname, 3, 2)
 
     root = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
     forwardMessages = shardHolders.reduce((acc, shardHolder) => {
@@ -60,7 +62,7 @@ describe('recombine.async.recombineForward (v2)', context => {
           recombine(root, (err, returnedSecret) => {
             if (err) console.error(err)
             assert.notOk(err, 'error is null')
-            assert.equal(secret, returnedSecret, 'returns the correct secret')
+            assert.equal(secret, returnedSecret.secret, 'returns the correct secret')
             next()
           })
         })
