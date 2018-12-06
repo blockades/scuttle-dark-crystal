@@ -31,8 +31,16 @@ module.exports = function (server) {
           pull.collect((err, replyLikeMsgs) => {
             if (err) return callback(err)
             var shards = replyLikeMsgs
-              .filter(r => isReply(r, version))
-              .map((replyMsg) => getContent(replyMsg).body)
+              .filter(r => isReply(r))
+              .map(getContent)
+              .map((replyMsg) => {
+                let { shardVersion, body } = replyMsg
+                if (!shardVersion) shardVersion = '1.0.0'
+                if (shardVersion !== version) {
+                  return callback(new Error('Shard version mismatch'))
+                }
+                return body
+              })
 
             if (shards.length < quorum) {
               var errorMsg = 'Not enough shards to recombine.'
