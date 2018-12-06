@@ -4,6 +4,7 @@ const getContent = require('ssb-msg-content')
 
 const secrets = require('../../lib/secrets-wrapper')
 const isReply = require('../../isReply')
+const secretObject = require('../../lib/secretObject')
 
 // const pullRitual = require('../../ritual/pull/mine')
 
@@ -49,7 +50,7 @@ module.exports = function (server) {
             } catch (err) {
               return callback(err)
             }
-            callback(null, buildSecretObject(secret))
+            callback(null, secretObject(secret))
           })
         )
       })
@@ -70,19 +71,6 @@ module.exports = function (server) {
       }
 
       return server.query.read(opts)
-    }
-    function buildSecretObject (secret) {
-      let secretObject
-      try {
-        secretObject = JSON.parse(secret)
-        // TODO should we use is-my-json-valid to be a bit stricter here?
-        if (Object.keys(secretObject).indexOf('secret') < 0) throw new Error('missing secret')
-        if (Object.keys(secretObject).indexOf('nickname') < 0) throw new Error('missing nickname')
-        if (Object.keys(secretObject).length > 2) throw new Error('too many properties')
-      } catch (err) {
-        secretObject = { secret }
-      }
-      return secretObject
     }
   }
 }
