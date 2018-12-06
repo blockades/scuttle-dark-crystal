@@ -48,7 +48,7 @@ describe('recover.async.reply (v1)', context => {
         reply(inviteMsg.key, (err, replyMsg) => {
           assert.notOk(err, 'null errors')
           assert.ok(replyMsg, 'returns a reply message')
-          assert.ok(isReply(replyMsg, '1.0.0'), 'message are valid replies')
+          assert.ok(isReply(replyMsg), 'message are valid replies')
           next()
         })
       })
