@@ -39,7 +39,7 @@ describe('recover.async.fetch (v1)', context => {
         // {
         //   root,
         //   ritual,
-        //   shards: [
+        //   shardsData: [
         //     {
         //       feedId, // custodian 0 feedId
         //       shard,
@@ -69,7 +69,7 @@ describe('recover.async.fetch (v1)', context => {
         assert.deepEqual(getContent(data.ritual), proposed.ritual, 'has ritual')
 
         // shard + custodian 0
-        var { feedId, shard, requests } = data.shards[0]
+        var { feedId, shard, requests } = data.shardsData[0]
         assert.equal(feedId, custodians[0].id, 'correct feedId')
         assert.deepEqual(getContent(shard), proposed.shards[0], 'correct shard')
 
@@ -80,7 +80,7 @@ describe('recover.async.fetch (v1)', context => {
         assert.deepEqual(getContent(requests[1].reply), proposed.requestPairs[3].reply, 'second request to custodian 0')
 
         // shard + custodian 1
-        var { feedId: feedId1, shard: shard1, requests: requests1 } = data.shards[1]
+        var { feedId: feedId1, shard: shard1, requests: requests1 } = data.shardsData[1]
         assert.equal(feedId1, custodians[1].id, 'correct feedId')
         assert.deepEqual(getContent(shard1), proposed.shards[1], 'correct shard')
 
@@ -88,7 +88,7 @@ describe('recover.async.fetch (v1)', context => {
         assert.deepEqual(getContent(requests1[0].reply), proposed.requestPairs[1].reply, 'first request to custodian 1')
 
         // shard + custodian 2
-        var { feedId: feedId2, shard: shard2, requests: requests2 } = data.shards[2]
+        var { feedId: feedId2, shard: shard2, requests: requests2 } = data.shardsData[2]
         assert.equal(feedId2, custodians[2].id, 'correct feedId')
         assert.deepEqual(getContent(shard2), proposed.shards[2], 'correct shard')
 
@@ -100,4 +100,3 @@ describe('recover.async.fetch (v1)', context => {
     })
   })
 })
-

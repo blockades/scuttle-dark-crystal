@@ -12,7 +12,7 @@ const isReply = require('../../isReply')
 // {
 //   root,
 //   ritual,
-//   shards: [
+//   shardsData: [
 //     {
 //       feedId,
 //       shard,
@@ -51,7 +51,7 @@ module.exports = function fetch (server) {
         const ritual = rituals[0]
 
         const shardVersion = ritual.value.content.version
-        const shards = backlinks
+        const shardsData = backlinks
           .filter(isShard)
           .reduce((acc, shard) => {
             const feedId = getCustodian(shard)
@@ -72,7 +72,7 @@ module.exports = function fetch (server) {
             return acc
           }, [])
 
-        cb(null, { root, ritual, shards })
+        cb(null, { root, ritual, shardsData })
       })
     })
   }
