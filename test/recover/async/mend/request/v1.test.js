@@ -1,9 +1,9 @@
 const { describe } = require('tape-plus')
 
-const Server = require('../../../testbot')
-const buildData = require('../fetch/v2.data.js')
-const Fetch = require('../../../../recover/async/fetch')
-const Mend = require('../../../../recover/async/mend')
+const Server = require('../../../../testbot')
+const Fetch = require('../../../../../recover/async/fetch')
+const Mend = require('../../../../../recover/async/mend')
+const buildData = require('../../fetch/data-request.v1.js')
 
 // mix: the intention was for this test to not touch a server, because this method doesn't need to
 // in practice I found I was generating the test data from the fetch tests and saving it into a file

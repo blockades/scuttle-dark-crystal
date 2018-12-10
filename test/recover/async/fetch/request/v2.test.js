@@ -1,13 +1,12 @@
 const { describe } = require('tape-plus')
 const getContent = require('ssb-msg-content')
 
-const Server = require('../../../testbot')
-const Fetch = require('../../../../recover/async/fetch')
+const Server = require('../../../../testbot')
+const Fetch = require('../../../../../recover/async/fetch')
+const buildData = require('../data-request.v2.js')
 
-const buildData = require('./v1.data.js')
-
-describe('recover.async.fetch (v1)', context => {
-  // we've got a v1 root, ritual, shards,
+describe('recover.async.fetch (v2)', context => {
+  // we've got a v2 root, ritual, shards,
   // and v1 requests, replies
   // get them all and put them in an object
 
