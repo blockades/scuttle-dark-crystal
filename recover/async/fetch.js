@@ -88,4 +88,3 @@ function getBranch (msg) {
     ? msg.value.content.branch[0]
     : msg.value.content.branch
 }
-
