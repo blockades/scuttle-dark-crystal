@@ -17,7 +17,7 @@ const isReply = require('../../isReply')
 //     {
 //       feedId,
 //       shard,
-//       requests: [
+//       requestsData: [
 //         { request } // request with no reply
 //         { request, reply }, // later request paired with a reply
 //       ]
@@ -25,14 +25,14 @@ const isReply = require('../../isReply')
 //     {
 //       feedId,
 //       shard,
-//       requests: [
+//       requestsData: [
 //         { request, reply }
 //       ]
 //     },
 //     {
 //       feedId,
 //       shard,
-//       requests: [
+//       requestsData: [
 //         { request }
 //       ]
 //     },
@@ -61,7 +61,7 @@ module.exports = function fetch (server) {
             const dialogue = backlinks.filter(msg => getCustodian(msg) === feedId)
             const replies = dialogue.filter(msg => isReply(msg, shardVersion))
 
-            const requests = dialogue.filter(isRequest)
+            const requestsData = dialogue.filter(isRequest)
               .map(request => {
                 return {
                   request,
@@ -69,7 +69,7 @@ module.exports = function fetch (server) {
                 }
               })
 
-            acc.push({ feedId, shard, requests })
+            acc.push({ feedId, shard, requestsData })
             return acc
           }, [])
 

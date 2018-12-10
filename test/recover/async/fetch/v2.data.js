@@ -1,5 +1,5 @@
 const pull = require('pull-stream')
-const createShares = require('../../../../lib/secrets-wrapper/v1').share
+const createShares = require('../../../../lib/secrets-wrapper/v2').share
 
 const isRoot = require('../../../../isRoot')
 const isRitual = require('../../../../isRitual')
@@ -32,25 +32,25 @@ module.exports = function publishV1Data (server) {
 function buildProposed (server, custodians) {
   const root = {
     type: 'dark-crystal/root',
-    version: '1.0.0',
+    version: '2.0.0',
     name: 'my treasure',
     recps: [server.id]
   }
 
   const ritual = {
     type: 'dark-crystal/ritual',
-    version: '1.0.0',
+    version: '2.0.0',
     root: 'NEEDED!',
     quorum: 3,
     shards: 2,
-    tool: 'secrets.js-grempe@1.1.0',
+    tool: 'secrets.js-grempe@1.1.0', // TODO - remove
     recps: [server.id]
   }
 
   const shards = custodians.map(custodian => {
     return {
       type: 'dark-crystal/shard',
-      version: '1.0.0',
+      version: '2.0.0',
       root: 'NEEDED!',
       shard: 'shardymcshardface=.box', // dummy as we're not testing reply generation logic
       recps: [custodian.id, server.id]
@@ -68,6 +68,7 @@ function buildProposed (server, custodians) {
     { feed: custodians[0], request: Request(custodians[0]), reply: Reply(custodians[0], shares[0]) }
   ]
   function Request (custodian) {
+    // TODO - this will need replyVersion in the future I think
     return {
       type: 'invite',
       version: '1',
@@ -77,6 +78,8 @@ function buildProposed (server, custodians) {
     }
   }
   function Reply (custodian, share) {
+    // TODO - this will need shardVersion and replyVersion in the future I think
+    // TODO - currently returns "naked" shares - will need to change for ephemeral returns
     return {
       type: 'invite-reply',
       version: '1',
@@ -142,7 +145,7 @@ function publishAll (server) {
               requestPairs.forEach(({ request, reply }) => {
                 if (!isRequest(request)) throw new Error('not a request')
                 if (reply) {
-                  if (!isReply(reply, '1.0.0')) throw new Error('not a reply')
+                  if (!isReply(reply, '2.0.0')) throw new Error('not a reply')
                 }
               })
 

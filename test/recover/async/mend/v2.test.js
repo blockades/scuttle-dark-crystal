@@ -1,7 +1,6 @@
 const { describe } = require('tape-plus')
-
 const Server = require('../../../testbot')
-const buildData = require('../fetch/v2.data.js')
+const buildData = require('../fetch/v1.data.js')
 const Fetch = require('../../../../recover/async/fetch')
 const Mend = require('../../../../recover/async/mend')
 

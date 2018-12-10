@@ -7,6 +7,9 @@ const Share = require('../../../../share/async/share')
 const Request = require('../../../../recover/async/request')
 const Recombine = require('../../../../recover/async/recombine')
 
+// mix: These tests may be redundent as recombine is now "fetch" + "mend" which are each tested
+// left in place because they still pass and don't (currently) cost anything
+
 describe('recover.async.recombine (with v2 shards)', context => {
   let server, recombine, request, alice, bob, carol
   let custodians, name, secret, quorum, share
