@@ -87,7 +87,10 @@ module.exports = function fetch (server) {
 
             const dialogue = backlinks.filter(msg => getCustodian(msg) === feedId)
             const replies = dialogue.filter(msg => isReply(msg))
-            if (replies.filter(reply => reply.shareVersion !== shareVersion).length) {
+            if (replies.some(reply => {
+              const replyShareVersion = get(reply, 'value.content.shareVersion') || '1.0.0'
+              return replyShareVersion !== shareVersion
+            })) {
               return cb(new Error('Shard version mismatch'))
             }
 
