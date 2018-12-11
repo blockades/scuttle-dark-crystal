@@ -1,22 +1,16 @@
 const pull = require('pull-stream')
 const next = require('pull-next-query')
-const isInvite = require('scuttle-invite/isInvite')
+const isReply = require('scuttle-invite/isReply')
 
 module.exports = function (server) {
-  return function requests (rootId, opts = {}) {
+  return function replies (rootId, opts = {}) {
     const query = [{
       $filter: {
         value: {
           timestamp: { $gt: 0 },
           content: rootId
-            ? { type: 'invite', root: rootId }
-            : { type: 'invite' }
-        }
-      }
-    }, {
-      $filter: {
-        value: {
-          author: { $ne: server.id }
+            ? { type: 'invite-reply', root: rootId }
+            : { type: 'invite-reply' }
         }
       }
     }]
@@ -25,7 +19,7 @@ module.exports = function (server) {
 
     return pull(
       next(server.query.read, _opts),
-      pull.filter(isInvite)
+      pull.filter(isReply)
     )
   }
 }
