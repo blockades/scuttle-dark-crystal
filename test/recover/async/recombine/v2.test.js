@@ -172,7 +172,7 @@ describe('recover.async.recombine (with v2 shards)', context => {
           buildReplies(collection, invite, data, rootId)
         ), {})
 
-        replies[alice.id].shardVersion = '1111.0.0'
+        replies[alice.id].shareVersion = '1111.0.0'
 
         alice.publish(replies[alice.id], (err, aliceReply) => {
           if (err) console.error(err)
@@ -224,7 +224,7 @@ describe('recover.async.recombine (with v2 shards)', context => {
       branch: invite.key,
       accept: true,
       version: '1',
-      shardVersion: '2.0.0',
+      shareVersion: '2.0.0',
       body: unbox(shard, findCustodian(custodianId).keys),
       recps: content.recps
     }

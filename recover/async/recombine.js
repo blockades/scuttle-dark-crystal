@@ -34,10 +34,10 @@ module.exports = function (server) {
               .filter(r => isReply(r))
               .map(getContent)
               .map((replyMsg) => {
-                let { shardVersion, body } = replyMsg
-                if (!shardVersion) shardVersion = '1.0.0'
-                if (shardVersion !== version) {
-                  return callback(new Error('Shard version mismatch'))
+                let { shareVersion, body } = replyMsg
+                if (!shareVersion) shareVersion = '1.0.0'
+                if (shareVersion !== version) {
+                  return callback(new Error('Share version mismatch'))
                 }
                 return body
               })

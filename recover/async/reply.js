@@ -60,7 +60,7 @@ module.exports = function (server) {
               accept: true,
               body: theDecryptedShard,
               recps: [author, server.id],
-              shardVersion: version
+              shareVersion: version
             }
 
             invites.async.private.reply(inviteId, reply, callback)
