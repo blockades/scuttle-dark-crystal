@@ -176,4 +176,3 @@ function processCommand (darkCrystal) {
     })
     .argv
 }
-
