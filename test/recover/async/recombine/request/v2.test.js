@@ -2,12 +2,15 @@ const { describe } = require('tape-plus')
 const { unbox } = require('ssb-keys')
 const getContent = require('ssb-msg-content')
 
-const Server = require('../../../testbot')
-const Share = require('../../../../share/async/share')
-const Request = require('../../../../recover/async/request')
-const Recombine = require('../../../../recover/async/recombine')
+const Server = require('../../../../testbot')
+const Share = require('../../../../../share/async/share')
+const Request = require('../../../../../recover/async/request')
+const Recombine = require('../../../../../recover/async/recombine')
 
-describe('recover.async.recombine (with v2 shards)', context => {
+// mix: These tests may be redundent as recombine is now "fetch" + "mend" which are each tested
+// left in place because they still pass and don't (currently) cost anything
+
+describe('recover.async.recombine (request v2 shards)', context => {
   let server, recombine, request, alice, bob, carol
   let custodians, name, secret, quorum, share
 
@@ -39,9 +42,9 @@ describe('recover.async.recombine (with v2 shards)', context => {
       request(rootId, (err, invites) => {
         if (err) console.error(err)
 
-        var replies = invites.reduce((collection, invite) => (
-          buildReplies(collection, invite, data, rootId)
-        ), {})
+        var replies = invites.reduce((collection, invite) => {
+          return buildReplies(collection, invite, data, rootId)
+        }, {})
 
         alice.publish(replies[alice.id], (err, aliceReply) => {
           if (err) console.error(err)
@@ -68,9 +71,9 @@ describe('recover.async.recombine (with v2 shards)', context => {
       request(rootId, (err, invites) => {
         if (err) console.error(err)
 
-        var replies = invites.reduce((collection, invite) => (
-          buildReplies(collection, invite, data, rootId)
-        ), {})
+        var replies = invites.reduce((collection, invite) => {
+          return buildReplies(collection, invite, data, rootId)
+        }, {})
 
         alice.publish(replies[alice.id], (err, aliceReply) => {
           if (err) console.error(err)
@@ -139,13 +142,14 @@ describe('recover.async.recombine (with v2 shards)', context => {
         request(rootId, (err, invites) => {
           if (err) console.error(err)
 
-          var replies = invites.reduce((collection, invite) => (
-            buildReplies(collection, invite, data, otherRootId)
-          ), {})
+          var replies = invites.reduce((collection, invite) => {
+            return buildReplies(collection, invite, data, otherRootId)
+          }, {})
 
-          alice.publish(replies.alice, (err, aliceReply) => {
+          alice.publish(replies[alice.keys.id], (err, aliceReply) => {
             if (err) console.error(err)
-            bob.publish(replies.bob, (err, bobReply) => {
+
+            bob.publish(replies[bob.keys.id], (err, bobReply) => {
               if (err) console.error(err)
 
               recombine(rootId, (err, returnedSecret) => {

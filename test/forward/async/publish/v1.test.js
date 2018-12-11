@@ -1,5 +1,7 @@
 const { describe } = require('tape-plus')
 const { box } = require('ssb-keys')
+const getContent = require('ssb-msg-content')
+const isShard = require('is-my-json-valid')(require('ssb-dark-crystal-schema/schemas/v1/shard'))
 
 const Publish = require('../../../../forward/async/publish')
 const Server = require('../../../testbot')
@@ -35,13 +37,17 @@ describe('forward.async.publish (v1 shard)', context => {
   })
 
   context('publishes a message when valid', (assert, next) => {
+    assert.ok(isShard(bobShard), 'is a v2 shard')
+
     bob.publish(bobShard, (err, bobReply) => {
       if (err) console.error(err)
       publish(root, alice.id, (err, forward) => {
+        const { version, shardVersion, shard } = getContent(forward)
         assert.notOk(err, 'null errors')
         assert.ok(forward, 'valid forward object')
-        assert.equal('1.0.0', forward.value.content.shardVersion, 'correct version')
-        assert.equal(shard, forward.value.content.shard, 'shard is inserted')
+        assert.equal('2.0.0', version, 'correct version')
+        assert.equal('1.0.0', shardVersion, 'correct shardVersion')
+        assert.equal(shard, shard, 'shard is inserted')
         next()
       })
     })

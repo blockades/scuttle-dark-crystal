@@ -2,11 +2,14 @@ const { describe } = require('tape-plus')
 const { unbox } = require('ssb-keys')
 const getContent = require('ssb-msg-content')
 
-const Server = require('../../../testbot')
-const Scuttle = require('../../../../') // for future can we specify a version in the require?
-const Recombine = require('../../../../recover/async/recombine')
+const Server = require('../../../../testbot')
+const Scuttle = require('../../../../../') // for future can we specify a version in the require?
+const Recombine = require('../../../../../recover/async/recombine')
 
-describe('recover.async.recombine (v1)', context => {
+// mix: These tests may be redundent as recombine is now "fetch" + "mend" which are each tested
+// left in place because they still pass and don't (currently) cost anything
+
+describe('recover.async.recombine (v1 request)', context => {
   let server, share, recombine, request
   let alice, bob, carol
   let name, secret, custodians, quorum

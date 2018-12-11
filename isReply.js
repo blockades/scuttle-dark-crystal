@@ -7,8 +7,9 @@ module.exports = function isReply (msg, version) {
   const shard = msgContent.body
 
   const errors = []
-  if (!_isReply(msg)) errors.push(_isReply.errors)
+  if (!_isReply(msg)) errors.push(new Error('invalid reply'))
   if (!validateShard(shard, version)) errors.push(new Error('invalid shard'))
+  // TODO this should be derived from shardVersion... that travels with the reply?
 
   if (!errors.length) return true
 
