@@ -8,6 +8,8 @@ const isForward = require('../../../../isForward')
 // (I think, might need to check out testbot feed publishing works)
 
 const QUORUM = 2
+const secret = '["my treasure location", "location of the treasure"]'
+
 module.exports = function publishV1Data (server) {
   return function (cb) {
     const custodians = [
@@ -28,7 +30,7 @@ module.exports = function publishV1Data (server) {
 
 function buildProposed (server, custodians) {
   if (QUORUM > custodians.length) throw new Error('test broken')
-  const shares = createShares('my treasure location', custodians.length, QUORUM)
+  const shares = createShares(secret, custodians.length, QUORUM)
 
   // NOTE - this is the complicated strucute you need to understand.
   // The request / reply are paired because replies need to point back to the associated request
