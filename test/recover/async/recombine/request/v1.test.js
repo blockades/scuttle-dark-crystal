@@ -2,19 +2,23 @@ const { describe } = require('tape-plus')
 const { unbox } = require('ssb-keys')
 const getContent = require('ssb-msg-content')
 
-const Server = require('../../../testbot')
-const ScuttleV1 = require('scuttle-dark-crystal') // for future can we specify a version in the require?
+const Server = require('../../../../testbot')
+const Scuttle = require('../../../../../') // for future can we specify a version in the require?
+const Recombine = require('../../../../../recover/async/recombine')
 
-describe('recover.async.recombine (v1)', context => {
+// mix: These tests may be redundent as recombine is now "fetch" + "mend" which are each tested
+// left in place because they still pass and don't (currently) cost anything
+
+describe('recover.async.recombine (v1 request)', context => {
   let server, share, recombine, request
   let alice, bob, carol
   let name, secret, custodians, quorum
 
   context.beforeEach(c => {
     server = Server()
-    var scuttle = ScuttleV1(server)
+    var scuttle = Scuttle(server)
     share = scuttle.share.async.share
-    recombine = scuttle.recover.async.recombine
+    recombine = Recombine(server)
     request = scuttle.recover.async.request
 
     alice = server.createFeed()
@@ -36,7 +40,6 @@ describe('recover.async.recombine (v1)', context => {
     share({ name, secret, quorum, recps: custodians.map(id) }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
-
       request(rootId, (err, invites) => {
         if (err) console.error(err)
 

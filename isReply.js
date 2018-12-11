@@ -11,7 +11,8 @@ module.exports = function isReply (msg) {
   const shard = msgContent.body
   let shareVersion = msgContent.shareVersion || '1.0.0'
   const errors = []
-  if (!_isReply(msg)) errors.push(_isReply.errors)
+
+  if (!_isReply(msg)) errors.push(new Error('invalid reply'))
   if (!isString(shareVersion)) errors.push(new Error('shareVersion must be a string'))
   if (versions.indexOf(shareVersion) < 0) errors.push(new Error('Unknown shareVersion'))
   if (!validateShard(shard, shareVersion)) errors.push(new Error('invalid shard'))
