@@ -86,6 +86,7 @@ function buildProposed (server, custodians) {
       root: 'NEEDED!',
       accept: true,
       body: share,
+      shareVersion: '2.0.0',
       branch: [ 'NEEDED!' ],
       recps: [custodian.id, server.id]
     }
@@ -145,7 +146,7 @@ function publishAll (server) {
               requestPairs.forEach(({ request, reply }) => {
                 if (!isRequest(request)) throw new Error('not a request')
                 if (reply) {
-                  if (!isReply(reply, '2.0.0')) throw new Error('not a reply')
+                  if (!isReply(reply)) throw new Error('not a reply')
                 }
               })
 

@@ -164,6 +164,36 @@ describe('recover.async.recombine (request v2 shards)', context => {
     })
   })
 
+  context('calls back with an error and returns no secret if a reply message has wrong version', (assert, next) => {
+    share({ name, secret, quorum, recps: custodians.map(id) }, (err, data) => {
+      if (err) console.error(err)
+      var rootId = data.root.key
+
+      request(rootId, (err, invites) => {
+        if (err) console.error(err)
+
+        var replies = invites.reduce((collection, invite) => (
+          buildReplies(collection, invite, data, rootId)
+        ), {})
+
+        replies[alice.id].shareVersion = '1111.0.0'
+
+        alice.publish(replies[alice.id], (err, aliceReply) => {
+          if (err) console.error(err)
+
+          bob.publish(replies[bob.id], (err, bobReply) => {
+            if (err) console.error(err)
+
+            recombine(rootId, (err, returnedSecret) => {
+              assert.ok(err, 'an error')
+              assert.notOk(returnedSecret, 'Does not return a secret')
+              next()
+            })
+          })
+        })
+      })
+    })
+  })
   context('calls back with an error when given a rootId for which there is no root message', (assert, next) => {
     const rootId = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
     recombine(rootId, (err, returnedSecret) => {
@@ -198,6 +228,7 @@ describe('recover.async.recombine (request v2 shards)', context => {
       branch: invite.key,
       accept: true,
       version: '1',
+      shareVersion: '2.0.0',
       body: unbox(shard, findCustodian(custodianId).keys),
       recps: content.recps
     }

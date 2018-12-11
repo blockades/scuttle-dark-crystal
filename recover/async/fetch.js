@@ -78,7 +78,7 @@ module.exports = function fetch (server) {
         if (rituals.length > 1) return cb(new Error(`only one ritual allowed, found ${rituals.length}`))
         const ritual = get(rituals, '[0]', null)
 
-        const shardVersion = get(ritual, 'value.content.version')
+        const shareVersion = get(ritual, 'value.content.version')
         const shardsData = backlinks
           .filter(isShard)
           .reduce((acc, shard) => {
@@ -86,7 +86,13 @@ module.exports = function fetch (server) {
             if (!isFeed(feedId)) return acc
 
             const dialogue = backlinks.filter(msg => getCustodian(msg) === feedId)
-            const replies = dialogue.filter(msg => isReply(msg, shardVersion))
+            const replies = dialogue.filter(msg => isReply(msg))
+            if (replies.some(reply => {
+              const replyShareVersion = get(reply, 'value.content.shareVersion') || '1.0.0'
+              return replyShareVersion !== shareVersion
+            })) {
+              return cb(new Error('Shard version mismatch'))
+            }
 
             const requestsData = dialogue.filter(isRequest)
               .map(request => {

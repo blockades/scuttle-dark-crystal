@@ -38,7 +38,7 @@ module.exports = function (server) {
           const {
             value: {
               author,
-              content: { shard }
+              content: { shard, version }
             }
           } = shards[0]
 
@@ -59,7 +59,8 @@ module.exports = function (server) {
               branch: inviteId,
               accept: true,
               body: theDecryptedShard,
-              recps: [author, server.id]
+              recps: [author, server.id],
+              shareVersion: version
             }
 
             invites.async.private.reply(inviteId, reply, callback)
