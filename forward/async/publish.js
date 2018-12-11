@@ -26,9 +26,11 @@ module.exports = function (server) {
           return callback(new Error('You may not forward a shard to its author. Use reply instead.'))
         }
 
+        const shareVersion = get(shards[0], 'value.content.version')
+
         const shard = get(shards[0], 'value.content.shard')
 
-        buildForward(server)({ root, shard, recp }, (err, content) => {
+        buildForward(server)({ root, shard, shareVersion, recp }, (err, content) => {
           if (err) return callback(err)
 
           publish(server)(content, callback)

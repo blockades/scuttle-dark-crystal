@@ -1,8 +1,8 @@
 const { describe } = require('tape-plus')
 
-const { share, combine } = require('../../../lib/secrets-wrapper/v2')
+const { share, combine } = require('../../../lib/secrets-wrapper/v1')
 
-describe('secrets-wrapper (v2)', context => {
+describe('secrets-wrapper (v1)', context => {
   let secret, numRecps, quorum
 
   context.beforeEach(c => {
@@ -19,17 +19,6 @@ describe('secrets-wrapper (v2)', context => {
       assert.notOk(err, 'does not throw an error')
     }
     assert.equal(result, secret, 'secret recovered')
-    next()
-  })
-
-  context('secret cannot be reproduced from less than quorum of shards', (assert, next) => {
-    try {
-      const shards = share(secret, numRecps, quorum).slice(3)
-      var result = combine(shards)
-    } catch (err) {
-      assert.ok(err, 'throws an error')
-    }
-    assert.notEqual(result, secret, 'secret not recovered')
     next()
   })
 

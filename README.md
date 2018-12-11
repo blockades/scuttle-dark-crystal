@@ -44,6 +44,7 @@ This will respond to a given invite message, by decrypting the associated shard 
 
 This will attempt to recombine the decrypted shards included in reply messages associated with a given rootId.  If successful the secret will be passed to the callback.
 
+This also works for forwarded shards, you just need to provide the root from on of the fwds.
 
 
 ### Root methods
@@ -102,11 +103,6 @@ Returns a stream of forwarded shard messages identified by root id.  Takes `opts
 #### `darkCrystal.forward.pull.fromOthers(opts)`
 
 Returns a stream of all forwarded shards you have recieved. Takes `opts` - standard stream options like `live`, `reverse` etc.
-
-#### `darkCrystal.recover.async.recombineForward(rootId, callback)`
-
-Attempts to recover a secret from forwarded messages with the given `rootId`. If successful, the secret will be passed to the callback, otherwise, an error will be passed.
-
 
 
 ### Validators
