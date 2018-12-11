@@ -3,9 +3,9 @@ const getContent = require('ssb-msg-content')
 
 const Server = require('../../../../testbot')
 const Fetch = require('../../../../../recover/async/fetch')
-const buildData = require('../data-forward.v1.js')
+const buildData = require('../data-forward.v2.js')
 
-describe('recover.async.fetch (v1 forward)', context => {
+describe('recover.async.fetch (v2 forward)', context => {
   // we've got a v1 root, ritual, shards,
   // and v1 requests, replies
   // get them all and put them in an object

@@ -1,5 +1,5 @@
 const pull = require('pull-stream')
-const createShares = require('../../../../lib/secrets-wrapper/v1').share
+const createShares = require('../../../../lib/secrets-wrapper/v2').share
 
 const isForward = require('../../../../isForward')
 
@@ -48,7 +48,7 @@ function buildProposed (server, custodians) {
       version: '2.0.0',
       root: 'NEEDED!!!!', // added later
       shard: share,
-      shardVersion: '1.0.0',
+      shardVersion: '2.0.0',
       recps: [custodian.id, server.id]
     }
   }

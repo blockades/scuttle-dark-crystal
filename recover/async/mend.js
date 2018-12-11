@@ -1,46 +1,89 @@
 const getContent = require('ssb-msg-content')
+const get = require('lodash.get')
 const { combine, validateShard } = require('../../lib/secrets-wrapper')
 
 // see recover/async/fetch.js for shape of data
 
 module.exports = function mend (data, cb) {
-  const { ritual, shardsData } = data
-  const shardVersion = getShardVersion(ritual)
+  if (data.shardsData.length === 0) return cb(new Error('cannot find any shards'))
 
-  const _shards = shardsData
-    .reduce((acc, { feedId, shard, requestsData }) => {
-      // mix: This needs to change for ephemeral returns
-      //  - need to check replyVersion (what mode of reply is this?)
-      //  - can't take any successfull request
+  const shardVersion = getShardVersion(data)
+  if (!shardVersion) return cb(null, new Error('unknown shard version, unable to mend shards'))
 
-      const successfulRequest = requestsData.find(request => request.reply)
-      if (!successfulRequest) return acc
-
-      acc.push(getShardFragment(successfulRequest.reply))
-      return acc
-    }, [])
-    .filter(_shard => validateShard(_shard, shardVersion))
-
-  if (!_shards.length) return cb(new Error('no valid shards provided to mend'))
+  const shards = getShards(data, shardVersion)
+  if (!shards.length) return cb(new Error('no valid shards provided to mend'))
 
   var secret
   try {
-    secret = combine(_shards, shardVersion)
+    secret = combine(shards, shardVersion)
   } catch (err) {
     return cb(err)
   }
-
   if (!secret) return cb(new Error('unable to successfully mend shards'))
 
   cb(null, secret)
 }
 
-// mix: TODO - decide where the 'canonical' defn of the shard version should be ?
-// root / ritual / shard / reply shardVersion ?
-function getShardVersion (ritual) {
-  return getContent(ritual).version
+// helpers
+
+function getShardVersion ({ ritual, shardsData }) {
+  // if we have the ritual, that's the best record of the shardVersion (I think?!)
+  if (ritual) return getContent(ritual).version
+
+  // otherwise we've been forwarded shards, and can check version on them
+  const versions = shardsData
+    .map(data => get(data, 'forwardsData[0].forward.value.content.shardVersion'))
+    .filter(Boolean)
+
+  return mode(versions)
+}
+function mode (array) {
+  return array.sort((a, b) => (
+    array.filter(v => v === a).length -
+      array.filter(v => v === b).length
+  )).pop()
 }
 
-function getShardFragment (reply) {
-  return getContent(reply).body
+function getShards ({ root, shardsData }, shardVersion) {
+  return root
+    ? getRequestedShards(shardsData, shardVersion)
+    : getForwardedShards(shardsData, shardVersion)
+}
+
+function getRequestedShards (shardsData, shardVersion) {
+  return shardsData
+    .reduce((acc, { feedId, shard, requestsData }) => {
+      // mix: This needs to change for ephemeral returns
+      //  - need to check replyVersion (what mode of reply is this?)
+      //  - can't take any successfull request
+
+      const reply = get(requestsData.find(request => request.reply), 'reply')
+      if (!reply) return acc
+
+      acc.push(getShare(reply))
+      return acc
+    }, [])
+    .filter(shard => validateShard(shard, shardVersion))
+}
+
+function getForwardedShards (shardsData, shardVersion) {
+  return shardsData
+    .reduce((acc, { feedId, shard, forwardsData }) => {
+      const forward = get(forwardsData, '[0].forward') // just get the first fwd
+      if (!forward) return acc
+      if (getContent(forward).shardVersion !== shardVersion) return acc
+
+      acc.push(getShare(forward))
+      return acc
+    }, [])
+    .filter(shard => validateShard(shard, shardVersion))
+}
+
+function getShare (msg) {
+  const { type, body, shard } = getContent(msg)
+
+  switch (type) {
+    case 'invite-reply': return body
+    case 'dark-crystal/forward': return shard
+  }
 }

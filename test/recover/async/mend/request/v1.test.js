@@ -9,7 +9,7 @@ const buildData = require('../../fetch/data-request.v1.js')
 // in practice I found I was generating the test data from the fetch tests and saving it into a file
 // I'm using a server to avoid committing a big file ):
 
-describe('recover.async.mend (v2)', context => {
+describe('recover.async.mend (v1)', context => {
   let server
   context.beforeEach(function () { server = Server() })
   context.afterEach(function () { server.close() })

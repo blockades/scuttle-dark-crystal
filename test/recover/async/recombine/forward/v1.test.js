@@ -1,10 +1,10 @@
 const { describe } = require('tape-plus')
 
-const Server = require('../../../testbot')
-const Recombine = require('../../../../recover/async/recombineForward')
-const { share } = require('../../../../lib/secrets-wrapper/v2')
+const Server = require('../../../../testbot')
+const Recombine = require('../../../../../recover/async/recombine')
+const { share } = require('../../../../../lib/secrets-wrapper/v1')
 
-describe('recover.async.recombineForward (v2)', context => {
+describe('recover.async.recombine (v1 forward)', context => {
   let server, recombine, alice, bob, carol, root
   let shardHolders, secret, shards, forwardMessages
 
@@ -35,7 +35,7 @@ describe('recover.async.recombineForward (v2)', context => {
         version: '2.0.0',
         root,
         shard: shards.pop(), // fwdd shards are currently totally open
-        shardVersion: '2.0.0',
+        shardVersion: '1.0.0',
         recps: [shardHolder, server.id]
       }
       return acc
@@ -64,18 +64,18 @@ describe('recover.async.recombineForward (v2)', context => {
     })
   })
 
-  context('Throws an error if quorum is not reached', (assert, next) => {
+  context('Returns garbage if quorum is not reached', (assert, next) => {
     alice.publish(forwardMessages[alice.id], (err, aliceForward) => {
       if (err) console.error(err)
       recombine(root, (err, returnedSecret) => {
-        assert.ok(err, 'Throws an error')
-        assert.notOk(returnedSecret, 'Does not return a secret')
+        assert.notOk(err, 'Error is null')
+        assert.ok(returnedSecret, 'Returns a string')
         next()
       })
     })
   })
 
-  context('Throws an error and returns no secret if an invalid shard is found', (assert, next) => {
+  context('Ignores junk shards, combines the rest', (assert, next) => {
     forwardMessages[bob.id].shard = 'this is not a shard'
 
     alice.publish(forwardMessages[alice.id], (err, aliceForward) => {
@@ -85,21 +85,12 @@ describe('recover.async.recombineForward (v2)', context => {
         carol.publish(forwardMessages[carol.id], (err, carolForward) => {
           if (err) console.error(err)
           recombine(root, (err, returnedSecret) => {
-            assert.ok(err, 'Throws an error')
-            assert.notOk(returnedSecret, 'Does not return a secret')
+            assert.notOk(err, 'no error')
+            assert.equal(secret, returnedSecret, 'returns the correct secret')
             next()
           })
         })
       })
-    })
-  })
-
-  context('Throws an error when given a rootId for which there is no root message', (assert, next) => {
-    const rootId = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
-    recombine(rootId, (err, returnedSecret) => {
-      assert.ok(err, 'Throws an error')
-      assert.notOk(returnedSecret, 'Does not return a secret')
-      next()
     })
   })
 })
