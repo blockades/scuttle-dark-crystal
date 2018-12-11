@@ -54,7 +54,7 @@ describe('recover.async.recombine (request v2 shards)', context => {
 
             recombine(rootId, (err, returnedSecret) => {
               assert.notOk(err, 'error is null')
-              assert.equal(secret, returnedSecret, 'returns the correct secret')
+              assert.equal(secret, returnedSecret.secret, 'returns the correct secret')
               next()
             })
           })

@@ -56,7 +56,7 @@ describe('recover.async.recombine (v1 forward)', context => {
           recombine(root, (err, returnedSecret) => {
             if (err) console.error(err)
             assert.notOk(err, 'error is null')
-            assert.equal(secret, returnedSecret, 'returns the correct secret')
+            assert.equal(secret, returnedSecret.secret, 'returns the correct secret')
             next()
           })
         })
@@ -69,7 +69,7 @@ describe('recover.async.recombine (v1 forward)', context => {
       if (err) console.error(err)
       recombine(root, (err, returnedSecret) => {
         assert.notOk(err, 'Error is null')
-        assert.ok(returnedSecret, 'Returns a string')
+        assert.ok(returnedSecret.secret, 'Returns a string')
         next()
       })
     })
@@ -86,7 +86,7 @@ describe('recover.async.recombine (v1 forward)', context => {
           if (err) console.error(err)
           recombine(root, (err, returnedSecret) => {
             assert.notOk(err, 'no error')
-            assert.equal(secret, returnedSecret, 'returns the correct secret')
+            assert.equal(secret, returnedSecret.secret, 'returns the correct secret')
             next()
           })
         })

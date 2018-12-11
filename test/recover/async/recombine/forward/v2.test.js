@@ -27,7 +27,7 @@ describe('recover.async.recombine (v2 forward)', context => {
     forwardMessages = {}
 
     secret = Math.random().toString(36)
-    secretWithNickname = JSON.stringify({ secret, nickname: 'a great secret' })
+    secretWithNickname = JSON.stringify([ secret, 'a great secret' ])
     shards = share(secretWithNickname, 3, 2)
 
     root = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
@@ -88,7 +88,7 @@ describe('recover.async.recombine (v2 forward)', context => {
           if (err) console.error(err)
           recombine(root, (err, returnedSecret) => {
             assert.notOk(err, 'no error')
-            assert.equal(secret, returnedSecret, 'returns the correct secret')
+            assert.equal(secret, returnedSecret.secret, 'returns the correct secret')
             next()
           })
         })
