@@ -33,7 +33,7 @@
     "scuttle-invite": "^1.0.1",
     "secrets.js-grempe": "1.1.0",
     "sodium-native": "^2.2.3",
-    "ssb-dark-crystal-schema": "^1.2.2",
+    "ssb-dark-crystal-schema": "^1.2.4",
     "ssb-msg-content": "^1.0.1"
   },
   "devDependencies": {

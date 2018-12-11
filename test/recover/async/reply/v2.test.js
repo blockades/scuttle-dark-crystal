@@ -55,7 +55,7 @@ describe('recover.async.reply (v2)', context => {
           assert.ok(isReply(replyMsg), 'message are valid replies')
           assert.equal(replyMsg.value.content.shareVersion,
             '2.0.0',
-            'reply contains correct shardVersion')
+            'reply contains correct shareVersion')
           next()
         })
       })

@@ -7,15 +7,15 @@ const { combine, validateShard } = require('../../lib/secrets-wrapper')
 module.exports = function mend (data, cb) {
   if (data.shardsData.length === 0) return cb(new Error('cannot find any shards'))
 
-  const shardVersion = getShardVersion(data)
-  if (!shardVersion) return cb(null, new Error('unknown shard version, unable to mend shards'))
+  const shareVersion = getShareVersion(data)
+  if (!shareVersion) return cb(null, new Error('unknown share version, unable to mend shards'))
 
-  const shards = getShards(data, shardVersion)
+  const shards = getShards(data, shareVersion)
   if (!shards.length) return cb(new Error('no valid shards provided to mend'))
 
   var secret
   try {
-    secret = combine(shards, shardVersion)
+    secret = combine(shards, shareVersion)
   } catch (err) {
     return cb(err)
   }
@@ -26,13 +26,13 @@ module.exports = function mend (data, cb) {
 
 // helpers
 
-function getShardVersion ({ ritual, shardsData }) {
-  // if we have the ritual, that's the best record of the shardVersion (I think?!)
+function getShareVersion ({ ritual, shardsData }) {
+  // if we have the ritual, that's the best record of the shareVersion (I think?!)
   if (ritual) return getContent(ritual).version
 
   // otherwise we've been forwarded shards, and can check version on them
   const versions = shardsData
-    .map(data => get(data, 'forwardsData[0].forward.value.content.shardVersion'))
+    .map(data => get(data, 'forwardsData[0].forward.value.content.shareVersion'))
     .filter(Boolean)
 
   return mode(versions)
@@ -44,13 +44,13 @@ function mode (array) {
   )).pop()
 }
 
-function getShards ({ root, shardsData }, shardVersion) {
+function getShards ({ root, shardsData }, shareVersion) {
   return root
-    ? getRequestedShards(shardsData, shardVersion)
-    : getForwardedShards(shardsData, shardVersion)
+    ? getRequestedShards(shardsData, shareVersion)
+    : getForwardedShards(shardsData, shareVersion)
 }
 
-function getRequestedShards (shardsData, shardVersion) {
+function getRequestedShards (shardsData, shareVersion) {
   return shardsData
     .reduce((acc, { feedId, shard, requestsData }) => {
       // mix: This needs to change for ephemeral returns
@@ -63,20 +63,20 @@ function getRequestedShards (shardsData, shardVersion) {
       acc.push(getShare(reply))
       return acc
     }, [])
-    .filter(shard => validateShard(shard, shardVersion))
+    .filter(shard => validateShard(shard, shareVersion))
 }
 
-function getForwardedShards (shardsData, shardVersion) {
+function getForwardedShards (shardsData, shareVersion) {
   return shardsData
     .reduce((acc, { feedId, shard, forwardsData }) => {
       const forward = get(forwardsData, '[0].forward') // just get the first fwd
       if (!forward) return acc
-      if (getContent(forward).shardVersion !== shardVersion) return acc
+      if (getContent(forward).shareVersion !== shareVersion) return acc
 
       acc.push(getShare(forward))
       return acc
     }, [])
-    .filter(shard => validateShard(shard, shardVersion))
+    .filter(shard => validateShard(shard, shareVersion))
 }
 
 function getShare (msg) {

@@ -42,11 +42,11 @@ describe('forward.async.publish (v2 shard)', context => {
     bob.publish(bobShard, (err, bobReply) => {
       if (err) console.error(err)
       publish(root, alice.id, (err, forward) => {
-        const { version, shardVersion, shard } = getContent(forward)
+        const { version, shareVersion, shard } = getContent(forward)
         assert.notOk(err, 'null errors')
         assert.ok(forward, 'valid forward object')
         assert.equal('2.0.0', version, 'correct version')
-        assert.equal('2.0.0', shardVersion, 'correct shardVersion')
+        assert.equal('2.0.0', shareVersion, 'correct shareVersion')
         assert.equal(shard, shard, 'shard is inserted')
         next()
       })

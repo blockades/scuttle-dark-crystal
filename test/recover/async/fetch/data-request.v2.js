@@ -78,7 +78,7 @@ function buildProposed (server, custodians) {
     }
   }
   function Reply (custodian, share) {
-    // TODO - this will need shardVersion and replyVersion in the future I think
+    // TODO - this will need shareVersion and replyVersion in the future I think
     // TODO - currently returns "naked" shares - will need to change for ephemeral returns
     return {
       type: 'invite-reply',
