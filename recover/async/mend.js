@@ -1,6 +1,7 @@
 const getContent = require('ssb-msg-content')
 const get = require('lodash.get')
 const { combine, validateShard } = require('../../lib/secrets-wrapper')
+const isString = require('../../lib/isString')
 
 // see recover/async/fetch.js for shape of data
 
@@ -21,7 +22,9 @@ module.exports = function mend (data, cb) {
   }
   if (!secret) return cb(new Error('unable to successfully mend shards'))
 
-  cb(null, secret)
+  const secretObj = secretObject(secret, shardVersion)
+
+  secretObj ? cb(null, secretObj) : cb(new Error('Badly formed secret'))
 }
 
 // helpers
@@ -29,7 +32,6 @@ module.exports = function mend (data, cb) {
 function getShardVersion ({ ritual, shardsData }) {
   // if we have the ritual, that's the best record of the shardVersion (I think?!)
   if (ritual) return getContent(ritual).version
-
   // otherwise we've been forwarded shards, and can check version on them
   const versions = shardsData
     .map(data => get(data, 'forwardsData[0].forward.value.content.shardVersion'))
@@ -85,5 +87,24 @@ function getShare (msg) {
   switch (type) {
     case 'invite-reply': return body
     case 'dark-crystal/forward': return shard
+  }
+}
+
+function secretObject (secret, version) {
+  switch (version) {
+    case '2.0.0': {
+      let secretArr
+      try {
+        secretArr = JSON.parse(secret)
+
+        if ((secretArr.length !== 2) || (!secretArr.every(isString))) return false
+      } catch (err) {
+        return false
+      }
+      return { secret: secretArr[0], label: secretArr[1] }
+    }
+    case '1.0.0': {
+      return { secret }
+    }
   }
 }
