@@ -22,7 +22,7 @@ module.exports = function mend (data, cb) {
   }
   if (!secret) return cb(new Error('unable to successfully mend shards'))
 
-  const secretObj = secretObject(secret, shardVersion)
+  const secretObj = secretObject(secret, shareVersion)
 
   secretObj ? cb(null, secretObj) : cb(new Error('Badly formed secret'))
 }
