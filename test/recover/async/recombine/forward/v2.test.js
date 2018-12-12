@@ -7,7 +7,7 @@ const { share } = require('../../../../../lib/secrets-wrapper/v2')
 describe('recover.async.recombine (v2 forward)', context => {
   let server, recombine, alice, bob, carol, root
   let shardHolders, secret, shards, forwardMessages
-  let secretWithNickname
+  let secretWithLabel
 
   context.beforeEach(c => {
     server = Server()
@@ -27,8 +27,8 @@ describe('recover.async.recombine (v2 forward)', context => {
     forwardMessages = {}
 
     secret = Math.random().toString(36)
-    secretWithNickname = JSON.stringify([ secret, 'a great secret' ])
-    shards = share(secretWithNickname, 3, 2)
+    secretWithLabel = JSON.stringify([ secret, 'a great secret' ])
+    shards = share(secretWithLabel, 3, 2)
 
     root = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
     forwardMessages = shardHolders.reduce((acc, shardHolder) => {
