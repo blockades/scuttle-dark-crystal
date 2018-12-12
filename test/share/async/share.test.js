@@ -140,9 +140,9 @@ describe('share.async.share', context => {
       )
     })
   })
-  context('publishes a root, a ritual and the shards, when a nickname is given', (assert, next) => {
-    const nickname = 'Give this key to your nearest and dearest'
-    share({ name, secret, quorum, nickname, recps }, (err, data) => {
+  context('publishes a root, a ritual and the shards, when a label is given', (assert, next) => {
+    const label = 'Give this key to your nearest and dearest'
+    share({ name, secret, quorum, label, recps }, (err, data) => {
       assert.notOk(err, 'error is null')
       assert.ok(data, 'returns the data')
 
