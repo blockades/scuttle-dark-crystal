@@ -12,7 +12,7 @@ const Recombine = require('../../../../../recover/async/recombine')
 
 describe('recover.async.recombine (request v2 shards)', context => {
   let server, recombine, request, alice, bob, carol
-  let custodians, name, secret, quorum, share
+  let custodians, name, secret, quorum, share, label
 
   context.beforeEach(c => {
     server = Server()
@@ -24,7 +24,8 @@ describe('recover.async.recombine (request v2 shards)', context => {
     bob = server.createFeed()
     carol = server.createFeed()
 
-    name = 'My SBB Dark Crystal'
+    name = 'My SSB Dark Crystal'
+    label = 'Give this key to your nearest and dearest'
     secret = Math.random().toString(36)
     custodians = [alice, bob, carol]
     quorum = 2
@@ -35,7 +36,7 @@ describe('recover.async.recombine (request v2 shards)', context => {
   })
 
   context('Returns the recombined secret', (assert, next) => {
-    share({ name, secret, quorum, recps: custodians.map(id) }, (err, data) => {
+    share({ name, secret, quorum, label, recps: custodians.map(id) }, (err, data) => {
       if (err) console.error(err)
       var rootId = data.root.key
 
@@ -55,6 +56,7 @@ describe('recover.async.recombine (request v2 shards)', context => {
             recombine(rootId, (err, returnedSecret) => {
               assert.notOk(err, 'error is null')
               assert.equal(secret, returnedSecret.secret, 'returns the correct secret')
+              assert.equal(label, returnedSecret.label, 'returns the correct label')
               next()
             })
           })
