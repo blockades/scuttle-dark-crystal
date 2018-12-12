@@ -50,7 +50,7 @@ function buildProposed (server, custodians) {
       version: '2.0.0',
       root: 'NEEDED!!!!', // added later
       shard: share,
-      shardVersion: '2.0.0',
+      shareVersion: '2.0.0',
       recps: [custodian.id, server.id]
     }
   }

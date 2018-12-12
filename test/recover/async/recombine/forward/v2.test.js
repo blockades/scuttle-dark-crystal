@@ -37,7 +37,7 @@ describe('recover.async.recombine (v2 forward)', context => {
         version: '2.0.0',
         root,
         shard: shards.pop(), // fwdd shards are currently totally open
-        shardVersion: '2.0.0',
+        shareVersion: '2.0.0',
         recps: [shardHolder, server.id]
       }
       return acc

@@ -86,27 +86,22 @@ module.exports = function fetch (server) {
             if (!isFeed(feedId)) return acc
 
             const dialogue = backlinks.filter(msg => getCustodian(msg) === feedId)
+
             const replies = dialogue.filter(msg => isReply(msg))
-            if (replies.some(reply => {
-              const replyShareVersion = get(reply, 'value.content.shareVersion') || '1.0.0'
-              return replyShareVersion !== shareVersion
-            })) {
-              return cb(new Error('Shard version mismatch'))
-            }
+              .filter(reply => getShareVersion(reply) === shareVersion)
 
             const requestsData = dialogue.filter(isRequest)
               .map(request => {
                 return {
                   request,
-                  reply: replies.find(reply => getBranch(reply) === request.key)
+                  reply: getReply(request, replies)
                 }
               })
             acc.push({ feedId, shard, requestsData })
             return acc
           }, [])
 
-        backlinks
-          .filter(isForward)
+        backlinks.filter(isForward)
           .forEach(forward => {
             const feedId = forward.value.author
 
@@ -128,6 +123,17 @@ module.exports = function fetch (server) {
   function getCustodian (msg) {
     return msg.value.content.recps.find(r => r !== server.id)
   }
+}
+
+function getShareVersion (reply) {
+  return get(reply, 'value.content.shareVersion', '1.0.0')
+}
+
+// NOTE - this is a bit brittle - there's not a 1:1 relationship between what's in the branch field and the invite it was replying to
+// e.g. if there were 2 requests, I think the next reply will always point to the _last_ request, not just any request
+// this will cause problems with ephemeral requests / replies maybe?
+function getReply (request, replies) {
+  return replies.find(reply => getBranch(reply) === request.key)
 }
 
 function getBranch (msg) {
