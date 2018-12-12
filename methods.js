@@ -10,7 +10,8 @@ module.exports = {
       request: require('./recover/async/request')
     },
     pull: {
-      requests: require('./recover/pull/requests')
+      requests: require('./recover/pull/requests'),
+      replies: require('./recover/pull/replies')
     }
   },
   root: {
