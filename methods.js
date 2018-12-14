@@ -50,7 +50,8 @@ module.exports = {
       publish: require('./forward/async/publish')
     },
     pull: {
-      fromOthers: require('./forward/pull/from-others')
+      fromOthers: require('./forward/pull/from-others'),
+      byRoot: require('./forward/pull/by-root')
     }
   },
   sync: {
