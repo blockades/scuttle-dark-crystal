@@ -45,6 +45,11 @@ module.exports = {
       share: require('./share/async/share')
     }
   },
+  forward: {
+    async: {
+      publish: require('./forward/async/publish')
+    }
+  },
   sync: {
     isRitual: () => isRitual,
     isRoot: () => isRoot,
