@@ -89,7 +89,6 @@ module.exports = function fetch (server) {
 
             const replies = dialogue.filter(msg => isReply(msg))
               .filter(reply => getShareVersion(reply) === shareVersion)
-
             const requestsData = dialogue.filter(isRequest)
               .map(request => {
                 return {
@@ -133,11 +132,10 @@ function getShareVersion (reply) {
 // e.g. if there were 2 requests, I think the next reply will always point to the _last_ request, not just any request
 // this will cause problems with ephemeral requests / replies maybe?
 function getReply (request, replies) {
-  return replies.find(reply => getBranch(reply) === request.key)
-}
-
-function getBranch (msg) {
-  return (Array.isArray(msg.value.content.branch))
-    ? msg.value.content.branch[0]
-    : msg.value.content.branch
+  return replies.find(reply => {
+    const branch = get(reply, 'value.content.branch')
+    return (Array.isArray(branch))
+      ? branch.find(b => b === request.key)
+      : branch === request.key
+  })
 }
