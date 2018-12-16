@@ -20,7 +20,8 @@ describe('recover.async.mend (v2)', context => {
 
       Mend(data, (err, secret) => {
         assert.equal(err, null, 'no error')
-        assert.equal(secret.secret, 'my treasure location', 'secret is revealed')
+        assert.equal(secret.secret, 'under the cabbage tree', 'secret is revealed')
+        assert.equal(secret.label, 'location of the treasure', 'label is revealed')
 
         next()
       })

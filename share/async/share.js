@@ -38,9 +38,7 @@ module.exports = function (server) {
 
     const numOfShards = recps.length
 
-    const secretWithLabel = JSON.stringify([ secret, label ])
-
-    const shards = secrets.share(secretWithLabel, numOfShards, quorum)
+    const shards = secrets.share(secrets.pack(secret, label), numOfShards, quorum)
 
     publishRoot(name, (err, root) => {
       if (err) return callback(err)

@@ -2,7 +2,7 @@ const { describe } = require('tape-plus')
 
 const Server = require('../../../../testbot')
 const Recombine = require('../../../../../recover/async/recombine')
-const { share } = require('../../../../../lib/secrets-wrapper/v2')
+const { pack, share } = require('../../../../../lib/secrets-wrapper/v2')
 
 describe('recover.async.recombine (v2 forward)', context => {
   let server, recombine, alice, bob, carol, root
@@ -28,7 +28,7 @@ describe('recover.async.recombine (v2 forward)', context => {
 
     secret = Math.random().toString(36)
     label = 'Give this key to your nearest and dearest'
-    secretWithLabel = JSON.stringify([ secret, label ])
+    secretWithLabel = pack(secret, label)
     shards = share(secretWithLabel, 3, 2)
 
     root = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'

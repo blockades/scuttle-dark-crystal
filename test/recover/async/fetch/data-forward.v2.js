@@ -1,5 +1,5 @@
 const pull = require('pull-stream')
-const createShares = require('../../../../lib/secrets-wrapper/v2').share
+const { pack, share: createShares } = require('../../../../lib/secrets-wrapper/v2')
 
 const isForward = require('../../../../isForward')
 
@@ -8,7 +8,8 @@ const isForward = require('../../../../isForward')
 // (I think, might need to check out testbot feed publishing works)
 
 const QUORUM = 2
-const secret = '["my treasure location", "location of the treasure"]'
+const secret = 'under the cabbage tree'
+const label = 'location of the treasure'
 
 module.exports = function publishV1Data (server) {
   return function (cb) {
@@ -30,7 +31,7 @@ module.exports = function publishV1Data (server) {
 
 function buildProposed (server, custodians) {
   if (QUORUM > custodians.length) throw new Error('test broken')
-  const shares = createShares(secret, custodians.length, QUORUM)
+  const shares = createShares(pack(secret, label), custodians.length, QUORUM)
 
   // NOTE - this is the complicated strucute you need to understand.
   // The request / reply are paired because replies need to point back to the associated request

@@ -1,7 +1,6 @@
 const getContent = require('ssb-msg-content')
 const get = require('lodash.get')
-const { combine, validateShard } = require('../../lib/secrets-wrapper')
-const isString = require('../../lib/isString')
+const { combine, unpack, validateShard } = require('../../lib/secrets-wrapper')
 
 // see recover/async/fetch.js for shape of data
 
@@ -22,9 +21,10 @@ module.exports = function mend (data, cb) {
   }
   if (!secret) return cb(new Error('unable to successfully mend shards'))
 
-  const secretObj = secretObject(secret, shareVersion)
+  const unpackedSecret = unpack(secret, shareVersion)
+  if (!unpackedSecret) return cb(new Error('Badly formed secret'))
 
-  secretObj ? cb(null, secretObj) : cb(new Error('Badly formed secret'))
+  cb(null, unpackedSecret)
 }
 
 // helpers
@@ -87,24 +87,5 @@ function getShare (msg) {
   switch (type) {
     case 'invite-reply': return body
     case 'dark-crystal/forward': return shard
-  }
-}
-
-function secretObject (secret, version) {
-  switch (version) {
-    case '2.0.0': {
-      let secretArr
-      try {
-        secretArr = JSON.parse(secret)
-
-        if ((secretArr.length !== 2) || (!secretArr.every(isString))) return false
-      } catch (err) {
-        return false
-      }
-      return { secret: secretArr[0], label: secretArr[1] }
-    }
-    case '1.0.0': {
-      return { secret }
-    }
   }
 }
