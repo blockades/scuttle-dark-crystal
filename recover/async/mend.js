@@ -1,6 +1,6 @@
 const getContent = require('ssb-msg-content')
 const get = require('lodash.get')
-const { combine, validateShard } = require('../../lib/secrets-wrapper')
+const { combine, unpack, validateShard } = require('../../lib/secrets-wrapper')
 
 // see recover/async/fetch.js for shape of data
 
@@ -21,7 +21,10 @@ module.exports = function mend (data, cb) {
   }
   if (!secret) return cb(new Error('unable to successfully mend shards'))
 
-  cb(null, secret)
+  const unpackedSecret = unpack(secret, shareVersion)
+  if (!unpackedSecret) return cb(new Error('Badly formed secret'))
+
+  cb(null, unpackedSecret)
 }
 
 // helpers
@@ -29,7 +32,6 @@ module.exports = function mend (data, cb) {
 function getShareVersion ({ ritual, shardsData }) {
   // if we have the ritual, that's the best record of the shareVersion (I think?!)
   if (ritual) return getContent(ritual).version
-
   // otherwise we've been forwarded shards, and can check version on them
   const versions = shardsData
     .map(data => get(data, 'forwardsData[0].forward.value.content.shareVersion'))
