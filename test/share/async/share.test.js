@@ -155,6 +155,7 @@ describe('share.async.share', context => {
       const removeEncryptionData = (message) => {
         delete message.value.signature
         delete message.value.cyphertext
+        delete message.rts
         return message
       }
 
