@@ -2,11 +2,12 @@ const { describe } = require('tape-plus')
 
 const Server = require('../../../../testbot')
 const Recombine = require('../../../../../recover/async/recombine')
-const { share } = require('../../../../../lib/secrets-wrapper/v2')
+const { pack, share } = require('../../../../../lib/secrets-wrapper/v2')
 
 describe('recover.async.recombine (v2 forward)', context => {
   let server, recombine, alice, bob, carol, root
   let shardHolders, secret, shards, forwardMessages
+  let secretWithLabel, label
 
   context.beforeEach(c => {
     server = Server()
@@ -26,13 +27,15 @@ describe('recover.async.recombine (v2 forward)', context => {
     forwardMessages = {}
 
     secret = Math.random().toString(36)
-    shards = share(secret, 3, 2)
+    label = 'Give this key to your nearest and dearest'
+    secretWithLabel = pack(secret, label)
+    shards = share(secretWithLabel, 3, 2)
 
     root = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
     forwardMessages = shardHolders.reduce((acc, shardHolder) => {
       acc[shardHolder] = {
         type: 'dark-crystal/forward',
-        version: '2.0.0',
+        version: '1.0.0',
         root,
         shard: shards.pop(), // fwdd shards are currently totally open
         shareVersion: '2.0.0',
@@ -56,7 +59,8 @@ describe('recover.async.recombine (v2 forward)', context => {
           recombine(root, (err, returnedSecret) => {
             if (err) console.error(err)
             assert.notOk(err, 'error is null')
-            assert.equal(secret, returnedSecret, 'returns the correct secret')
+            assert.equal(secret, returnedSecret.secret, 'returns the correct secret')
+            assert.equal(label, returnedSecret.label, 'returns the correct label')
             next()
           })
         })
@@ -86,7 +90,7 @@ describe('recover.async.recombine (v2 forward)', context => {
           if (err) console.error(err)
           recombine(root, (err, returnedSecret) => {
             assert.notOk(err, 'no error')
-            assert.equal(secret, returnedSecret, 'returns the correct secret')
+            assert.equal(secret, returnedSecret.secret, 'returns the correct secret')
             next()
           })
         })

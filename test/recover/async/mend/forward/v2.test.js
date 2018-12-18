@@ -9,7 +9,7 @@ const buildData = require('../../fetch/data-forward.v2.js')
 // in practice I found I was generating the test data from the fetch tests and saving it into a file
 // I'm using a server to avoid committing a big file ):
 
-describe('recover.async.mend (v1 forward)', context => {
+describe('recover.async.mend (v2 forward)', context => {
   let server
   context.beforeEach(function () { server = Server() })
   context.afterEach(function () { server.close() })
@@ -20,7 +20,8 @@ describe('recover.async.mend (v1 forward)', context => {
 
       Mend(data, (err, secret) => {
         assert.equal(err, null, 'no error')
-        assert.equal(secret, 'my treasure location', 'secret is revealed')
+        assert.equal(secret.secret, 'under the cabbage tree', 'secret is revealed')
+        assert.equal(secret.label, 'location of the treasure', 'label is revealed')
 
         next()
       })

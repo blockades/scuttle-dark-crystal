@@ -1,5 +1,5 @@
 const pull = require('pull-stream')
-const createShares = require('../../../../lib/secrets-wrapper/v2').share
+const { pack, share: createShares } = require('../../../../lib/secrets-wrapper/v2')
 
 const isRoot = require('../../../../isRoot')
 const isRitual = require('../../../../isRitual')
@@ -10,6 +10,9 @@ const isReply = require('../../../../isReply')
 // WARNING - with older versions of scuttlebot, this publishes messages publicly
 // with newer sbot anything with recps will be auto-published privately
 // (I think, might need to check out testbot feed publishing works)
+
+const secret = 'under the cabbage tree'
+const label = 'location of the treasure'
 
 module.exports = function publishV1Data (server) {
   return function (cb) {
@@ -32,7 +35,7 @@ module.exports = function publishV1Data (server) {
 function buildProposed (server, custodians) {
   const root = {
     type: 'dark-crystal/root',
-    version: '2.0.0',
+    version: '1.0.0',
     name: 'my treasure',
     recps: [server.id]
   }
@@ -57,7 +60,7 @@ function buildProposed (server, custodians) {
     }
   })
 
-  const shares = createShares('my treasure location', 3, 2)
+  const shares = createShares(pack(secret, label), 3, 2)
 
   // NOTE - this is the complicated strucute you need to understand.
   // The request / reply are paired because replies need to point back to the associated request

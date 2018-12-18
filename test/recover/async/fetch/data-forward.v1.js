@@ -45,7 +45,7 @@ function buildProposed (server, custodians) {
   function Forward (custodian, share) {
     return {
       type: 'dark-crystal/forward',
-      version: '2.0.0',
+      version: '1.0.0',
       root: 'NEEDED!!!!', // added later
       shard: share,
       shareVersion: '1.0.0',
