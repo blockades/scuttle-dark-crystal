@@ -8,7 +8,7 @@ module.exports = function buildShard (server) {
 
       var content = {
         type: 'dark-crystal/forward',
-        version: '2.0.0',
+        version: '1.0.0',
         root,
         shard: theDecryptedShard,
         shareVersion,
