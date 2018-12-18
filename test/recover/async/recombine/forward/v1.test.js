@@ -32,7 +32,7 @@ describe('recover.async.recombine (v1 forward)', context => {
     forwardMessages = shardHolders.reduce((acc, shardHolder) => {
       acc[shardHolder] = {
         type: 'dark-crystal/forward',
-        version: '2.0.0',
+        version: '1.0.0',
         root,
         shard: shards.pop(), // fwdd shards are currently totally open
         shareVersion: '1.0.0',

@@ -35,7 +35,7 @@ module.exports = function publishV1Data (server) {
 function buildProposed (server, custodians) {
   const root = {
     type: 'dark-crystal/root',
-    version: '2.0.0',
+    version: '1.0.0',
     name: 'my treasure',
     recps: [server.id]
   }
