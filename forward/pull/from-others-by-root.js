@@ -3,7 +3,7 @@ const { isForward } = require('ssb-dark-crystal-schema')
 const { isMsgId } = require('ssb-ref')
 
 module.exports = function (server) {
-  return function byRoot (rootId, opts = {}) {
+  return function fromOthersByRoot (rootId, opts = {}) {
     if (!rootId) throw new Error('must have a rootId')
     if (!isMsgId(rootId)) throw new Error('Invalid rootId')
 
@@ -15,6 +15,12 @@ module.exports = function (server) {
             type: 'dark-crystal/forward',
             root: rootId
           }
+        }
+      }
+    }, {
+      $filter: {
+        value: {
+          author: { $ne: server.id }
         }
       }
     }]

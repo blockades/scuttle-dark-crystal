@@ -53,7 +53,7 @@ module.exports = {
     pull: {
       fromOthers: require('./forward/pull/from-others'),
       toOthers: require('./forward/pull/to-others'),
-      byRoot: require('./forward/pull/by-root')
+      fromOthersByRoot: require('./forward/pull/from-others-by-root')
     }
   },
   sync: {
