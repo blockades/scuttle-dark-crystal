@@ -1,5 +1,5 @@
 const { describe } = require('tape-plus')
-const isInvite = require('scuttle-invite/isInvite')
+const { isRequest } = require('ssb-dark-crystal-schema')
 
 const Server = require('../../testbot')
 const Share = require('../../../share/async/share')
@@ -37,9 +37,9 @@ describe('recover.async.request', context => {
       var rootId = data.root.key
       request(rootId, (err, msgs) => {
         assert.notOk(err, 'null errors')
-        assert.ok(msgs, 'invites messages')
+        assert.ok(msgs, 'request messages')
         assert.equal(msgs.length, recps.length, 'publishes a request for each shard')
-        assert.ok(msgs.every(isInvite), 'all messages are valid invites')
+        assert.ok(msgs.every(isRequest), 'all messages are valid requests')
         next()
       })
     })
@@ -53,7 +53,7 @@ describe('recover.async.request', context => {
         assert.notOk(err, 'null errors')
         assert.ok(msgs, 'invite message')
         assert.equal(msgs.length, 1, 'publishes a single message')
-        assert.ok(msgs.every(isInvite), 'all messages are valid invites')
+        assert.ok(msgs.every(isRequest), 'all messages are valid requests')
         next()
       })
     })
@@ -67,7 +67,7 @@ describe('recover.async.request', context => {
         assert.notOk(err, 'null errors')
         assert.ok(msgs, 'invite message')
         assert.equal(msgs.length, 2, 'publishes multiple messages')
-        assert.ok(msgs.every(isInvite), 'all messages are valid invites')
+        assert.ok(msgs.every(isRequest), 'all messages are valid requests')
         next()
       })
     })

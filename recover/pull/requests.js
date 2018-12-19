@@ -1,6 +1,6 @@
 const pull = require('pull-stream')
 const next = require('pull-next-query')
-const isInvite = require('scuttle-invite/isInvite')
+const { isRequest } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
   return function requests (rootId, opts = {}) {
@@ -25,7 +25,7 @@ module.exports = function (server) {
 
     return pull(
       next(server.query.read, _opts),
-      pull.filter(isInvite)
+      pull.filter(isRequest)
     )
   }
 }
