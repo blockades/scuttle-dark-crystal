@@ -1,6 +1,6 @@
 const pull = require('pull-stream')
 const next = require('pull-next-query')
-const isReply = require('scuttle-invite/isReply')
+const { isReply } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
   return function replies (rootId, opts = {}) {
