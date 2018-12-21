@@ -40,7 +40,7 @@
     "scuttle-invite": "^1.0.1",
     "secrets.js-grempe": "1.1.0",
     "sodium-native": "^2.2.3",
-    "ssb-dark-crystal-schema": "github:blockades/ssb-dark-crystal-schema#master",
+    "ssb-dark-crystal-schema": "^1.2.6",
     "ssb-msg-content": "^1.0.1",
     "ssb-client": "^4.6.0",
     "ssb-config": "^2.3.7",
