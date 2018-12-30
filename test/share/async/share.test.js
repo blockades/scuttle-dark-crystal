@@ -107,30 +107,23 @@ describe('share.async.share', context => {
         }]
       })
 
-      function trim (message) {
-        delete message.value.signature
-        delete message.value.cyphertext
-        delete message.rts
-        return message
-      }
-
       pull(
         pullType('dark-crystal/root'),
         pull.collect((err, roots) => {
           if (err) console.error(err)
-          assert.deepEqual(data.root, trim(roots[0]), 'publishes a root')
+          assert.deepEqual(trim(data.root), trim(roots[0]), 'publishes a root')
 
           pull(
             pullType('dark-crystal/ritual'),
             pull.collect((err, rituals) => {
               if (err) console.error(err)
-              assert.deepEqual(data.ritual, trim(rituals[0]), 'publishes a single ritual')
+              assert.deepEqual(trim(data.ritual), trim(rituals[0]), 'publishes a single ritual')
 
               pull(
                 pullType('dark-crystal/shard'),
                 pull.collect((err, shards) => {
                   assert.notOk(err, 'no error')
-                  assert.deepEqual(data.shards, shards.map(trim), 'publishes a set of shards')
+                  assert.deepEqual(data.shards.map(trim), shards.map(trim), 'publishes a set of shards')
                   next()
                 })
               )
@@ -152,30 +145,23 @@ describe('share.async.share', context => {
         }]
       })
 
-      const removeEncryptionData = (message) => {
-        delete message.value.signature
-        delete message.value.cyphertext
-        delete message.rts
-        return message
-      }
-
       pull(
         pullType('dark-crystal/root'),
         pull.collect((err, roots) => {
           if (err) console.error(err)
-          assert.deepEqual(data.root, removeEncryptionData(roots[0]), 'publishes a root')
+          assert.deepEqual(trim(data.root), trim(roots[0]), 'publishes a root')
 
           pull(
             pullType('dark-crystal/ritual'),
             pull.collect((err, rituals) => {
               if (err) console.error(err)
-              assert.deepEqual(data.ritual, removeEncryptionData(rituals[0]), 'publishes a single ritual')
+              assert.deepEqual(trim(data.ritual), trim(rituals[0]), 'publishes a single ritual')
 
               pull(
                 pullType('dark-crystal/shard'),
                 pull.collect((err, shards) => {
                   assert.notOk(err, 'no error')
-                  assert.deepEqual(data.shards, shards.map(removeEncryptionData), 'publishes a set of shards')
+                  assert.deepEqual(data.shards.map(trim), shards.map(trim), 'publishes a set of shards')
                   next()
                 })
               )
@@ -186,3 +172,13 @@ describe('share.async.share', context => {
     })
   })
 })
+
+function trim (msg) {
+  delete msg.value.meta
+  delete msg.value.private
+  delete msg.value.unbox
+  delete msg.value.signature
+  delete msg.value.cyphertext
+  delete msg.rts
+  return msg
+}

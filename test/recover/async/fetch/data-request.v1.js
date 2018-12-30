@@ -92,11 +92,14 @@ function buildProposed (server, custodians) {
 }
 
 function publishAll (server) {
+  const unbox = server.private.unbox
+
   return function ({ root, ritual, shards, requestPairs }, cb) {
     if (!isRoot(root)) console.log('problem with root', isRoot.errors)
 
-    server.publish(root, (err, root) => {
+    server.publish(root, (err, _root) => {
       if (err) return cb(err)
+      const root = unbox(_root)
 
       // add root attribute to messages
       ritual.root = root.key
@@ -112,6 +115,7 @@ function publishAll (server) {
       pull(
         pull.values([ritual, ...shards]),
         pull.asyncMap(server.publish),
+        pull.map(unbox),
         pull.collect((err, [ ritual, ...shards ]) => {
           if (err) return cb(err)
 
@@ -121,12 +125,12 @@ function publishAll (server) {
               server.publish(request, (err, request) => {
                 if (err) return cb(err)
 
-                if (!reply) return cb(null, { request })
+                if (!reply) return cb(null, { request: unbox(request) })
 
                 reply.branch = [ request.key ] // how invites point to what they're replying to
                 feed.publish(reply, (err, reply) => {
                   if (err) return cb(err)
-                  cb(null, { request, reply })
+                  cb(null, { request: unbox(request), reply: unbox(reply) })
                 })
               })
             }),
