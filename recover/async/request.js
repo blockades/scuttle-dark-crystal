@@ -3,6 +3,7 @@ const pull = require('pull-stream')
 const getContent = require('ssb-msg-content')
 const { isMsgId, isFeed } = require('ssb-ref')
 const { isRequest } = require('ssb-dark-crystal-schema')
+const ephemeralKeys = require('ephemeral-keys')
 
 const PullShardsByRoot = require('../../shard/pull/by-root')
 
@@ -26,15 +27,22 @@ module.exports = function (server) {
       recipients
         ? pull.filter(isShardForNamedRecipient)
         : pull.through(),
-      pull.map(shard => {
+      pull.asyncMap((shard, cb) => {
         const { recps } = getContent(shard)
-        return {
-          type: 'invite', // is over-written by invites.async.private.publish
-          version: '1', // ditto
-          root: rootId,
-          recps,
-          body: "Hi you've been holding a shard for me, can I please have it back?"
-        }
+
+        // TODO: not sure if we need to tell level that dbkey is an object
+        const dbKey = { rootId, recp: recps.find(notMe) }
+
+        ephemeralKeys.generateAndStore(dbKey, (err, ephPublicKey) => {
+          if (err) cb(err)
+          cb(null, {
+            type: 'invite', // is over-written by invites.async.private.publish
+            version: '1', // ditto
+            root: rootId,
+            recps,
+            body: ephPublicKey
+          })
+        })
       }),
       pull.filter(isRequest),
       pull.collect((err, requests) => {
@@ -55,6 +63,10 @@ module.exports = function (server) {
       return recps.some(r => recipients.includes(r))
     }
   }
+
+  function notMe (recp) {
+    return recp !== server.id
+  }
 }
 
 function recpsValid (recipients) {
@@ -67,3 +79,4 @@ function recpsValid (recipients) {
 
   return feedIds.length === recipients.length
 }
+
