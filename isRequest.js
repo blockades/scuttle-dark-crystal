@@ -1,1 +1,1 @@
-module.exports = require('scuttle-invite/isInvite')
+module.exports = require('ssb-dark-crystal-schema').isRequest

@@ -1,4 +1,3 @@
-const fs = require('fs')
 const { describe } = require('tape-plus')
 const Server = require('../../testbot')
 
@@ -12,7 +11,11 @@ describe('ritual.async.publish', context => {
   context.beforeEach(c => {
     server = Server()
     publish = Publish(server)
-    params = JSON.parse(fs.readFileSync('./test/fixtures/ritual.json', 'utf8'))
+    params = {
+      root: '%viiJnnnXjNkfCALivEZbrDe8UndkCCCNQ/CgBOWgJLw=.sha256',
+      quorum: 2,
+      shards: 5
+    }
   })
 
   context.afterEach(c => {

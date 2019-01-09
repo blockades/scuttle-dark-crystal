@@ -1,56 +1,39 @@
 const pull = require('pull-stream')
-const { box } = require('ssb-keys')
-const { isFeed } = require('ssb-ref')
+const { isMsg, isFeed } = require('ssb-ref')
 
-const { isShard, SCHEMA_VERSION, errorParser } = require('ssb-dark-crystal-schema')
+const buildShard = require('../async/build')
+const publish = require('../../lib/publish-msg')
 
 module.exports = function (server) {
   return function publishAll ({ shards, recps, rootId }, callback) {
-    const indexes = [...Array(shards.length).keys()]
+    if (!validRecps(recps)) return callback(new Error('shards publishAll: all recps must be valid feedIds', recps))
+    if (!isMsg(rootId)) return callback(new Error('shard publishAll: invalid rootId', rootId))
+    if (shards.length !== recps.length) return callback(new Error('shard publishAll: need as many shards as recps'))
 
-    if (!validRecps(recps)) return callback(new Error('All recps must be valid feedIds', recps))
-
-    const shardMsgs = indexes
-      .map(index => {
-        let recp = recps[index]
-        let shard = shards[index]
-        return {
-          type: 'dark-crystal/shard',
-          version: SCHEMA_VERSION,
-          root: rootId,
-          shard: box(shard, [recp]),
-          recps: [recp, server.id]
-        }
-      })
-      .map(shard => {
-        isShard(shard, {attachErrors: true})
-        return shard
-      })
-
-    const errors = getErrors(shardMsgs)
-    if (errors) return callback(new Error(errors))
+    const opts = shards.map((shard, i) => {
+      return { root: rootId, shard, recp: recps[i] }
+    })
 
     pull(
-      pull.values(shardMsgs),
-      pull.asyncMap((shardMsg, cb) => {
-        server.private.publish(shardMsg, shardMsg.recps, (err, msg) => {
-          if (err) cb(err)
-          else server.private.unbox(msg, cb)
-        })
-      }),
-      pull.collect(callback)
+      pull.values(opts),
+      pull.asyncMap(buildShard(server)),
+      pull.collect((err, shardMsgs) => {
+        if (err) return callback(err)
+
+        publishAll(shardMsgs)
+      })
     )
+
+    function publishAll (shards) {
+      pull(
+        pull.values(shards),
+        pull.asyncMap(publish(server)),
+        pull.collect(callback)
+      )
+    }
   }
 }
 
 function validRecps (recps) {
   return recps.every(isFeed)
-}
-
-function getErrors (msgs) {
-  const errors = msgs
-    .filter(s => s.errors)
-    .map(errorParser)
-
-  return errors.length ? errors : null
 }

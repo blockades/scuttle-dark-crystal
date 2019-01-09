@@ -1,17 +1,20 @@
-const isReply = require('scuttle-invite/isReply')
+const { isReply: _isReply } = require('ssb-dark-crystal-schema')
 const getContent = require('ssb-msg-content')
-const secrets = require('secrets.js-grempe')
+const { validateShard } = require('./lib/secrets-wrapper')
 
-module.exports = function (msg) {
-  return isReply(msg) && validateShard(msg)
-}
+module.exports = function isReply (msg) {
+  const {
+    body: shard,
+    shareVersion = '1.0.0' // early version 1 replies didn't have a shareVersion
+  } = getContent(msg)
 
-function validateShard (possibleReply) {
-  const shard = getContent(possibleReply).body
-  try {
-    secrets.extractShareComponents(shard)
-  } catch (err) {
-    return false
-  }
-  return true
+  const errors = []
+
+  if (!_isReply(msg)) errors.push(new Error('invalid reply'))
+  if (!validateShard(shard, shareVersion)) errors.push(new Error('invalid shard'))
+
+  if (!errors.length) return true
+
+  isReply.errors = errors
+  return false
 }

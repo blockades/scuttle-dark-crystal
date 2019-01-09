@@ -11,7 +11,7 @@ module.exports = function (server) {
     const query = [{
       $filter: {
         value: {
-          timestamp: {$gt: 0}, // needed for pull-next-query to stepOn on published timestamp
+          timestamp: { $gt: 0 }, // needed for pull-next-query to stepOn on published timestamp
           content: {
             type: 'dark-crystal/shard',
             root: rootId

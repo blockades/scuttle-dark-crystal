@@ -1,12 +1,13 @@
 const { describe } = require('tape-plus')
 const { box } = require('ssb-keys')
 
-const Server = require('../../testbot')
-const Reply = require('../../../recover/async/reply')
+const Server = require('../../../testbot')
+const Reply = require('../../../../recover/async/reply')
+const isShard = require('../../../../isShard')
+const isReply = require('../../../../isReply')
+const { share } = require('../../../../lib/secrets-wrapper/v2')
 
-const isReply = require('scuttle-invite/isReply')
-
-describe('reply.async.reply', context => {
+describe('recover.async.reply (v2)', context => {
   let server, reply, katie
   let rootId, katiesInvite, katiesShard
 
@@ -25,11 +26,13 @@ describe('reply.async.reply', context => {
       recps: [katie.id, server.id]
     }
 
+    const shards = share('the treasure is under the old cabbage tree', 5, 2)
+
     katiesShard = {
       type: 'dark-crystal/shard',
-      version: '1.0.0',
+      version: '2.0.0',
       root: rootId,
-      shard: box('imagine this is a shard', [server.id]),
+      shard: box(shards[0], [server.id]),
       recps: [katie.id, server.id]
     }
   })
@@ -39,6 +42,9 @@ describe('reply.async.reply', context => {
   })
 
   context('Publishes a reply', (assert, next) => {
+    assert.ok(isShard(katiesShard), 'is a v2 shard')
+    // TODO - check it's a v1 invite?
+
     katie.publish(katiesShard, (err, shardMsg) => {
       if (err) throw err
       katie.publish(katiesInvite, (err, inviteMsg) => {
@@ -47,6 +53,9 @@ describe('reply.async.reply', context => {
           assert.notOk(err, 'null errors')
           assert.ok(replyMsg, 'returns a reply message')
           assert.ok(isReply(replyMsg), 'message are valid replies')
+          assert.equal(replyMsg.value.content.shareVersion,
+            '2.0.0',
+            'reply contains correct shareVersion')
           next()
         })
       })

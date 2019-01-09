@@ -1,11 +1,10 @@
-const secrets = require('secrets.js-grempe')
+const { isFeed } = require('ssb-ref')
 
 const PublishRoot = require('../../root/async/publish')
 const PublishRitual = require('../../ritual/async/publish')
 const PublishAllShards = require('../../shard/async/publish-all')
 
-const { isFeed } = require('ssb-ref')
-
+const secrets = require('../../lib/secrets-wrapper')
 const isNumber = require('../../lib/isNumber')
 const isString = require('../../lib/isString')
 const isFunction = require('../../lib/isFunction')
@@ -15,12 +14,14 @@ module.exports = function (server) {
   const publishRitual = PublishRitual(server)
   const publishAllShards = PublishAllShards(server)
 
-  return function ({ name, secret, quorum, recps }, callback) {
+  return function ({ name, secret, quorum, label, recps }, callback) {
     if (!name && !isString(name)) throw new Error('name must be a string')
     if (!secret && !isString(secret)) throw new Error('secret must be a string')
     if (!isNumber(quorum)) throw new Error('quorum must be a number')
     if (!Array.isArray(recps)) throw new Error('recps must be an array')
     if (!isFunction(callback)) throw new Error('callback is not a function')
+    if (!label) label = name
+    if (!isString(label)) throw new Error('label must be a string')
 
     let feedIds = recps
       .map(recp => typeof recp === 'string' ? recp : recp.link)
@@ -37,8 +38,7 @@ module.exports = function (server) {
 
     const numOfShards = recps.length
 
-    const hexSecret = secrets.str2hex(secret)
-    const shards = secrets.share(hexSecret, numOfShards, quorum)
+    const shards = secrets.share(secrets.pack(secret, label), numOfShards, quorum)
 
     publishRoot(name, (err, root) => {
       if (err) return callback(err)
@@ -52,7 +52,6 @@ module.exports = function (server) {
         // RESOLUTION: Extracted reducer into a publishAll function
         //
         publishAllShards({ shards, recps: recipients, rootId }, (err, shards) => {
-          console.error(err)
           if (err) return callback(err)
 
           callback(null, {

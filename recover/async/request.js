@@ -2,7 +2,7 @@ const ScuttleInvite = require('scuttle-invite')
 const pull = require('pull-stream')
 const getContent = require('ssb-msg-content')
 const { isMsgId, isFeed } = require('ssb-ref')
-const isInvite = require('scuttle-invite/isInvite')
+const { isRequest } = require('ssb-dark-crystal-schema')
 
 const PullShardsByRoot = require('../../shard/pull/by-root')
 
@@ -36,7 +36,7 @@ module.exports = function (server) {
           body: "Hi you've been holding a shard for me, can I please have it back?"
         }
       }),
-      pull.filter(isInvite),
+      pull.filter(isRequest),
       pull.collect((err, requests) => {
         if (err) return callback(err)
         if (requests.length < 1) return callback(new Error('There are no shards associated with rootId ', rootId))

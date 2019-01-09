@@ -1,9 +1,9 @@
 const { describe } = require('tape-plus')
-const Server = require('../../testbot')
 const secrets = require('secrets.js-grempe')
-const {isShard} = require('ssb-dark-crystal-schema')
+const { isShard } = require('ssb-dark-crystal-schema')
 
 const PublishAll = require('../../../shard/async/publish-all')
+const Server = require('../../testbot')
 
 describe('shard.async.publishAll', context => {
   let server
@@ -39,7 +39,7 @@ describe('shard.async.publishAll', context => {
       assert.equal(publishedShards.length, shards.length, 'publishes one message for each recipient')
 
       publishedShards.forEach((shardMessage) => {
-        assert.ok(isShard(shardMessage.value.content), 'valid shard')
+        assert.ok(isShard(shardMessage), 'valid shard')
       })
       next()
     })

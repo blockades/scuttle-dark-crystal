@@ -1,19 +1,17 @@
-const { isRoot, SCHEMA_VERSION } = require('ssb-dark-crystal-schema')
+const { isRoot } = require('ssb-dark-crystal-schema')
+const publish = require('../../lib/publish-msg')
 
-module.exports = function (server) {
-  return function publish (name, callback) {
+module.exports = function publishRoot (server) {
+  return function (name, callback) {
     var content = {
       type: 'dark-crystal/root',
-      version: SCHEMA_VERSION,
+      version: '1.0.0',
       name,
       recps: [server.id]
     }
 
-    if (isRoot(content)) {
-      server.private.publish(content, [server.id], (err, root) => {
-        if (err) callback(err)
-        else server.private.unbox(root, callback)
-      })
-    } else callback(isRoot.errors)
+    if (!isRoot(content)) return callback(isRoot.errors)
+
+    publish(server)(content, callback)
   }
 }
