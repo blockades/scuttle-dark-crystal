@@ -40,7 +40,8 @@ module.exports = function (server) {
             version: '1', // ditto
             root: rootId,
             recps,
-            body: ephPublicKey
+            body: 'Hi, you are holding a shard for me, can I please have it back?',
+            ephPublicKey
           })
         })
       }),

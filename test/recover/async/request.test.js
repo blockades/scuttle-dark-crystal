@@ -36,6 +36,7 @@ describe('recover.async.request', context => {
       if (err) console.error(err)
       var rootId = data.root.key
       request(rootId, (err, msgs) => {
+console.log(JSON.stringify(msgs,null,4))
         assert.notOk(err, 'null errors')
         assert.ok(msgs, 'request messages')
         assert.equal(msgs.length, recps.length, 'publishes a request for each shard')

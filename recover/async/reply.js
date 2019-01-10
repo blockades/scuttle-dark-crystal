@@ -1,5 +1,6 @@
 const ScuttleInvite = require('scuttle-invite')
 const pull = require('pull-stream')
+const ephemeralKeys = require('ephemeral-keys')
 
 const PullShardsByRoot = require('../../shard/pull/by-root')
 
@@ -15,7 +16,8 @@ module.exports = function (server) {
         value: {
           author: inviteAuthor,
           content: {
-            root: rootId
+            root: rootId,
+            ephPublicKey
           }
         }
       } = invite
@@ -54,11 +56,21 @@ module.exports = function (server) {
           server.private.unbox(shard, (err, theDecryptedShard) => {
             if (err) return callback(err)
 
+            let shardToSend
+            if (ephPublicKey) {
+              // TODO: validate ephPublicKey looks as it should
+              // TODO: contextMessage could also include server.id?
+              const contextMessage = rootId
+              shardToSend = ephemeralKeys.boxMessage(theDecryptedShard, ephPublicKey, contextMessage)
+            } else {
+              shardToSend = theDecryptedShard
+            }
+
             const reply = {
               root: rootId,
               branch: inviteId,
               accept: true,
-              body: theDecryptedShard,
+              body: shardToSend,
               recps: [author, server.id],
               shareVersion: version
             }
