@@ -6,10 +6,12 @@ const Reply = require('../../../../recover/async/reply')
 const isShard = require('../../../../isShard')
 const isReply = require('../../../../isReply')
 const { share } = require('../../../../lib/secrets-wrapper/v2')
+const ephemeralKeys = require('ephemeral-keys')
 
 describe('recover.async.reply (v2)', context => {
   let server, reply, katie
   let rootId, katiesInvite, katiesShard
+  let ephPublicKey, dbKey
 
   context.beforeEach(c => {
     server = Server()
@@ -17,6 +19,8 @@ describe('recover.async.reply (v2)', context => {
     katie = server.createFeed()
 
     rootId = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
+
+    dbKey = { rootId, recp: server.id }
 
     katiesInvite = {
       type: 'invite',
@@ -47,21 +51,25 @@ describe('recover.async.reply (v2)', context => {
 
     katie.publish(katiesShard, (err, shardMsg) => {
       if (err) throw err
-      katie.publish(katiesInvite, (err, inviteMsg) => {
+      ephemeralKeys.generateAndStore(dbKey, (err, ephPublicKey) => {
         if (err) throw err
-        reply(inviteMsg.key, (err, replyMsg) => {
-          assert.notOk(err, 'null errors')
-          assert.ok(replyMsg, 'returns a reply message')
-          assert.ok(isReply(replyMsg), 'message are valid replies')
-          assert.equal(replyMsg.value.content.shareVersion,
-            '2.0.0',
-            'reply contains correct shareVersion')
-          next()
+        katiesInvite.ephPublicKey = ephPublicKey
+        katie.publish(katiesInvite, (err, inviteMsg) => {
+          if (err) throw err
+          reply(inviteMsg.key, (err, replyMsg) => {
+            assert.notOk(err, 'null errors')
+            assert.ok(replyMsg, 'returns a reply message')
+            assert.ok(isReply(replyMsg), 'message are valid replies')
+            assert.equal(replyMsg.value.content.shareVersion,
+              '2.0.0',
+              'reply contains correct shareVersion')
+            next()
+          })
         })
       })
     })
   })
-
+  // TODO: add generateAndStore to remaining tests
   context('Throws error if associated shard does not exist', (assert, next) => {
     katie.publish(katiesInvite, (err, inviteMsg) => {
       if (err) throw err
