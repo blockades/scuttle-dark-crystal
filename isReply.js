@@ -11,7 +11,7 @@ module.exports = function isReply (msg) {
   const errors = []
 
   if (!_isReply(msg)) errors.push(new Error('invalid reply'))
-  if (!validateShard(shard, shareVersion)) errors.push(new Error('invalid shard'))
+  // if (!validateShard(shard, shareVersion)) errors.push(new Error('invalid shard'))
 
   if (!errors.length) return true
 
