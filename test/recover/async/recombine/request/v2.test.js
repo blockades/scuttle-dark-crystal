@@ -1,6 +1,7 @@
 const { describe } = require('tape-plus')
 const { unbox } = require('ssb-keys')
 const getContent = require('ssb-msg-content')
+const ephemeralKeys = require('ephemeral-keys')
 
 const Server = require('../../../../testbot')
 const Share = require('../../../../../share/async/share')
@@ -224,6 +225,9 @@ describe('recover.async.recombine (request v2 shards)', context => {
       .find(shard => shard.recps.find(recp => recp === custodianId))
       .shard
 
+    const unboxedShard = unbox(shard, findCustodian(custodianId).keys)
+    const contextMessage = rootId // TODO: better contextMessage
+    const boxedShard = ephemeralKeys.boxMessage(unboxedShard, content.ephPublicKey, contextMessage)
     collection[custodianId] = {
       type: 'invite-reply',
       root: rootId,
@@ -231,7 +235,7 @@ describe('recover.async.recombine (request v2 shards)', context => {
       accept: true,
       version: '1',
       shareVersion: '2.0.0',
-      body: unbox(shard, findCustodian(custodianId).keys),
+      body: boxedShard,
       recps: content.recps
     }
 
