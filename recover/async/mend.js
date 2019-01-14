@@ -5,27 +5,29 @@ const pull = require('pull-stream')
 
 // see recover/async/fetch.js for shape of data
 
-module.exports = function mend (data, cb) {
-  if (data.shardsData.length === 0) return cb(new Error('cannot find any shards'))
+module.exports = function mend (server) {
+  return function (data, cb) {
+    if (data.shardsData.length === 0) return cb(new Error('cannot find any shards'))
 
-  const shareVersion = getShareVersion(data)
-  if (!shareVersion) return cb(null, new Error('unknown share version, unable to mend shards'))
+    const shareVersion = getShareVersion(data)
+    if (!shareVersion) return cb(null, new Error('unknown share version, unable to mend shards'))
 
-  const shards = getShards(data, shareVersion)
-  if (!shards.length) return cb(new Error('no valid shards provided to mend'))
+    const shards = getShards(data, shareVersion)
+    if (!shards.length) return cb(new Error('no valid shards provided to mend'))
 
-  var secret
-  try {
-    secret = combine(shards, shareVersion)
-  } catch (err) {
-    return cb(err)
+    var secret
+    try {
+      secret = combine(shards, shareVersion)
+    } catch (err) {
+      return cb(err)
+    }
+    if (!secret) return cb(new Error('unable to successfully mend shards'))
+
+    const unpackedSecret = unpack(secret, shareVersion)
+    if (!unpackedSecret) return cb(new Error('Badly formed secret'))
+
+    cb(null, unpackedSecret)
   }
-  if (!secret) return cb(new Error('unable to successfully mend shards'))
-
-  const unpackedSecret = unpack(secret, shareVersion)
-  if (!unpackedSecret) return cb(new Error('Badly formed secret'))
-
-  cb(null, unpackedSecret)
 }
 
 // helpers
@@ -63,7 +65,7 @@ function getRequestedShards (shardsData, shareVersion, rootId) {
       return acc
     }, [])),
     pull.asyncMap((shard, cb) => {
-      const dbKey = { rootId, recp: feedId }
+      const dbKey = { rootId, recp: shard.feedId }
       const contextMessage = rootId
       server.ephemeral.unBoxMessage(dbKey, shard, contextMessage, (err, rawShard) => {
         if (err) cb(err)

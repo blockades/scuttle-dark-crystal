@@ -8,7 +8,7 @@ module.exports = function (server) {
 
     fetch(server)(root, (err, data) => {
       if (err) return cb(err)
-      mend(data, cb)
+      mend(server)(data, cb)
     })
   }
 }
