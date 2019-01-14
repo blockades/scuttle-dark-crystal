@@ -1,6 +1,7 @@
 const getContent = require('ssb-msg-content')
 const get = require('lodash.get')
 const { combine, unpack, validateShard } = require('../../lib/secrets-wrapper')
+const pull = require('pull-stream')
 
 // see recover/async/fetch.js for shape of data
 
@@ -48,24 +49,32 @@ function mode (array) {
 
 function getShards ({ root, shardsData }, shareVersion) {
   return root
-    ? getRequestedShards(shardsData, shareVersion)
+    ? getRequestedShards(shardsData, shareVersion, root.key)
     : getForwardedShards(shardsData, shareVersion)
 }
 
-function getRequestedShards (shardsData, shareVersion) {
-  return shardsData
-    .reduce((acc, { feedId, shard, requestsData }) => {
-      // mix: This needs to change for ephemeral returns
-      //  - need to check replyVersion (what mode of reply is this?)
-      //  - can't take any successfull request
-
+function getRequestedShards (shardsData, shareVersion, rootId) {
+  pull(
+    pull.values(shardsData.reduce((acc, { feedId, shard, requestsData }) => {
       const reply = get(requestsData.find(request => request.reply), 'reply')
       if (!reply) return acc
 
       acc.push(getShare(reply))
       return acc
-    }, [])
-    .filter(shard => validateShard(shard, shareVersion))
+    }, [])),
+    pull.asyncMap((shard, cb) => {
+      const dbKey = { rootId, recp: feedId }
+      const contextMessage = rootId
+      server.ephemeral.unBoxMessage(dbKey, shard, contextMessage, (err, rawShard) => {
+        if (err) cb(err)
+        cb(null, rawShard)
+      })
+    }),
+    pull.filter(shard => validateShard(shard, shareVersion)),
+    pull.collect((err, shards) => {
+      return shards
+    })
+  )
 }
 
 function getForwardedShards (shardsData, shareVersion) {

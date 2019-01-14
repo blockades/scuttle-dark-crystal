@@ -1,6 +1,5 @@
 const ScuttleInvite = require('scuttle-invite')
 const pull = require('pull-stream')
-const ephemeralKeys = require('ephemeral-keys')
 
 const PullShardsByRoot = require('../../shard/pull/by-root')
 
@@ -61,7 +60,7 @@ module.exports = function (server) {
               // TODO: validate ephPublicKey looks as it should
               // TODO: contextMessage could also include server.id?
               const contextMessage = rootId
-              shardToSend = ephemeralKeys.boxMessage(theDecryptedShard, ephPublicKey, contextMessage)
+              shardToSend = server.ephemeral.boxMessage(theDecryptedShard, ephPublicKey, contextMessage)
             } else {
               shardToSend = theDecryptedShard
             }

@@ -6,7 +6,6 @@ const Reply = require('../../../../recover/async/reply')
 const isShard = require('../../../../isShard')
 const isReply = require('../../../../isReply')
 const { share } = require('../../../../lib/secrets-wrapper/v2')
-const ephemeralKeys = require('ephemeral-keys')
 
 describe('recover.async.reply (v2)', context => {
   let server, reply, katie
@@ -51,7 +50,7 @@ describe('recover.async.reply (v2)', context => {
 
     katie.publish(katiesShard, (err, shardMsg) => {
       if (err) throw err
-      ephemeralKeys.generateAndStore(dbKey, (err, ephPublicKey) => {
+      server.ephemeral.generateAndStore(dbKey, (err, ephPublicKey) => {
         if (err) throw err
         katiesInvite.ephPublicKey = ephPublicKey
         katie.publish(katiesInvite, (err, inviteMsg) => {

@@ -3,7 +3,6 @@ const pull = require('pull-stream')
 const getContent = require('ssb-msg-content')
 const { isMsgId, isFeed } = require('ssb-ref')
 const { isRequest } = require('ssb-dark-crystal-schema')
-const ephemeralKeys = require('ephemeral-keys')
 
 const PullShardsByRoot = require('../../shard/pull/by-root')
 
@@ -33,7 +32,7 @@ module.exports = function (server) {
         // TODO: not sure if we need to tell level that dbkey is an object
         const dbKey = { rootId, recp: recps.find(notMe) }
 
-        ephemeralKeys.generateAndStore(dbKey, (err, ephPublicKey) => {
+        server.ephemeral.generateAndStore(dbKey, (err, ephPublicKey) => {
           if (err) cb(err)
           cb(null, {
             type: 'invite', // is over-written by invites.async.private.publish
