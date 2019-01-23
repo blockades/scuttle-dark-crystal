@@ -5,7 +5,7 @@ const isShard = require('is-my-json-valid')(require('ssb-dark-crystal-schema/sch
 
 const Publish = require('../../../../forward/async/publish')
 const Server = require('../../../testbot')
-const { share: shareV2 } = require('../../../../lib/secrets-wrapper/v2')
+const { share: shareV2 } = require('dark-crystal-secrets/v2')
 
 describe('forward.async.publish (v2 shard)', context => {
   let server

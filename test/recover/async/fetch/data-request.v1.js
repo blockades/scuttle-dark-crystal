@@ -1,5 +1,5 @@
 const pull = require('pull-stream')
-const createShares = require('../../../../lib/secrets-wrapper/v1').share
+const createShares = require('dark-crystal-secrets/v1').share
 
 const isRoot = require('../../../../isRoot')
 const isRitual = require('../../../../isRitual')

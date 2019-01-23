@@ -1,5 +1,5 @@
 const pull = require('pull-stream')
-const { pack, share: createShares } = require('../../../../lib/secrets-wrapper/v2')
+const { pack, share: createShares } = require('dark-crystal-secrets/v2')
 
 const isForward = require('../../../../isForward')
 
