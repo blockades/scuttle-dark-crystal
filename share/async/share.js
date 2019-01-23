@@ -4,7 +4,7 @@ const PublishRoot = require('../../root/async/publish')
 const PublishRitual = require('../../ritual/async/publish')
 const PublishAllShards = require('../../shard/async/publish-all')
 
-const secrets = require('../../lib/secrets-wrapper')
+const secrets = require('dark-crystal-secrets')
 const isNumber = require('../../lib/isNumber')
 const isString = require('../../lib/isString')
 const isFunction = require('../../lib/isFunction')
