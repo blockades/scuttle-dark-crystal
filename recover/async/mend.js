@@ -8,7 +8,7 @@ const pull = require('pull-stream')
 module.exports = function mend (server) {
   return function (data, cb) {
     if (data.shardsData.length === 0) return cb(new Error('cannot find any shards'))
-console.log('here')
+
     const shareVersion = getShareVersion(data)
     if (!shareVersion) return cb(null, new Error('unknown share version, unable to mend shards'))
 
@@ -69,14 +69,17 @@ console.log('here')
         return acc
       }, [])),
       pull.asyncMap((shard, cb) => {
-        const dbKey = JSON.stringify({ rootId, recp: shard.feedId })
+        if (shareVersion === '1.0.0') {
+          cb(null, shard.share)
+        } else {
+          const dbKey = JSON.stringify({ rootId, recp: shard.feedId })
 
-        const contextMessage = rootId
-        server.ephemeral.unBoxMessage(dbKey, shard.share, contextMessage, (err, rawShard) => {
-          if (err) cb(err)
-          cb(null, rawShard)
-        })
-      }, 10),
+          const contextMessage = rootId
+          server.ephemeral.unBoxMessage(dbKey, shard.share, contextMessage, (err, rawShard) => {
+            err ? cb(err) : cb(null, rawShard)
+          })
+        }
+      }),
       pull.filter(shard => validateShard(shard, shareVersion)),
       pull.collect((err, shards) => {
         if (err) callback(err)
@@ -107,5 +110,4 @@ console.log('here')
       case 'dark-crystal/forward': return shard
     }
   }
-
 }
