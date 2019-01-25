@@ -18,7 +18,7 @@ describe('recover.async.mend (v2)', context => {
     getFetchData(server, (err, data) => {
       if (err) throw err
 
-      Mend(data, (err, secret) => {
+      Mend(server)(data, (err, secret) => {
         assert.equal(err, null, 'no error')
         assert.equal(secret.secret, 'under the cabbage tree', 'secret is revealed')
         assert.equal(secret.label, 'location of the treasure', 'label is revealed')
