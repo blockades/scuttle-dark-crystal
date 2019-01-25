@@ -29,5 +29,5 @@ module.exports = function isReply (msg) {
 
 // temporary - TODO use ssb-ref
 function isBoxedMessage (message) {
-  return message.slice(-4) === '.box'
+  return /\.box$/.test(message)
 }
