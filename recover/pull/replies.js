@@ -1,6 +1,6 @@
 const pull = require('pull-stream')
 const next = require('pull-next-query')
-const { isReply } = require('ssb-dark-crystal-schema')
+const isReply = require('../../isReply')
 
 module.exports = function (server) {
   return function replies (rootId, opts = {}) {
@@ -16,7 +16,6 @@ module.exports = function (server) {
     }]
 
     const _opts = Object.assign({ limit: 100 }, opts, { query })
-
     return pull(
       next(server.query.read, _opts),
       pull.filter(isReply)
