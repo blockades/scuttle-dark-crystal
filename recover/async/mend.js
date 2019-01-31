@@ -74,7 +74,7 @@ module.exports = function mend (server) {
         } else {
           const dbKey = JSON.stringify({ rootId, recp: shard.feedId })
 
-          const contextMessage = rootId
+          const contextMessage = dbKey
           server.ephemeral.unBoxMessage(dbKey, shard.share, contextMessage, (err, rawShard) => {
             err ? cb(err) : cb(null, rawShard)
           })
