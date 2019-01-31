@@ -142,7 +142,7 @@ function publishAll (server) {
                   if (!reply) return cb(null, { request: unbox(request) })
 
                   reply.branch = [ request.key ] // how invites point to what they're replying to
-                  const contextMessage = root.key // TODO: better contextMessage
+                  const contextMessage = dbKey
                   reply.body = server.ephemeral.boxMessage(reply.body, ephPublicKey, contextMessage)
                   console.log(reply.body)
                   feed.publish(reply, (err, reply) => {

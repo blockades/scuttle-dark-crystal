@@ -224,7 +224,7 @@ describe('recover.async.recombine (request v2 shards)', context => {
       .shard
 
     const unboxedShard = unbox(shard, findCustodian(custodianId).keys)
-    const contextMessage = rootId // TODO: better contextMessage
+    const contextMessage = JSON.stringify({ rootId, recp: custodianId })
     const boxedShard = server.ephemeral.boxMessage(unboxedShard, content.ephPublicKey, contextMessage)
     collection[custodianId] = {
       type: 'invite-reply',
