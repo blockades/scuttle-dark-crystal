@@ -69,7 +69,7 @@ module.exports = function mend (server) {
         return acc
       }, [])),
       pull.asyncMap((shard, cb) => {
-        if (shareVersion === '1.0.0') {
+        if (shareVersion === '1.0.0' || !isBoxedMessage(shard.share)) {
           cb(null, shard.share)
         } else {
           const dbKey = JSON.stringify({ rootId, recp: shard.feedId })
@@ -110,4 +110,8 @@ module.exports = function mend (server) {
       case 'dark-crystal/forward': return shard
     }
   }
+}
+
+function isBoxedMessage (message) {
+  return /\.box$/.test(message)
 }
