@@ -29,9 +29,7 @@ module.exports = function (server) {
       pull.asyncMap((shard, cb) => {
         const { recps } = getContent(shard)
 
-        // TODO: not sure if we need to tell level that dbkey is an object
-        const dbKey = { rootId, recp: recps.find(notMe) }
-
+        const dbKey = JSON.stringify({ rootId, recp: recps.find(notMe) })
         server.ephemeral.generateAndStore(dbKey, (err, ephPublicKey) => {
           if (err) cb(err)
           cb(null, {
@@ -79,4 +77,3 @@ function recpsValid (recipients) {
 
   return feedIds.length === recipients.length
 }
-
