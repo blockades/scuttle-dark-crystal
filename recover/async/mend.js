@@ -100,3 +100,4 @@ function getShare (msg) {
     case 'dark-crystal/forward': return shard
   }
 }
+
