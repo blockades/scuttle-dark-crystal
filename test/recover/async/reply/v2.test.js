@@ -10,7 +10,7 @@ const { share } = require('../../../../lib/secrets-wrapper/v2')
 describe('recover.async.reply (v2)', context => {
   let server, reply, katie
   let rootId, katiesInvite, katiesShard
-  let ephPublicKey, dbKey
+  let dbKey
 
   context.beforeEach(c => {
     server = Server()
@@ -68,14 +68,18 @@ describe('recover.async.reply (v2)', context => {
       })
     })
   })
-  // TODO: add generateAndStore to remaining tests
+
   context('Throws error if associated shard does not exist', (assert, next) => {
-    katie.publish(katiesInvite, (err, inviteMsg) => {
+    server.ephemeral.generateAndStore(dbKey, (err, ephPublicKey) => {
       if (err) throw err
-      reply(inviteMsg.key, (err, replyMsg) => {
-        assert.ok(err, 'Throws error')
-        assert.notOk(replyMsg, 'Does not return a reply message')
-        next()
+      katiesInvite.ephPublicKey = ephPublicKey
+      katie.publish(katiesInvite, (err, inviteMsg) => {
+        if (err) throw err
+        reply(inviteMsg.key, (err, replyMsg) => {
+          assert.ok(err, 'Throws error')
+          assert.notOk(replyMsg, 'Does not return a reply message')
+          next()
+        })
       })
     })
   })

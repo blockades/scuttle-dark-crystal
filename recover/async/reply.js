@@ -57,9 +57,7 @@ module.exports = function (server) {
 
             let shardToSend
             if (ephPublicKey) {
-              // TODO: validate ephPublicKey looks as it should
-              // TODO: contextMessage could also include server.id?
-              const contextMessage = rootId
+              const contextMessage = JSON.stringify({ rootId, recp: server.id })
               shardToSend = server.ephemeral.boxMessage(theDecryptedShard, ephPublicKey, contextMessage)
             } else {
               shardToSend = theDecryptedShard

@@ -46,6 +46,9 @@ This will attempt to recombine the decrypted shards included in reply messages a
 
 This also works for forwarded shards, you just need to provide the root from on of the fwds.
 
+#### `darkCrystal.recover.async.deleteKeyPairs(rootId, callback)`
+
+Deletes the ephemeral keypairs for all returned shards associated with the given rootId (effectively deleting the shards). If successful, no errors will be returned in the callback.
 
 ### Root methods
 
