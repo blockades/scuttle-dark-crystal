@@ -69,5 +69,10 @@ describe('recover.async.deleteKeyPair', context => {
       })
     )
   })
-  // TODO: tests for errors on invalid rootId or recp
+  context('Throws an error if given an invalid rootId', (assert, next) => {
+    deleteKeyPairs('foo', (err) => {
+      assert.ok(err, 'throws an error')
+      next()
+    })
+  })
 })

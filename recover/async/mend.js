@@ -111,7 +111,7 @@ module.exports = function mend (server) {
     }
   }
 }
-
+// TODO: should we use isCanonicalBase64 ?
 function isBoxedMessage (message) {
   return /\.box$/.test(message)
 }

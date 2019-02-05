@@ -34,5 +34,4 @@ describe('recover.async.deleteKeyPair', context => {
       })
     })
   })
-  // TODO: tests for errors on invalid rootId or recp
 })

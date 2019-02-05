@@ -11,7 +11,6 @@ module.exports = function isReply (msg) {
 
   const errors = []
 
-  // TODO this is a mess
   if (!_isReply(msg)) errors.push(new Error('invalid reply'))
   if (!isString(shard)) {
     errors.push(new Error('body must contain a string'))
@@ -27,7 +26,7 @@ module.exports = function isReply (msg) {
   return false
 }
 
-// temporary - TODO use ssb-ref
+// TODO: should we use isCanonicalBase64 ?
 function isBoxedMessage (message) {
   return /\.box$/.test(message)
 }
