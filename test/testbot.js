@@ -3,7 +3,7 @@ module.exports = function Testbot (opts) {
     .use(require('ssb-private'))
     .use(require('ssb-query'))
     .use(require('ssb-backlinks'))
-    .use(require('ephemeral-keys'))
+    .use(require('ssb-ephemeral-keys'))
     .call(opts)
 
   return server
