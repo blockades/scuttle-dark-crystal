@@ -8,7 +8,7 @@ module.exports = function (server) {
     const dbKey = JSON.stringify({ rootId, recp: recipient })
     server.ephemeral.deleteKeyPair(dbKey, (err) => {
       if (err) return callback(err)
-      callback()
+      callback(null, true)
     })
   }
 }
