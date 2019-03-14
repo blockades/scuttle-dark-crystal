@@ -12,7 +12,6 @@ module.exports = function mend (server) {
     const shareVersion = getShareVersion(data)
     if (!shareVersion) return cb(null, new Error('unknown share version, unable to mend shards'))
 
-    // const shards = getShards(data, shareVersion)
     getShards(data, shareVersion, (err, shards) => {
       if (err) return cb(err)
       if (!shards.length) return cb(new Error('no valid shards provided to mend'))
@@ -72,10 +71,8 @@ module.exports = function mend (server) {
         if (shareVersion === '1.0.0' || !isBoxedMessage(shard.share)) {
           cb(null, shard.share)
         } else {
-          const dbKey = JSON.stringify({ rootId, recp: shard.feedId })
-
-          const contextMessage = dbKey
-          server.ephemeral.unBoxMessage(dbKey, shard.share, contextMessage, (err, rawShard) => {
+          const dbKey = { rootId, recp: shard.feedId }
+          server.ephemeral.unBoxMessage(dbKey, shard.share, dbKey, (err, rawShard) => {
             err ? cb(err) : cb(null, rawShard)
           })
         }
