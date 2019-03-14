@@ -2,7 +2,7 @@ const { describe } = require('tape-plus')
 
 const Server = require('../../../../testbot')
 const Recombine = require('../../../../../recover/async/recombine')
-const { pack, share } = require('../../../../../lib/secrets-wrapper/v2')
+const { pack, share } = require('dark-crystal-secrets/v2')
 
 describe('recover.async.recombine (v2 forward)', context => {
   let server, recombine, alice, bob, carol, root
