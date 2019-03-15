@@ -3,9 +3,9 @@ const Server = require('../../testbot')
 const DeleteKeyPairs = require('../../../recover/async/deleteEphemeralKeyPairs')
 const pull = require('pull-stream')
 
-describe('recover.async.deleteEphemeralKeyPair', context => {
+describe('recover.async.deleteEphemeralKeyPairs', context => {
   let server, deleteKeyPairs, custodians, replies
-  let rootId, custodianKeys, ephPubKey
+  let rootId, custodianKeys, testPubKey
 
   context.beforeEach(c => {
     server = Server()
@@ -21,7 +21,7 @@ describe('recover.async.deleteEphemeralKeyPair', context => {
     replies = {}
     rootId = '%H3Uv1nZyVV1h1YmbNJT5fmU469gO5p6YWmXGnRPbSww=.sha256'
 
-    ephPubKey = 'qDPnOmAo6LP0Tpx/uBHLZBq0UPcAUDcuK74tyoahEQE=.curve25519'
+    testPubKey = 'qDPnOmAo6LP0Tpx/uBHLZBq0UPcAUDcuK74tyoahEQE=.curve25519'
 
     custodians.forEach(({ id }) => {
       replies[id] = {
@@ -44,7 +44,7 @@ describe('recover.async.deleteEphemeralKeyPair', context => {
     pull(
       pull.values(custodians),
       pull.asyncMap((custodian, cb) => {
-        server.ephemeral.boxMessage('something', ephPubKey, (err, cipherText) => {
+        server.ephemeral.boxMessage('something', testPubKey, (err, cipherText) => {
           if (err) console.error(err)
           replies[custodian.id].body = cipherText
           custodian.publish(replies[custodian.id], (err, reply) => {
@@ -63,10 +63,12 @@ describe('recover.async.deleteEphemeralKeyPair', context => {
         deleteKeyPairs(rootId, (err) => {
           assert.notOk(err, 'null errors')
           custodianKeys.forEach(custodianKey => {
-            const cipherText = server.ephemeral.boxMessage('something', custodianKey.ephPublicKey)
-            server.ephemeral.unBoxMessage(custodianKey.dbKey, cipherText, null, (err, message) => {
-              assert.ok(err, 'throws an error when attempting to use a key')
-              assert.notOk(message, 'returns no message')
+            server.ephemeral.boxMessage('something', custodianKey.ephPublicKey, (err, cipherText) => {
+              if (err) console.error(err)
+              server.ephemeral.unBoxMessage(custodianKey.dbKey, cipherText, (err, message) => {
+                assert.ok(err, 'throws an error when attempting to use a key')
+                assert.notOk(message, 'returns no message')
+              })
             })
           })
           next()
