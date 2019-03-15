@@ -223,9 +223,9 @@ describe('recover.async.recombine (request v2 shards)', context => {
       .find(shard => shard.recps.find(recp => recp === custodianId))
       .shard
 
-    const unboxedShard = unbox(shard, findCustodian(custodianId).keys)
+    const unboxedShare = unbox(shard, findCustodian(custodianId).keys)
     const contextMessage = JSON.stringify({ rootId, recp: custodianId })
-    const boxedShard = server.ephemeral.boxMessage(unboxedShard, content.ephPublicKey, contextMessage)
+    const boxedShare = server.ephemeral.boxMessage(unboxedShare, content.ephPublicKey, contextMessage)
     collection[custodianId] = {
       type: 'invite-reply',
       root: rootId,
@@ -233,7 +233,7 @@ describe('recover.async.recombine (request v2 shards)', context => {
       accept: true,
       version: '1',
       shareVersion: '2.0.0',
-      body: boxedShard,
+      body: boxedShare,
       recps: content.recps
     }
 
