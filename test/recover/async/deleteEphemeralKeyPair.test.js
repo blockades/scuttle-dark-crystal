@@ -1,6 +1,6 @@
 const { describe } = require('tape-plus')
 const Server = require('../../testbot')
-const DeleteKeyPair = require('../../../recover/async/deleteKeyPair')
+const DeleteKeyPair = require('../../../recover/async/deleteEphemeralKeyPair')
 
 describe('recover.async.deleteKeyPair', context => {
   let server, deleteKeyPair, recp
@@ -16,18 +16,20 @@ describe('recover.async.deleteKeyPair', context => {
     server.close()
   })
 
-  context('Successfully deletes a keypair', (assert, next) => {
+  context('Successfully deletes an ephemeral keypair', (assert, next) => {
     server.publish({ type: 'post', content: 'some message' }, (err, { key: rootId }) => {
-      if (err) console.log(err)
+      if (err) throw err
       server.ephemeral.generateAndStore({ rootId, recp }, (err, ephPublicKey) => {
-        if (err) console.log(err)
+        if (err) throw err
         deleteKeyPair(rootId, recp, (err) => {
           assert.notOk(err, 'null errors')
-          const cipherText = server.ephemeral.boxMessage('something', ephPublicKey)
-          server.ephemeral.unBoxMessage({ rootId, recp }, cipherText, null, (err, message) => {
-            assert.ok(err, 'throws an error when attempting to use the key')
-            assert.notOk(message, 'returns no message')
-            next()
+          server.ephemeral.boxMessage('something', ephPublicKey, (err, cipherText) => {
+            if (err) throw err
+            server.ephemeral.unBoxMessage({ rootId, recp }, cipherText, null, (err, message) => {
+              assert.ok(err, 'throws an error when attempting to use the key')
+              assert.notOk(message, 'returns no message')
+              next()
+            })
           })
         })
       })

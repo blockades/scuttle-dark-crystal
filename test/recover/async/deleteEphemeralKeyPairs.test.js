@@ -1,11 +1,11 @@
 const { describe } = require('tape-plus')
 const Server = require('../../testbot')
-const DeleteKeyPairs = require('../../../recover/async/deleteKeyPairs')
+const DeleteKeyPairs = require('../../../recover/async/deleteEphemeralKeyPairs')
 const pull = require('pull-stream')
 
 describe('recover.async.deleteKeyPair', context => {
   let server, deleteKeyPairs, custodians, replies
-  let rootId, custodianKeys
+  let rootId, custodianKeys, ephPubKey
 
   context.beforeEach(c => {
     server = Server()
@@ -21,6 +21,8 @@ describe('recover.async.deleteKeyPair', context => {
     replies = {}
     rootId = '%H3Uv1nZyVV1h1YmbNJT5fmU469gO5p6YWmXGnRPbSww=.sha256'
 
+    ephPubKey = 'qDPnOmAo6LP0Tpx/uBHLZBq0UPcAUDcuK74tyoahEQE=.curve25519'
+
     custodians.forEach(({ id }) => {
       replies[id] = {
         type: 'invite-reply',
@@ -29,7 +31,6 @@ describe('recover.async.deleteKeyPair', context => {
         accept: true,
         version: '1',
         shareVersion: '2.0.0',
-        body: server.ephemeral.boxMessage('something', 'qDPnOmAo6LP0Tpx/uBHLZBq0UPcAUDcuK74tyoahEQE=.curve25519'),
         recps: [ server.id, id ]
       }
     })
@@ -39,17 +40,21 @@ describe('recover.async.deleteKeyPair', context => {
     server.close()
   })
 
-  context('Successfully all keypairs associated with a given rootId', (assert, next) => {
+  context('Successfully delete all ephemeral keypairs associated with a given rootId', (assert, next) => {
     pull(
       pull.values(custodians),
       pull.asyncMap((custodian, cb) => {
-        custodian.publish(replies[custodian.id], (err, reply) => {
-          if (err) cb(err)
-          const dbKey = { rootId, recp: custodian.id }
-          server.ephemeral.generateAndStore(dbKey, (err, ephPublicKey) => {
+        server.ephemeral.boxMessage('something', ephPubKey, (err, cipherText) => {
+          if (err) console.error(err)
+          replies[custodian.id].body = cipherText
+          custodian.publish(replies[custodian.id], (err, reply) => {
             if (err) cb(err)
-            custodianKeys.push({ dbKey, ephPublicKey })
-            cb(null, custodian)
+            const dbKey = { rootId, recp: custodian.id }
+            server.ephemeral.generateAndStore(dbKey, (err, ephPublicKey) => {
+              if (err) cb(err)
+              custodianKeys.push({ dbKey, ephPublicKey })
+              cb(null, custodian)
+            })
           })
         })
       }),
