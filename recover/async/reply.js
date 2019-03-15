@@ -55,24 +55,25 @@ module.exports = function (server) {
           server.private.unbox(shard, (err, theDecryptedShard) => {
             if (err) return callback(err)
 
-            let shardToSend
-            if (ephPublicKey) {
-              const contextMessage = JSON.stringify({ rootId, recp: server.id })
-              shardToSend = server.ephemeral.boxMessage(theDecryptedShard, ephPublicKey, contextMessage)
-            } else {
-              shardToSend = theDecryptedShard
-            }
-
             const reply = {
               root: rootId,
               branch: inviteId,
               accept: true,
-              body: shardToSend,
               recps: [author, server.id],
               shareVersion: version
             }
 
-            invites.async.private.reply(inviteId, reply, callback)
+            if (ephPublicKey) {
+              const contextMessage = { rootId, recp: server.id }
+              server.ephemeral.boxMessage(theDecryptedShard, ephPublicKey, contextMessage, (err, shareToSend) => {
+                if (err) throw err
+                reply.body = shareToSend
+                invites.async.private.reply(inviteId, reply, callback)
+              })
+            } else {
+              reply.body = theDecryptedShard
+              invites.async.private.reply(inviteId, reply, callback)
+            }
           })
         })
       )
