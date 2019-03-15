@@ -5,8 +5,7 @@ module.exports = function (server) {
     if (!isMsgId(rootId)) return callback(new Error('Invalid root'))
     if (!isFeed(recipient)) return callback(new Error('Invalid recipient'))
 
-    const dbKey = JSON.stringify({ rootId, recp: recipient })
-    server.ephemeral.deleteKeyPair(dbKey, (err) => {
+    server.ephemeral.deleteKeyPair({ rootId, recp: recipient }, (err) => {
       if (err) return callback(err)
       callback(null, true)
     })
