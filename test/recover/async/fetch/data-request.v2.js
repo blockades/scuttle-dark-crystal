@@ -129,10 +129,7 @@ function publishAll (server) {
           pull(
             pull.values(requestPairs),
             pull.asyncMap(({ feed, request, reply }, cb) => {
-              const dbKey = JSON.stringify({
-                rootId: request.root,
-                recp: request.recps.find(notMe)
-              })
+              const dbKey = { rootId: request.root, recp: request.recps.find(notMe) }
               server.ephemeral.generateAndStore(dbKey, (err, ephPublicKey) => {
                 if (err) throw err
                 request.ephPublicKey = ephPublicKey

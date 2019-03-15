@@ -29,8 +29,7 @@ module.exports = function (server) {
       pull.asyncMap((shard, cb) => {
         const { recps } = getContent(shard)
 
-        const dbKey = JSON.stringify({ rootId, recp: recps.find(notMe) })
-        server.ephemeral.generateAndStore(dbKey, (err, ephPublicKey) => {
+        server.ephemeral.generateAndStore({ rootId, recp: recps.find(notMe) }, (err, ephPublicKey) => {
           if (err) cb(err)
           cb(null, {
             type: 'invite', // is over-written by invites.async.private.publish

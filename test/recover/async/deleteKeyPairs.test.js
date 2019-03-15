@@ -45,7 +45,7 @@ describe('recover.async.deleteKeyPair', context => {
       pull.asyncMap((custodian, cb) => {
         custodian.publish(replies[custodian.id], (err, reply) => {
           if (err) cb(err)
-          const dbKey = JSON.stringify({ rootId, recp: custodian.id })
+          const dbKey = { rootId, recp: custodian.id }
           server.ephemeral.generateAndStore(dbKey, (err, ephPublicKey) => {
             if (err) cb(err)
             custodianKeys.push({ dbKey, ephPublicKey })
