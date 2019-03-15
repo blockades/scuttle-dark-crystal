@@ -3,7 +3,7 @@ const Server = require('../../testbot')
 const DeleteKeyPairs = require('../../../recover/async/deleteEphemeralKeyPairs')
 const pull = require('pull-stream')
 
-describe('recover.async.deleteKeyPair', context => {
+describe('recover.async.deleteEphemeralKeyPair', context => {
   let server, deleteKeyPairs, custodians, replies
   let rootId, custodianKeys, ephPubKey
 

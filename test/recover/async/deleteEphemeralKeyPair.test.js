@@ -2,7 +2,7 @@ const { describe } = require('tape-plus')
 const Server = require('../../testbot')
 const DeleteKeyPair = require('../../../recover/async/deleteEphemeralKeyPair')
 
-describe('recover.async.deleteKeyPair', context => {
+describe('recover.async.deleteEphemeralKeyPair', context => {
   let server, deleteKeyPair, recp
 
   context.beforeEach(c => {
