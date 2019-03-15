@@ -15,7 +15,7 @@ module.exports = function isReply (msg) {
   if (!isString(shard)) {
     errors.push(new Error('body must contain a string'))
   } else {
-    if (!isBoxedMessage(shard) || shareVersion === '1.0.0') {
+    if (!isBoxedShare(shard) || shareVersion === '1.0.0') {
       if (!validateShard(shard, shareVersion)) errors.push(new Error('invalid shard'))
     }
   }
@@ -27,6 +27,6 @@ module.exports = function isReply (msg) {
 }
 
 // TODO: should we use isCanonicalBase64 ?
-function isBoxedMessage (message) {
+function isBoxedShare (message) {
   return /\.box$/.test(message)
 }
