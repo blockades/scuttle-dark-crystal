@@ -8,7 +8,7 @@ module.exports = {
       recombine: require('./recover/async/recombine'),
       reply: require('./recover/async/reply'),
       request: require('./recover/async/request'),
-      deleteKeyPairs: require('./recover/async/deleteKeyPairs')
+      deleteEphemeralKeyPairs: require('./recover/async/deleteEphemeralKeyPairs')
     },
     pull: {
       requests: require('./recover/pull/requests'),
