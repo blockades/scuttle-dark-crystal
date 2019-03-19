@@ -1,4 +1,4 @@
-const { isFeed } = require('ssb-ref')
+const { isFeed, isBlobId } = require('ssb-ref')
 
 const PublishRoot = require('../../root/async/publish')
 const PublishRitual = require('../../ritual/async/publish')
@@ -14,7 +14,16 @@ module.exports = function (server) {
   const publishRitual = PublishRitual(server)
   const publishAllShards = PublishAllShards(server)
 
-  return function ({ name, secret, quorum, label, recps }, callback) {
+  return function (params, callback) {
+    var {
+      name,
+      secret,
+      quorum,
+      label,
+      recps,
+      attachment
+    } = params
+
     if (!name && !isString(name)) throw new Error('name must be a string')
     if (!secret && !isString(secret)) throw new Error('secret must be a string')
     if (!isNumber(quorum)) throw new Error('quorum must be a number')
@@ -22,6 +31,11 @@ module.exports = function (server) {
     if (!isFunction(callback)) throw new Error('callback is not a function')
     if (!label) label = name
     if (!isString(label)) throw new Error('label must be a string')
+
+    if (attachment) {
+      if (!isString(attachment.name)) return callback(new Error('data.attachment.name: provide an attachment name'))
+      if (!isBlobId(attachment.link)) return callback(new Error('data.attachment.link: referenced schema does not match'))
+    }
 
     let feedIds = recps
       .map(recp => typeof recp === 'string' ? recp : recp.link)
@@ -51,7 +65,7 @@ module.exports = function (server) {
         // TEMP SOLUTION: Have a publishAllShards (plural) function which validates each with isShard before publishing all
         // RESOLUTION: Extracted reducer into a publishAll function
         //
-        publishAllShards({ shards, recps: recipients, rootId }, (err, shards) => {
+        publishAllShards({ shards, recps: recipients, rootId, attachment }, (err, shards) => {
           if (err) return callback(err)
 
           callback(null, {
