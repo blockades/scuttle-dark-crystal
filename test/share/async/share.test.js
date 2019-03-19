@@ -199,7 +199,6 @@ describe('share.async.share', context => {
           $filter: { value: { content: { type } } }
         }]
       })
-      console.log(data)
 
       pull(
         pullType('dark-crystal/root'),
