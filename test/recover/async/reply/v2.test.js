@@ -5,7 +5,7 @@ const Server = require('../../../testbot')
 const Reply = require('../../../../recover/async/reply')
 const isShard = require('../../../../isShard')
 const isReply = require('../../../../isReply')
-const { share } = require('../../../../lib/secrets-wrapper/v2')
+const { share } = require('dark-crystal-secrets/v2')
 
 describe('recover.async.reply (v2)', context => {
   let server, reply, katie

@@ -1,7 +1,7 @@
 const getContent = require('ssb-msg-content')
 const get = require('lodash.get')
-const { combine, unpack, validateShard } = require('../../lib/secrets-wrapper')
 const pull = require('pull-stream')
+const { combine, unpack, validateShard } = require('dark-crystal-secrets')
 
 // see recover/async/fetch.js for shape of data
 

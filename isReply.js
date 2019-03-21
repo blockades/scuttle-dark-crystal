@@ -1,7 +1,7 @@
 const { isReply: _isReply } = require('ssb-dark-crystal-schema')
 const getContent = require('ssb-msg-content')
-const { validateShard } = require('./lib/secrets-wrapper')
 const isString = require('./lib/isString')
+const { validateShard } = require('dark-crystal-secrets')
 
 module.exports = function isReply (msg) {
   const {
