@@ -1,6 +1,7 @@
 const { describe } = require('tape-plus')
 const { unbox } = require('ssb-keys')
 const getContent = require('ssb-msg-content')
+const pull = require('pull-stream')
 
 const Server = require('../../../../testbot')
 const Share = require('../../../../../share/async/share')
@@ -42,21 +43,18 @@ describe('recover.async.recombine (request v2 shards)', context => {
 
       request(rootId, (err, invites) => {
         if (err) console.error(err)
-
-        var replies = invites.reduce((collection, invite) => {
-          return buildReplies(collection, invite, data, rootId)
-        }, {})
-
-        alice.publish(replies[alice.id], (err, aliceReply) => {
+        buildReplies(invites, data, rootId, (err, replies) => {
           if (err) console.error(err)
-
-          bob.publish(replies[bob.id], (err, bobReply) => {
+          alice.publish(replies[alice.id], (err, aliceReply) => {
             if (err) console.error(err)
-            recombine(rootId, (err, returnedSecret) => {
-              assert.notOk(err, 'error is null')
-              assert.equal(secret, returnedSecret.secret, 'returns the correct secret')
-              assert.equal(label, returnedSecret.label, 'returns the correct label')
-              next()
+            bob.publish(replies[bob.id], (err, bobReply) => {
+              if (err) console.error(err)
+              recombine(rootId, (err, returnedSecret) => {
+                assert.notOk(err, 'error is null')
+                assert.equal(secret, returnedSecret.secret, 'returns the correct secret')
+                assert.equal(label, returnedSecret.label, 'returns the correct label')
+                next()
+              })
             })
           })
         })
@@ -71,18 +69,16 @@ describe('recover.async.recombine (request v2 shards)', context => {
       var rootId = data.root.key
       request(rootId, (err, invites) => {
         if (err) console.error(err)
-
-        var replies = invites.reduce((collection, invite) => {
-          return buildReplies(collection, invite, data, rootId)
-        }, {})
-
-        alice.publish(replies[alice.id], (err, aliceReply) => {
+        buildReplies(invites, data, rootId, (err, replies) => {
           if (err) console.error(err)
+          alice.publish(replies[alice.id], (err, aliceReply) => {
+            if (err) console.error(err)
 
-          recombine(rootId, (err, returnedSecret) => {
-            assert.ok(err, 'an error')
-            assert.notOk(returnedSecret, 'Does not return a secret')
-            next()
+            recombine(rootId, (err, returnedSecret) => {
+              assert.ok(err, 'an error')
+              assert.notOk(returnedSecret, 'Does not return a secret')
+              next()
+            })
           })
         })
       })
@@ -97,33 +93,37 @@ describe('recover.async.recombine (request v2 shards)', context => {
       request(rootId, (err, invites) => {
         if (err) console.error(err)
 
-        var replies = invites.reduce((collection, invite) => {
-          var content = getContent(invite)
-          var custodianId = content.recps.find(notMe)
+        // var replies = invites.reduce((collection, invite) => {
+        //   var content = getContent(invite)
+        //   var custodianId = content.recps.find(notMe)
+        //
+        //   collection[custodianId] = {
+        //     type: 'invite-reply',
+        //     root: rootId,
+        //     branch: invite.key,
+        //     accept: true,
+        //     version: '1',
+        //     body: 'This is not a valid shard',
+        //     recps: content.recps
+        //   }
+        //
+        //   return collection
+        // }, {})
 
-          collection[custodianId] = {
-            type: 'invite-reply',
-            root: rootId,
-            branch: invite.key,
-            accept: true,
-            version: '1',
-            body: 'This is not a valid shard',
-            recps: content.recps
-          }
-
-          return collection
-        }, {})
-
-        alice.publish(replies[alice.id], (err, aliceReply) => {
+        buildReplies(invites, data, rootId, (err, replies) => {
           if (err) console.error(err)
-
-          bob.publish(replies[bob.id], (err, bobReply) => {
+          replies[alice.id].body = 'This is not a valid share'
+          alice.publish(replies[alice.id], (err, aliceReply) => {
             if (err) console.error(err)
 
-            recombine(rootId, (err, returnedSecret) => {
-              assert.ok(err, 'an error')
-              assert.notOk(returnedSecret, 'Does not return a secret')
-              next()
+            bob.publish(replies[bob.id], (err, bobReply) => {
+              if (err) console.error(err)
+
+              recombine(rootId, (err, returnedSecret) => {
+                assert.ok(err, 'an error')
+                assert.notOk(returnedSecret, 'Does not return a secret')
+                next()
+              })
             })
           })
         })
@@ -143,20 +143,19 @@ describe('recover.async.recombine (request v2 shards)', context => {
         request(rootId, (err, invites) => {
           if (err) console.error(err)
 
-          var replies = invites.reduce((collection, invite) => {
-            return buildReplies(collection, invite, data, otherRootId)
-          }, {})
-
-          alice.publish(replies[alice.keys.id], (err, aliceReply) => {
+          buildReplies(invites, data, otherRootId, (err, replies) => {
             if (err) console.error(err)
-
-            bob.publish(replies[bob.keys.id], (err, bobReply) => {
+            alice.publish(replies[alice.keys.id], (err, aliceReply) => {
               if (err) console.error(err)
 
-              recombine(rootId, (err, returnedSecret) => {
-                assert.ok(err, 'an error')
-                assert.notOk(returnedSecret, 'Does not return a secret')
-                next()
+              bob.publish(replies[bob.keys.id], (err, bobReply) => {
+                if (err) console.error(err)
+
+                recombine(rootId, (err, returnedSecret) => {
+                  assert.ok(err, 'an error')
+                  assert.notOk(returnedSecret, 'Does not return a secret')
+                  next()
+                })
               })
             })
           })
@@ -173,28 +172,29 @@ describe('recover.async.recombine (request v2 shards)', context => {
       request(rootId, (err, invites) => {
         if (err) console.error(err)
 
-        var replies = invites.reduce((collection, invite) => (
-          buildReplies(collection, invite, data, rootId)
-        ), {})
-
-        replies[alice.id].shareVersion = '1111.0.0'
-
-        alice.publish(replies[alice.id], (err, aliceReply) => {
+        buildReplies(invites, data, rootId, (err, replies) => {
           if (err) console.error(err)
 
-          bob.publish(replies[bob.id], (err, bobReply) => {
+          replies[alice.id].shareVersion = '1111.0.0'
+
+          alice.publish(replies[alice.id], (err, aliceReply) => {
             if (err) console.error(err)
 
-            recombine(rootId, (err, returnedSecret) => {
-              assert.ok(err, 'an error')
-              assert.notOk(returnedSecret, 'Does not return a secret')
-              next()
+            bob.publish(replies[bob.id], (err, bobReply) => {
+              if (err) console.error(err)
+
+              recombine(rootId, (err, returnedSecret) => {
+                assert.ok(err, 'an error')
+                assert.notOk(returnedSecret, 'Does not return a secret')
+                next()
+              })
             })
           })
         })
       })
     })
   })
+
   context('calls back with an error when given a rootId for which there is no root message', (assert, next) => {
     const rootId = '%g1gbRKarJT4au9De2r4aJ+MghFSAyQzjfVnnxtJNBBw=.sha256'
     recombine(rootId, (err, returnedSecret) => {
@@ -216,27 +216,44 @@ describe('recover.async.recombine (request v2 shards)', context => {
     return custodians.find(c => c.id === custodianId)
   }
 
-  function buildReplies (collection, invite, data, rootId) {
-    var content = getContent(invite)
-    var custodianId = content.recps.find(notMe)
-    var shard = data.shards.map(getContent)
-      .find(shard => shard.recps.find(recp => recp === custodianId))
-      .shard
+  function buildReplies (invites, data, rootId, cb) {
+    pull(
+      pull.values(invites),
+      pull.asyncMap((invite, callback) => {
+        var content = getContent(invite)
+        var custodianId = content.recps.find(notMe)
+        var shard = data.shards.map(getContent)
+          .find(shard => shard.recps.find(recp => recp === custodianId))
+          .shard
 
-    const unboxedShare = unbox(shard, findCustodian(custodianId).keys)
-    const contextMessage = JSON.stringify({ rootId, recp: custodianId })
-    const boxedShare = server.ephemeral.boxMessage(unboxedShare, content.ephPublicKey, contextMessage)
-    collection[custodianId] = {
-      type: 'invite-reply',
-      root: rootId,
-      branch: invite.key,
-      accept: true,
-      version: '1',
-      shareVersion: '2.0.0',
-      body: boxedShare,
-      recps: content.recps
-    }
-
-    return collection
+        const unboxedShare = unbox(shard, findCustodian(custodianId).keys)
+        const contextMessage = { rootId, recp: custodianId }
+        server.ephemeral.boxMessage(unboxedShare, content.ephPublicKey, contextMessage, (err, boxedShare) => {
+          if (err) cb(err)
+          callback(null,
+            { custodianId,
+              reply: {
+                type: 'invite-reply',
+                root: rootId,
+                branch: invite.key,
+                accept: true,
+                version: '1',
+                shareVersion: '2.0.0',
+                body: boxedShare,
+                recps: content.recps
+              }
+            }
+          )
+        })
+      }),
+      pull.collect((err, repliesArray) => {
+        if (err) cb(err)
+        var replies = {}
+        repliesArray.forEach(reply => {
+          replies[reply.custodianId] = reply.reply
+        })
+        cb(null, replies)
+      })
+    )
   }
 })
