@@ -234,7 +234,7 @@ describe('share.async.share', context => {
                   data.shards.map(s => s.value.content.attachment).forEach(attached => (
                     assert.deepEqual(
                       attached,
-                      unpackLink(attachment.link).blobId,
+                      { name: attachment.name, blobId: unpackLink(attachment.link).blobId },
                       'shard contains blob reference'
                     )
                   ))
