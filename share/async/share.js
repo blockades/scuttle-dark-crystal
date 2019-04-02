@@ -38,7 +38,7 @@ module.exports = function (server) {
         var { blobId, blobKey } = unpackLink(attachment.link)
       } catch (err) { return callback(err) }
       label = blobKey
-      attachment = blobId
+      attachment = { name: attachment.name, blobId }
     }
 
     if (!label) label = name
