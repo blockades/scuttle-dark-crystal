@@ -1,4 +1,4 @@
-const { isFeed, isBlobId, isLink } = require('ssb-ref')
+const { isFeed, isLink } = require('ssb-ref')
 
 const PublishRoot = require('../../root/async/publish')
 const PublishRitual = require('../../ritual/async/publish')
@@ -10,7 +10,6 @@ const isNumber = require('../../lib/isNumber')
 const isString = require('../../lib/isString')
 const isFunction = require('../../lib/isFunction')
 const assert = require('../../lib/assert')
-
 
 module.exports = function (server) {
   const publishRoot = PublishRoot(server)
@@ -35,7 +34,9 @@ module.exports = function (server) {
     if (attachment) {
       if (!isString(attachment.name)) return callback(new Error('data.attachment.name: provide an attachment name'))
       if (!isLink(attachment.link)) return callback(new Error('data.attachment.link: referenced schema does not match'))
-      var { blobId, blobKey } = unpackLink(attachment.link)
+      try {
+        var { blobId, blobKey } = unpackLink(attachment.link)
+      } catch (err) { return callback(err) }
       label = blobKey
       attachment = blobId
     }
