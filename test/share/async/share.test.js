@@ -115,7 +115,15 @@ describe('share.async.share', context => {
     })
   })
 
-  // TODO: 'throws an error when given unencrypted blob reference'
+  context('throws an error when given an unencrypted blob reference', (assert, next) => {
+    attachment.link = '&ERGA0oJCELz2s4sr47f75iXZComB/2akzZq+IpcuqDs=.sha256'
+    share({ name, secret, quorum, recps, attachment }, (err, data) => {
+      assert.ok(err, 'raises error')
+      assert.notOk(data, 'data is undefined')
+      assert.equal(err.message, 'Blob not encrypted')
+      next()
+    })
+  })
 
   context('publishes a root, a ritual and the shards', (assert, next) => {
     share({ name, secret, quorum, recps }, (err, data) => {
