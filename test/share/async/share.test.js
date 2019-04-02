@@ -1,6 +1,7 @@
 const { describe } = require('tape-plus')
 const pull = require('pull-stream')
 const Server = require('../../testbot')
+const unpackLink = require('../../../lib/unpackLink')
 
 const Share = require('../../../share/async/share')
 
@@ -22,7 +23,9 @@ describe('share.async.share', context => {
     quorum = 3
     attachment = {
       name: 'gossip.json',
-      link: '&ERGA0oJCELz2s4sr47f75iXZComB/2akzZq+IpcuqDs=.sha256'
+      link: '&ERGA0oJCELz2s4sr47f75iXZComB/2akzZq+IpcuqDs=.sha256?unbox=qTWboArROGUrRUjniZGSxh9zcqpdjCSAsJSWYBRqhyQ=.boxs',
+      size: 66300,
+      type: 'application/json'
     }
   })
 
@@ -101,7 +104,7 @@ describe('share.async.share', context => {
   })
 
   context('invalid attachment', (assert, next) => {
-    attachment = { link: 'not a blobId', name: 'name' }
+    attachment.link = 'not a valid link'
 
     share({ name, secret, quorum, recps, attachment }, (err, data) => {
       assert.ok(err, 'raises error')
@@ -111,6 +114,8 @@ describe('share.async.share', context => {
       next()
     })
   })
+
+  // TODO: 'throws an error when given unencrypted blob reference'
 
   context('publishes a root, a ritual and the shards', (assert, next) => {
     share({ name, secret, quorum, recps }, (err, data) => {
@@ -189,7 +194,7 @@ describe('share.async.share', context => {
     })
   })
 
-  context('Sends the attachment with each shard message', (assert, next) => {
+  context('Handles encrypted blob attachment', (assert, next) => {
     share({ name, secret, quorum, recps, attachment }, (err, data) => {
       assert.notOk(err, 'error is null')
       assert.ok(data, 'returns the data')
@@ -219,9 +224,12 @@ describe('share.async.share', context => {
                   assert.deepEqual(data.shards.map(trim), shards.map(trim), 'publishes a set of shards')
 
                   data.shards.map(s => s.value.content.attachment).forEach(attached => (
-                    assert.deepEqual(attached, attachment, 'shard contains attachment')
+                    assert.deepEqual(
+                      attached,
+                      unpackLink(attachment.link).blobId,
+                      'shard contains blob reference'
+                    )
                   ))
-
                   next()
                 })
               )
