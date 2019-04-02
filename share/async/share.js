@@ -1,13 +1,16 @@
-const { isFeed, isBlobId } = require('ssb-ref')
+const { isFeed, isBlobId, isLink } = require('ssb-ref')
 
 const PublishRoot = require('../../root/async/publish')
 const PublishRitual = require('../../ritual/async/publish')
 const PublishAllShards = require('../../shard/async/publish-all')
 
 const secrets = require('dark-crystal-secrets')
+const unpackLink = require('../../lib/unpackLink')
 const isNumber = require('../../lib/isNumber')
 const isString = require('../../lib/isString')
 const isFunction = require('../../lib/isFunction')
+const assert = require('../../lib/assert')
+
 
 module.exports = function (server) {
   const publishRoot = PublishRoot(server)
@@ -23,19 +26,22 @@ module.exports = function (server) {
       recps,
       attachment
     } = params
-
-    if (!name && !isString(name)) throw new Error('name must be a string')
-    if (!secret && !isString(secret)) throw new Error('secret must be a string')
-    if (!isNumber(quorum)) throw new Error('quorum must be a number')
-    if (!Array.isArray(recps)) throw new Error('recps must be an array')
-    if (!isFunction(callback)) throw new Error('callback is not a function')
-    if (!label) label = name
-    if (!isString(label)) throw new Error('label must be a string')
+    assert((name && isString(name)), 'name must be a string')
+    assert((secret && isString(secret)), 'secret must be a string')
+    assert((isNumber(quorum)), 'quorum must be a number')
+    assert((Array.isArray(recps)), 'recps must be an array')
+    assert((isFunction(callback)), 'callback must be a function')
 
     if (attachment) {
       if (!isString(attachment.name)) return callback(new Error('data.attachment.name: provide an attachment name'))
-      if (!isBlobId(attachment.link)) return callback(new Error('data.attachment.link: referenced schema does not match'))
+      if (!isLink(attachment.link)) return callback(new Error('data.attachment.link: referenced schema does not match'))
+      var { blobId, blobKey } = unpackLink(attachment.link)
+      label = blobKey
+      attachment = blobId
     }
+
+    if (!label) label = name
+    assert((isString(label)), 'label must be a string')
 
     let feedIds = recps
       .map(recp => typeof recp === 'string' ? recp : recp.link)
@@ -67,7 +73,6 @@ module.exports = function (server) {
         //
         publishAllShards({ shards, recps: recipients, rootId, attachment }, (err, shards) => {
           if (err) return callback(err)
-
           callback(null, {
             root: root,
             ritual: ritual,
