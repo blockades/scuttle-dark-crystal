@@ -56,6 +56,14 @@ module.exports = {
       fromOthersByRoot: require('./forward/pull/from-others-by-root')
     }
   },
+  forwardRequest: {
+    async: {
+      publish: require('./forward-request/async/publish')
+    },
+    pull: {
+      fromSelf: require('./forward/pull/from-self')
+    }
+  },
   sync: {
     isRitual: () => isRitual,
     isRoot: () => isRoot,
