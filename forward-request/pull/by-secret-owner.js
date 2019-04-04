@@ -4,8 +4,8 @@ const { isForwardRequest } = require('ssb-dark-crystal-schema')
 const { isFeedId } = require('ssb-ref')
 
 module.exports = function (server) {
-  return function byAuthor (author, opts = {}) {
-    assert(isFeedId(author), 'author must be a valid feedId')
+  return function bySecretOwner (secretOwner, opts = {}) {
+    assert(isFeedId(secretOwner), 'secretOwner must be a valid feedId')
     const query = [{
       $filter: {
         value: {
@@ -16,7 +16,7 @@ module.exports = function (server) {
     }, {
       $filter: {
         value: {
-          author
+          content: { secretOwner }
         }
       }
     }]
