@@ -58,7 +58,7 @@ module.exports = {
   },
   forwardRequest: {
     async: {
-      publish: require('./forward-request/async/publish')
+      publishAll: require('./forward-request/async/publish-all')
     },
     pull: {
       fromSelf: require('./forward-request/pull/from-self'),
