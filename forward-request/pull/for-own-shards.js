@@ -9,6 +9,8 @@ module.exports = function (server) {
   return function forOwnShards (opts = {}) {
     return pull(
       shardsFromOthers(),
+      // This query is specific to recovering SSB identities
+      pull.filter(shard => get(shard, 'value.content.attachment.name') === 'gossip.json'),
       pull.unique(s => get(s, 'value.author')),
       pull.map(shard => {
         pull(
