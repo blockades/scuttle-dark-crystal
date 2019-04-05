@@ -62,7 +62,7 @@ module.exports = {
     },
     pull: {
       fromSelf: require('./forward-request/pull/from-self'),
-      forOwnShards: require('./foward-request/pull/for-own-shards')
+      forOwnShards: require('./forward-request/pull/for-own-shards')
     }
   },
   sync: {
