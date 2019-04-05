@@ -61,8 +61,8 @@ module.exports = {
       publish: require('./forward-request/async/publish')
     },
     pull: {
-      fromSelf: require('./forward/pull/from-self'),
-      forOwnShards: require('./foward/pull/for-own-shards')
+      fromSelf: require('./forward-request/pull/from-self'),
+      forOwnShards: require('./foward-request/pull/for-own-shards')
     }
   },
   sync: {
