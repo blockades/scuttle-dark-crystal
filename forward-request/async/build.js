@@ -1,8 +1,7 @@
-const { isForwardRequest } = require('ssb-dark-crystal-schema')
-const publish = require('../../lib/publish-msg')
+const { isForwardRequest, errorParser } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
-  return function publishRitual ({ secretOwner, recp }, callback) {
+  return function buildForwardRequest ({ secretOwner, recp }, callback) {
     var content = {
       type: 'dark-crystal/forward-request',
       version: '1.0.0',
@@ -14,6 +13,6 @@ module.exports = function (server) {
 
     if (!isForwardRequest(content)) return callback(isForwardRequest.errors)
 
-    publish(server)(content, callback)
+    callback(null, content)
   }
 }
