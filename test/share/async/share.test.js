@@ -1,13 +1,14 @@
 const { describe } = require('tape-plus')
 const pull = require('pull-stream')
 const Server = require('../../testbot')
+const unpackLink = require('../../../lib/unpackLink')
 
 const Share = require('../../../share/async/share')
 
 describe('share.async.share', context => {
   let server
   let share
-  let recps, name, secret, quorum
+  let recps, name, secret, quorum, attachment
 
   context.beforeEach(c => {
     server = Server()
@@ -20,6 +21,12 @@ describe('share.async.share', context => {
     name = 'My SBB Dark Crystal'
     secret = Math.random().toString(36)
     quorum = 3
+    attachment = {
+      name: 'gossip.json',
+      link: '&ERGA0oJCELz2s4sr47f75iXZComB/2akzZq+IpcuqDs=.sha256?unbox=qTWboArROGUrRUjniZGSxh9zcqpdjCSAsJSWYBRqhyQ=.boxs',
+      size: 66300,
+      type: 'application/json'
+    }
   })
 
   context.afterEach(c => {
@@ -96,6 +103,28 @@ describe('share.async.share', context => {
     })
   })
 
+  context('invalid attachment', (assert, next) => {
+    attachment.link = 'not a valid link'
+
+    share({ name, secret, quorum, recps, attachment }, (err, data) => {
+      assert.ok(err, 'raises error')
+      assert.notOk(data, 'data is undefined')
+      assert.equal(err.message, 'data.attachment.link: referenced schema does not match')
+
+      next()
+    })
+  })
+
+  context('throws an error when given an unencrypted blob reference', (assert, next) => {
+    attachment.link = '&ERGA0oJCELz2s4sr47f75iXZComB/2akzZq+IpcuqDs=.sha256'
+    share({ name, secret, quorum, recps, attachment }, (err, data) => {
+      assert.ok(err, 'raises error')
+      assert.notOk(data, 'data is undefined')
+      assert.equal(err.message, 'Blob not encrypted')
+      next()
+    })
+  })
+
   context('publishes a root, a ritual and the shards', (assert, next) => {
     share({ name, secret, quorum, recps }, (err, data) => {
       assert.notOk(err, 'error is null')
@@ -133,6 +162,7 @@ describe('share.async.share', context => {
       )
     })
   })
+
   context('publishes a root, a ritual and the shards, when a label is given', (assert, next) => {
     const label = 'Give this key to your nearest and dearest'
     share({ name, secret, quorum, label, recps }, (err, data) => {
@@ -162,6 +192,52 @@ describe('share.async.share', context => {
                 pull.collect((err, shards) => {
                   assert.notOk(err, 'no error')
                   assert.deepEqual(data.shards.map(trim), shards.map(trim), 'publishes a set of shards')
+                  next()
+                })
+              )
+            })
+          )
+        })
+      )
+    })
+  })
+
+  context('Handles encrypted blob attachment', (assert, next) => {
+    share({ name, secret, quorum, recps, attachment }, (err, data) => {
+      assert.notOk(err, 'error is null')
+      assert.ok(data, 'returns the data')
+
+      const pullType = (type) => server.query.read({
+        query: [{
+          $filter: { value: { content: { type } } }
+        }]
+      })
+
+      pull(
+        pullType('dark-crystal/root'),
+        pull.collect((err, roots) => {
+          if (err) console.error(err)
+          assert.deepEqual(trim(data.root), trim(roots[0]), 'publishes a root')
+
+          pull(
+            pullType('dark-crystal/ritual'),
+            pull.collect((err, rituals) => {
+              if (err) console.error(err)
+              assert.deepEqual(trim(data.ritual), trim(rituals[0]), 'publishes a single ritual')
+
+              pull(
+                pullType('dark-crystal/shard'),
+                pull.collect((err, shards) => {
+                  assert.notOk(err, 'no error')
+                  assert.deepEqual(data.shards.map(trim), shards.map(trim), 'publishes a set of shards')
+
+                  data.shards.map(s => s.value.content.attachment).forEach(attached => (
+                    assert.deepEqual(
+                      attached,
+                      { name: attachment.name, blobId: unpackLink(attachment.link).blobId },
+                      'shard contains blob reference'
+                    )
+                  ))
                   next()
                 })
               )
