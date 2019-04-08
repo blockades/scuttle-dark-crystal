@@ -3,7 +3,7 @@ const next = require('pull-next-query')
 const { isForwardRequest } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
-  return function friends (opts = {}) {
+  return function fromSelf (opts = {}) {
     const query = [{
       $filter: {
         value: {
