@@ -12,12 +12,12 @@ module.exports = function (server) {
       // This query is specific to recovering SSB identities
       pull.filter(shard => get(shard, 'value.content.attachment.name') === 'gossip.json'),
       pull.unique(s => get(s, 'value.author')),
-      pull.map(shard => {
+      pull.asyncMap((shard, cb) => {
         pull(
           forwardRequestBySecretOwner(get(shard, 'value.author')),
           pull.collect((err, forwards) => {
-            if (err) return err
-            return forwards
+            if (err) cb(err)
+            cb(null, forwards)
           })
         )
       })
