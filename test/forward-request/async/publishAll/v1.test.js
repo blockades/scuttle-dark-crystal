@@ -53,9 +53,9 @@ describe('forwardRequest.async.publish', context => {
   context('fails to publish all with single invalid recp', (assert, next) => {
     recps[0] = 'this is not a feedId'
 
-    publishAll({ secretOwner, recps }, (err, forwardRequests) => {
+    publishAll({ secretOwner, recps }, (err, recipients) => {
       assert.ok(err, 'produces error')
-      assert.notOk(forwardRequests, 'forward object is null')
+      assert.equal(recps, recipients, 'returns invalid recps')
       next()
     })
   })
