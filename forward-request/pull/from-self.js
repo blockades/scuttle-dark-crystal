@@ -14,7 +14,7 @@ module.exports = function (server) {
     }, {
       $filter: {
         value: {
-          author: { $ne: server.id }
+          author: server.id
         }
       }
     }]
