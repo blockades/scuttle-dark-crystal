@@ -4,9 +4,12 @@ const get = require('lodash.get')
 const PullShardsByRoot = require('../../shard/pull/by-root')
 const buildForward = require('./build')
 const publish = require('../../lib/publish-msg')
+const PullForwardRequestsSecretOwner = require('../../forward-request/pull/by-secret-owner')
+
 
 module.exports = function (server) {
   const pullShardsByRoot = PullShardsByRoot(server)
+  const pullForwardRequestsSecretOwner = PullForwardRequestsSecretOwner(server)
   return function publishForward (root, recp, callback) {
     if (!ref.isMsgId(root)) return callback(new Error('Invalid rootId'))
     pull(
@@ -25,16 +28,26 @@ module.exports = function (server) {
         if (get(shards[0], 'value.author') === recp) {
           return callback(new Error('You may not forward a shard to its author. Use reply instead.'))
         }
+        pull(
+          pullForwardRequestsSecretOwner(get(shards[0], 'value.author')),
+          pull.collect((err, forwardRequests) => {
+            var requestId = null
+            if (err) return callback(err)
+            if (forwardRequests.length > 0) {
+              requestId = forwardRequests[0]
+            }
 
-        const shareVersion = get(shards[0], 'value.content.version')
-        const shardId = get(shards[0], 'key')
-        const shard = get(shards[0], 'value.content.shard')
+            const shareVersion = get(shards[0], 'value.content.version')
+            const shardId = get(shards[0], 'key')
+            const shard = get(shards[0], 'value.content.shard')
 
-        buildForward(server)({ root, shard, shardId, shareVersion, recp }, (err, content) => {
-          if (err) return callback(err)
+            buildForward(server)({ root, shard, shardId, requestId, shareVersion, recp }, (err, content) => {
+              if (err) return callback(err)
 
-          publish(server)(content, callback)
-        })
+              publish(server)(content, callback)
+            })
+          })
+        )
       })
     )
   }

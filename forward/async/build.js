@@ -1,7 +1,7 @@
 const isForward = require('../../isForward')
 
 module.exports = function buildShard (server) {
-  return function ({ root, shard, shardId, shareVersion, recp }, cb) {
+  return function ({ root, shard, shardId, requestId, shareVersion, recp }, cb) {
     // this undoes the privatebox packing we've used to encrypt shards
     server.private.unbox(shard, (err, theDecryptedShard) => {
       if (err) return cb(err)
@@ -12,6 +12,7 @@ module.exports = function buildShard (server) {
         root,
         shard: theDecryptedShard,
         shardId,
+        requestId,
         shareVersion,
         recps: [recp, server.id]
       }
