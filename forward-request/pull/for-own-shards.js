@@ -7,6 +7,10 @@ const { get } = require('lodash')
 module.exports = function (server) {
   const shardsFromOthers = ShardsFromOthers(server)
   return function forOwnShards (filter, opts = {}) {
+    if ((typeof filter === 'object') && (opts === null)) {
+      opts = filter
+      filter = null
+    }
     if (!filter) filter = thing => thing
     return pull(
       shardsFromOthers(),
