@@ -6,11 +6,11 @@ const { get } = require('lodash')
 
 module.exports = function (server) {
   const shardsFromOthers = ShardsFromOthers(server)
-  return function forOwnShards (opts = {}) {
+  return function forOwnShards (filter, opts = {}) {
+    if (!filter) filter = thing => thing
     return pull(
       shardsFromOthers(),
-      // This query is specific to recovering SSB identities
-      pull.filter(shard => get(shard, 'value.content.attachment.name') === 'gossip.json'),
+      pull.filter(filter),
       pull.unique(s => get(s, 'value.author')),
       pull.asyncMap((shard, cb) => {
         pull(
