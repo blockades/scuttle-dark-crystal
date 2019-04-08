@@ -1,4 +1,4 @@
-const { isRitual, isRoot, isShard, isForward } = require('ssb-dark-crystal-schema')
+const { isRitual, isRoot, isShard, isForward, isForwardRequest } = require('ssb-dark-crystal-schema')
 const isRequest = require('./isRequest')
 const isReply = require('./isReply')
 
@@ -71,6 +71,7 @@ module.exports = {
     isShard: () => isShard,
     isForward: () => isForward,
     isRequest: () => isRequest,
-    isReply: () => isReply
+    isReply: () => isReply,
+    isForwardRequest: () => isForwardRequest
   }
 }
