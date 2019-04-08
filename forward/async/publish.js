@@ -6,7 +6,6 @@ const buildForward = require('./build')
 const publish = require('../../lib/publish-msg')
 const PullForwardRequestsSecretOwner = require('../../forward-request/pull/by-secret-owner')
 
-
 module.exports = function (server) {
   const pullShardsByRoot = PullShardsByRoot(server)
   const pullForwardRequestsSecretOwner = PullForwardRequestsSecretOwner(server)
