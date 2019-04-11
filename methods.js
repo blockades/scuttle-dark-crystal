@@ -61,6 +61,7 @@ module.exports = {
       publishAll: require('./forward-request/async/publish-all')
     },
     pull: {
+      bySecretOwner: require('./forward-request/pull/by-secret-owner'),
       fromSelf: require('./forward-request/pull/from-self'),
       forOwnShards: require('./forward-request/pull/for-own-shards')
     }

@@ -12,11 +12,11 @@ module.exports = function (server) {
       opts = filter
       filter = null
     }
-    if (!filter) filter = () => true // don't filter anything
+    if (!filter) filter = () => { return true } // don't filter anything
 
     return pull(
       shardsFromOthers(),
-      pull.filter(filter),
+      // pull.filter(filter),
       pull.unique(s => get(s, 'value.author')),
       pull.asyncMap((shard, cb) => {
         pull(
