@@ -16,7 +16,7 @@ module.exports = function (server) {
 
     return pull(
       shardsFromOthers(),
-      // pull.filter(filter),
+      pull.filter(filter),
       pull.unique(s => get(s, 'value.author')),
       pull.asyncMap((shard, cb) => {
         pull(
