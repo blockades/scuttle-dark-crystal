@@ -8,7 +8,7 @@ const Server = require('../../../testbot')
 describe('forwardRequest.async.publish', context => {
   let server
   let publishAll
-  let secretOwner, recp
+  let secretOwner, recps
 
   context.beforeEach(c => {
     server = Server()
