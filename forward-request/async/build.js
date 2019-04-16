@@ -1,4 +1,4 @@
-const { isForwardRequest, errorParser } = require('ssb-dark-crystal-schema')
+const { isForwardRequest } = require('ssb-dark-crystal-schema')
 
 module.exports = function (server) {
   return function buildForwardRequest ({ secretOwner, recp }, callback) {
