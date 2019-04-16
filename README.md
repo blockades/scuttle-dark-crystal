@@ -85,14 +85,14 @@ Returns a stream of shard messages identified by root id.  Takes `opts` - standa
 Returns a stream of shards others have shared with you. Takes `opts` - standard stream options like `live`, `reverse` etc.
 
 
-
 ### Shard forward methods 
 
-#### `darkCrystal.forward.async.publish(root, recp, callback)`
+#### `darkCrystal.forward.async.publish({ root, recp, requestId } callback)`
 
-Takes arguments
+Takes an object with properties: 
 - `root` the id of the root message with which the shard is associated
 - `recp` the feedId of the recipient of the forwarded shard
+- `requestId` the id of an associated `dark-crystal/forward-request` message (optional)
 
 Publishes a forward message which allows a shard to be sent to someone other than the owner of the secret.
 
@@ -104,6 +104,30 @@ Returns a stream of forwarded shard messages identified by root id.  Takes `opts
 
 Returns a stream of all forwarded shards you have recieved. Takes `opts` - standard stream options like `live`, `reverse` etc.
 
+### Forward request methods
+
+#### `darkCrystal.forwardRequest.async.publish-all({ secretOwner, recps })` 
+
+Takes an object with properties:
+- `secretOwner` the feedId of the owner of the secret of which the shards are being requested
+- `recps` an array of feedIds of the recipients of the request (who should be the holders of the shards being requested)
+
+Publishes a request to the given recipients that they forward you shards. Note that the request does not specify a rootId, since we can assume the rootId is unknown to the person requesting a forward. Forward requests are currently optional. 
+
+#### `darkCrystal.forwardRequest.pull.bySecretOwner(secretOwner, opts)`
+
+Returns a stream of forward requests for shards authored by a given feedId.
+`opts` are standard stream options.
+
+#### `darkCrystal.forwardRequest.pull.forOwnShards(filter, opts)`
+
+Returns a stream of forward requests for shards which you hold. `filter` is an optional argument which, if given, is a function returning a boolean which is applied as a filter to the stream. 
+`opts` are standard stream options.
+
+#### `darkCrystal.forwardRequest.pull.fromSelf(opts)`
+
+Returns a stream of forward requests which you authored (to others).
+`opts` are standard stream options.
 
 ### Validators
 
