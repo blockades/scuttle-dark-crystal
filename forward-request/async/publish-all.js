@@ -1,5 +1,5 @@
 const pull = require('pull-stream')
-const { isMsg, isFeed } = require('ssb-ref')
+const { isFeed } = require('ssb-ref')
 
 const buildForwardRequest = require('../async/build')
 const publish = require('../../lib/publish-msg')
