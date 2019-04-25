@@ -5,13 +5,13 @@ const buildShard = require('../async/build')
 const publish = require('../../lib/publish-msg')
 
 module.exports = function (server) {
-  return function publishAll ({ shards, recps, rootId }, callback) {
+  return function publishAll ({ shards, recps, rootId, attachment }, callback) {
     if (!validRecps(recps)) return callback(new Error('shards publishAll: all recps must be valid feedIds', recps))
     if (!isMsg(rootId)) return callback(new Error('shard publishAll: invalid rootId', rootId))
     if (shards.length !== recps.length) return callback(new Error('shard publishAll: need as many shards as recps'))
 
     const opts = shards.map((shard, i) => {
-      return { root: rootId, shard, recp: recps[i] }
+      return { root: rootId, shard, recp: recps[i], attachment }
     })
 
     pull(

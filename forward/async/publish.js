@@ -7,7 +7,7 @@ const publish = require('../../lib/publish-msg')
 
 module.exports = function (server) {
   const pullShardsByRoot = PullShardsByRoot(server)
-  return function publishForward (root, recp, callback) {
+  return function publishForward ({ root, recp, requestId }, callback) {
     if (!ref.isMsgId(root)) return callback(new Error('Invalid rootId'))
     pull(
       pullShardsByRoot(root),
@@ -27,12 +27,11 @@ module.exports = function (server) {
         }
 
         const shareVersion = get(shards[0], 'value.content.version')
-
+        const shardId = get(shards[0], 'key')
         const shard = get(shards[0], 'value.content.shard')
 
-        buildForward(server)({ root, shard, shareVersion, recp }, (err, content) => {
+        buildForward(server)({ root, shard, shardId, requestId, shareVersion, recp }, (err, content) => {
           if (err) return callback(err)
-
           publish(server)(content, callback)
         })
       })

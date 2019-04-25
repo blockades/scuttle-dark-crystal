@@ -34,6 +34,8 @@ describe('shard.async.publishAll', context => {
 
   context('publishes all shards', (assert, next) => {
     publishAll({ shards, recps, rootId }, (err, publishedShards) => {
+      console.log(publishedShards[0])
+      console.log(publishedShards[0].value.content)
       assert.notOk(err, 'error is null')
       assert.ok(Array.isArray(publishedShards), 'returns some data')
       assert.equal(publishedShards.length, shards.length, 'publishes one message for each recipient')

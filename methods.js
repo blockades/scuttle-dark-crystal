@@ -1,4 +1,4 @@
-const { isRitual, isRoot, isShard, isForward } = require('ssb-dark-crystal-schema')
+const { isRitual, isRoot, isShard, isForward, isForwardRequest } = require('ssb-dark-crystal-schema')
 const isRequest = require('./isRequest')
 const isReply = require('./isReply')
 
@@ -56,12 +56,23 @@ module.exports = {
       fromOthersByRoot: require('./forward/pull/from-others-by-root')
     }
   },
+  forwardRequest: {
+    async: {
+      publishAll: require('./forward-request/async/publish-all')
+    },
+    pull: {
+      bySecretOwner: require('./forward-request/pull/by-secret-owner'),
+      fromSelf: require('./forward-request/pull/from-self'),
+      forOwnShards: require('./forward-request/pull/for-own-shards')
+    }
+  },
   sync: {
     isRitual: () => isRitual,
     isRoot: () => isRoot,
     isShard: () => isShard,
     isForward: () => isForward,
     isRequest: () => isRequest,
-    isReply: () => isReply
+    isReply: () => isReply,
+    isForwardRequest: () => isForwardRequest
   }
 }
