@@ -7,16 +7,9 @@ const { get } = require('lodash')
 module.exports = function (server) {
   const shardsFromOthers = ShardsFromOthers(server)
 
-  return function forOwnShards (filter, opts = {}) {
-    if ((typeof filter === 'object') && (opts === null)) {
-      opts = filter
-      filter = null
-    }
-    if (!filter) filter = () => { return true } // don't filter anything
-
+  return function forOwnShards (opts = {}) {
     return pull(
       shardsFromOthers(),
-      pull.filter(filter),
       pull.unique(s => get(s, 'value.author')),
       pull.asyncMap((shard, cb) => {
         pull(
