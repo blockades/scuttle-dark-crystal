@@ -2,6 +2,7 @@ const { describe } = require('tape-plus')
 const Server = require('../../testbot')
 const DeleteKeyPairs = require('../../../recover/async/deleteEphemeralKeyPairs')
 const pull = require('pull-stream')
+const contextMessage = 'only for testing deletion of ephemeral keypairs'
 
 describe('recover.async.deleteEphemeralKeyPairs', context => {
   let server, deleteKeyPairs, custodians, replies
@@ -44,7 +45,7 @@ describe('recover.async.deleteEphemeralKeyPairs', context => {
     pull(
       pull.values(custodians),
       pull.asyncMap((custodian, cb) => {
-        server.ephemeral.boxMessage('something', testPubKey, (err, cipherText) => {
+        server.ephemeral.boxMessage('something', testPubKey, contextMessage, (err, cipherText) => {
           if (err) console.error(err)
           replies[custodian.id].body = cipherText
           custodian.publish(replies[custodian.id], (err, reply) => {
@@ -63,7 +64,7 @@ describe('recover.async.deleteEphemeralKeyPairs', context => {
         deleteKeyPairs(rootId, (err) => {
           assert.notOk(err, 'null errors')
           custodianKeys.forEach(custodianKey => {
-            server.ephemeral.boxMessage('something', custodianKey.ephPublicKey, (err, cipherText) => {
+            server.ephemeral.boxMessage('something', custodianKey.ephPublicKey, contextMessage, (err, cipherText) => {
               if (err) console.error(err)
               server.ephemeral.unBoxMessage(custodianKey.dbKey, cipherText, (err, message) => {
                 assert.ok(err, 'throws an error when attempting to use a key')
