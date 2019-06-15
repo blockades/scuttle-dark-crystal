@@ -66,7 +66,7 @@ describe('recover.async.deleteEphemeralKeyPairs', context => {
           custodianKeys.forEach(custodianKey => {
             server.ephemeral.boxMessage('something', custodianKey.ephPublicKey, contextMessage, (err, cipherText) => {
               if (err) console.error(err)
-              server.ephemeral.unBoxMessage(custodianKey.dbKey, cipherText, (err, message) => {
+              server.ephemeral.unBoxMessage(custodianKey.dbKey, cipherText, contextMessage, (err, message) => {
                 assert.ok(err, 'throws an error when attempting to use a key')
                 assert.notOk(message, 'returns no message')
               })
