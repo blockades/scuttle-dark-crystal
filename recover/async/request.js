@@ -26,15 +26,20 @@ module.exports = function (server) {
       recipients
         ? pull.filter(isShardForNamedRecipient)
         : pull.through(),
-      pull.map(shard => {
+      pull.asyncMap((shard, cb) => {
         const { recps } = getContent(shard)
-        return {
-          type: 'invite', // is over-written by invites.async.private.publish
-          version: '1', // ditto
-          root: rootId,
-          recps,
-          body: "Hi you've been holding a shard for me, can I please have it back?"
-        }
+
+        server.ephemeral.generateAndStore({ rootId, recp: recps.find(notMe) }, (err, ephPublicKey) => {
+          if (err) cb(err)
+          cb(null, {
+            type: 'invite', // is over-written by invites.async.private.publish
+            version: '1', // ditto
+            root: rootId,
+            recps,
+            body: 'Hi, you are holding a shard for me, can I please have it back?',
+            ephPublicKey
+          })
+        })
       }),
       pull.filter(isRequest),
       pull.collect((err, requests) => {
@@ -54,6 +59,10 @@ module.exports = function (server) {
 
       return recps.some(r => recipients.includes(r))
     }
+  }
+
+  function notMe (recp) {
+    return recp !== server.id
   }
 }
 

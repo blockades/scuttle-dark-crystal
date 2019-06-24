@@ -14,7 +14,7 @@ const isReply = require('../../../../isReply')
 const secret = 'under the cabbage tree'
 const label = 'location of the treasure'
 
-module.exports = function publishV1Data (server) {
+module.exports = function publishV2Data (server) {
   return function (cb) {
     const custodians = [
       server.createFeed(), // piet
@@ -129,15 +129,24 @@ function publishAll (server) {
           pull(
             pull.values(requestPairs),
             pull.asyncMap(({ feed, request, reply }, cb) => {
-              server.publish(request, (err, request) => {
-                if (err) return cb(err)
-
-                if (!reply) return cb(null, { request: unbox(request) })
-
-                reply.branch = [ request.key ] // how invites point to what they're replying to
-                feed.publish(reply, (err, reply) => {
+              const dbKey = { rootId: request.root, recp: request.recps.find(notMe) }
+              server.ephemeral.generateAndStore(dbKey, (err, ephPublicKey) => {
+                if (err) throw err
+                request.ephPublicKey = ephPublicKey
+                server.publish(request, (err, request) => {
                   if (err) return cb(err)
-                  cb(null, { request: unbox(request), reply: unbox(reply) })
+
+                  if (!reply) return cb(null, { request: unbox(request) })
+
+                  reply.branch = [ request.key ] // how invites point to what they're replying to
+                  server.ephemeral.boxMessage(reply.body, ephPublicKey, dbKey, (err, cipherText) => {
+                    if (err) return cb(err)
+                    reply.body = cipherText
+                    feed.publish(reply, (err, reply) => {
+                      if (err) return cb(err)
+                      cb(null, { request: unbox(request), reply: unbox(reply) })
+                    })
+                  })
                 })
               })
             }),
@@ -163,5 +172,9 @@ function publishAll (server) {
         })
       )
     })
+  }
+
+  function notMe (recp) {
+    return recp !== server.id
   }
 }

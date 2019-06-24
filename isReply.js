@@ -1,5 +1,6 @@
 const { isReply: _isReply } = require('ssb-dark-crystal-schema')
 const getContent = require('ssb-msg-content')
+const isString = require('./lib/isString')
 const { validateShard } = require('dark-crystal-secrets')
 
 module.exports = function isReply (msg) {
@@ -11,10 +12,21 @@ module.exports = function isReply (msg) {
   const errors = []
 
   if (!_isReply(msg)) errors.push(new Error('invalid reply'))
-  if (!validateShard(shard, shareVersion)) errors.push(new Error('invalid shard'))
+  if (!isString(shard)) {
+    errors.push(new Error('body must contain a string'))
+  } else {
+    if (!isBoxedShare(shard) || shareVersion === '1.0.0') {
+      if (!validateShard(shard, shareVersion)) errors.push(new Error('invalid shard'))
+    }
+  }
 
   if (!errors.length) return true
 
   isReply.errors = errors
   return false
+}
+
+// TODO: should we use isCanonicalBase64 ?
+function isBoxedShare (message) {
+  return /\.box$/.test(message)
 }

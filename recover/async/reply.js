@@ -15,7 +15,8 @@ module.exports = function (server) {
         value: {
           author: inviteAuthor,
           content: {
-            root: rootId
+            root: rootId,
+            ephPublicKey
           }
         }
       } = invite
@@ -58,12 +59,21 @@ module.exports = function (server) {
               root: rootId,
               branch: inviteId,
               accept: true,
-              body: theDecryptedShard,
               recps: [author, server.id],
               shareVersion: version
             }
 
-            invites.async.private.reply(inviteId, reply, callback)
+            if (ephPublicKey) {
+              const contextMessage = { rootId, recp: server.id }
+              server.ephemeral.boxMessage(theDecryptedShard, ephPublicKey, contextMessage, (err, shareToSend) => {
+                if (err) throw err
+                reply.body = shareToSend
+                invites.async.private.reply(inviteId, reply, callback)
+              })
+            } else {
+              reply.body = theDecryptedShard
+              invites.async.private.reply(inviteId, reply, callback)
+            }
           })
         })
       )
